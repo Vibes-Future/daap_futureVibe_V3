@@ -497,6 +497,7 @@ class VibesDApp {
             // Also get current balances of individual wallets
             const walletAddresses = {
                 feeCollectorSol: '6xW2ZYh16AhRR3teKAWK8v1BDkUTDyTPBEqvLyhPpSos',
+                feeCollectorUsdc: '6bHam5U8Z5Qnrky86HMQfCGaWX7ie5hdyvKpJzAAjGHj',
                 treasurySol: '5zKuHDrHFsaB6WbGGxjwRAtX2dP6Sze7qUWX9vyNq1AR',
                 secondarySol: '9JqWNcKYQCTGNM2aRdNAPk3hXfFBVUZHNdr668C9DcSn',
                 treasuryUsdc: 'Fypp3b43LduLMPWoTEaBimTbgdMzgSs2iYbcSXs9jf5R', // This will be converted to ATA
@@ -550,6 +551,32 @@ class VibesDApp {
                 this.secondaryUsdcAtaAddress = null;
             }
             
+            // For fee collector USDC, calculate the ATA
+            let feeCollectorUsdcBalance = 0;
+            try {
+                const usdcMint = new solanaWeb3.PublicKey('ChqSU5J7xaKaMHffaU3K6kdi2YyjbKpzK2Z5H7ogjY4F');
+                const [feeCollectorUsdcAta] = await solanaWeb3.PublicKey.findProgramAddress(
+                    [
+                        new solanaWeb3.PublicKey(walletAddresses.feeCollectorUsdc).toBytes(),
+                        new solanaWeb3.PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA').toBytes(),
+                        usdcMint.toBytes(),
+                    ],
+                    new solanaWeb3.PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
+                );
+                
+                const feeCollectorUsdcAccount = await this.connection.getAccountInfo(feeCollectorUsdcAta);
+                if (feeCollectorUsdcAccount) {
+                    const tokenData = new DataView(feeCollectorUsdcAccount.data.buffer);
+                    feeCollectorUsdcBalance = Number(tokenData.getBigUint64(64, true));
+                }
+                
+                // Store the calculated ATA for the UI
+                this.feeCollectorUsdcAtaAddress = feeCollectorUsdcAta.toString();
+            } catch (e) {
+                console.log('Could not read fee collector USDC balance:', e.message);
+                this.feeCollectorUsdcAtaAddress = null;
+            }
+            
             // Store admin fund data
             this.adminFundData = {
                 // Historical totals from contract tracking
@@ -563,6 +590,7 @@ class VibesDApp {
                 // Current wallet balances
                 currentBalances: {
                     feeCollectorSol: feeCollectorSolBalance / Math.pow(10, 9),
+                    feeCollectorUsdc: feeCollectorUsdcBalance / Math.pow(10, 6),
                     treasurySol: treasurySolBalance / Math.pow(10, 9),
                     secondarySol: secondarySolBalance / Math.pow(10, 9),
                     treasuryUsdc: treasuryUsdcBalance / Math.pow(10, 6),
@@ -576,16 +604,18 @@ class VibesDApp {
                 lastUpdated: new Date(),
                 // Use CURRENT balances for accurate totals (historical data from contract might be incorrect)
                 totalRaisedSol: (feeCollectorSolBalance + treasurySolBalance + secondarySolBalance) / Math.pow(10, 9),
-                totalRaisedUsdc: (treasuryUsdcBalance + secondaryUsdcBalance) / Math.pow(10, 6), // Fee collector doesn't hold USDC
+                totalRaisedUsdc: (feeCollectorUsdcBalance + treasuryUsdcBalance + secondaryUsdcBalance) / Math.pow(10, 6), // Include fee collector USDC
                 
                 // Store calculated ATAs
-                secondaryUsdcAta: this.secondaryUsdcAtaAddress
+                secondaryUsdcAta: this.secondaryUsdcAtaAddress,
+                feeCollectorUsdcAta: this.feeCollectorUsdcAtaAddress
             };
             
             // Debug logging for verification
             console.log('📊 ADMIN FUND DATA CALCULATION DEBUG:');
             console.log('===========================================');
             console.log(`Fee Collector SOL: ${(feeCollectorSolBalance / Math.pow(10, 9)).toFixed(6)} SOL`);
+            console.log(`Fee Collector USDC: ${(feeCollectorUsdcBalance / Math.pow(10, 6)).toFixed(2)} USDC`);
             console.log(`Treasury SOL: ${(treasurySolBalance / Math.pow(10, 9)).toFixed(6)} SOL`);
             console.log(`Secondary SOL: ${(secondarySolBalance / Math.pow(10, 9)).toFixed(6)} SOL`);
             console.log(`Treasury USDC: ${(treasuryUsdcBalance / Math.pow(10, 6)).toFixed(2)} USDC`);
@@ -612,6 +642,7 @@ class VibesDApp {
                 totalSecondaryUsdc: 0,
                 currentBalances: {
                     feeCollectorSol: 0,
+                    feeCollectorUsdc: 0,
                     treasurySol: 0,
                     secondarySol: 0,
                     treasuryUsdc: 0,
@@ -1295,6 +1326,16 @@ class VibesDApp {
                 feeLink.textContent = data.addresses.feeCollectorSol;
             }
 
+            // Update Fee Collector USDC
+            document.getElementById('fee-usdc-amount').textContent = data.currentBalances.feeCollectorUsdc.toFixed(2);
+            const feeUsdcLink = document.getElementById('fee-usdc-link');
+            if (feeUsdcLink && data.feeCollectorUsdcAta) {
+                feeUsdcLink.href = createExplorerLink(data.feeCollectorUsdcAta);
+                feeUsdcLink.textContent = data.feeCollectorUsdcAta;
+            } else if (feeUsdcLink) {
+                feeUsdcLink.textContent = 'ATA not found';
+            }
+
             // Update Treasury SOL
             document.getElementById('treasury-sol-amount').textContent = data.currentBalances.treasurySol.toFixed(4);
             const treasuryLink = document.getElementById('treasury-sol-link');
@@ -1366,6 +1407,8 @@ class VibesDApp {
                 
                 // Fund distribution rows
                 `Fee Collector,Gebure Platform Fee (0.5%),SOL,${data.currentBalances.feeCollectorSol.toFixed(6)},${data.addresses.feeCollectorSol},https://explorer.solana.com/address/${data.addresses.feeCollectorSol}?cluster=devnet`,
+                
+                `Fee Collector,Gebure Platform Fee (0.5%),USDC,${data.currentBalances.feeCollectorUsdc.toFixed(2)},${data.feeCollectorUsdcAta || 'Not Available'},${data.feeCollectorUsdcAta ? 'https://explorer.solana.com/address/' + data.feeCollectorUsdcAta + '?cluster=devnet' : 'N/A'}`,
                 
                 `Treasury,Main Project Treasury (80%),SOL,${data.currentBalances.treasurySol.toFixed(4)},${data.addresses.treasurySol},https://explorer.solana.com/address/${data.addresses.treasurySol}?cluster=devnet`,
                 
