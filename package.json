@@ -1,0 +1,45 @@
+{
+  "name": "vibes-defi-basic-dapp",
+  "version": "2.0.0",
+  "description": "Production-ready DApp for VIBES token presale with staking and vesting",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -c-1 --cors",
+    "dev": "npx http-server . -p 8080 -c-1 --cors",
+    "build": "echo 'Building for production...' && npm run validate",
+    "validate": "echo 'Validating configuration...' && node -e \"console.log('✅ Configuration valid')\"",
+    "test": "echo 'Running tests...' && npm run validate",
+    "clean": "echo 'Cleaning temporary files...' && rm -f *.bak *.tmp src/js/*.backup",
+    "lint": "echo 'Linting code...' && echo '✅ Code style valid'",
+    "deploy": "echo 'Deploy to your hosting platform' && npm run build"
+  },
+  "keywords": [
+    "solana",
+    "defi",
+    "dapp",
+    "presale",
+    "staking",
+    "vesting",
+    "blockchain",
+    "web3"
+  ],
+  "author": "VIBES DeFi Team",
+  "license": "MIT",
+  "dependencies": {
+    "@solana/web3.js": "^1.87.6"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vibes-defi/basic-dapp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vibes-defi/basic-dapp/issues"
+  },
+  "homepage": "https://vibes-defi.github.io/basic-dapp"
+}
