@@ -26,7 +26,8 @@
   "author": "VIBES DeFi Team",
   "license": "MIT",
   "dependencies": {
-    "@solana/web3.js": "^1.87.6"
+    "@solana/web3.js": "^1.87.6",
+    "dotenv": "^17.2.3"
   },
   "devDependencies": {
     "http-server": "^14.1.1"

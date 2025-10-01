@@ -599,21 +599,25 @@ class DirectContractClient {
                 signTransaction: typeof this.wallet.signTransaction
             });
             
-            // Send transaction
+            // Send transaction - FIXED: Use sendTransaction for Phantom wallet
             let signature;
             if (typeof this.wallet.sendTransaction === 'function') {
-                console.log('📝 Using wallet.sendTransaction method...');
-                signature = await this.wallet.sendTransaction(transaction, this.connection);
-                console.log('📝 Wallet.sendTransaction returned:', signature);
-            } else if (typeof this.wallet.signAndSendTransaction === 'function') {
-                console.log('📝 Using wallet.signAndSendTransaction method...');
-                const result = await this.wallet.signAndSendTransaction(transaction);
-                signature = result.signature || result;
-                console.log('📝 Wallet.signAndSendTransaction returned:', result);
+                console.log('📝 Using wallet.sendTransaction method (Phantom recommended)...');
+                signature = await this.wallet.sendTransaction(transaction, this.connection, {
+                    skipPreflight: false,
+                    preflightCommitment: 'confirmed'
+                });
+                console.log('📝 Wallet.sendTransaction returned signature:', signature);
+            } else if (typeof this.wallet.signTransaction === 'function') {
+                // Fallback: Sign then send manually
+                console.log('📝 Using signTransaction + sendRawTransaction fallback...');
+                const signed = await this.wallet.signTransaction(transaction);
+                signature = await this.connection.sendRawTransaction(signed.serialize());
+                console.log('📝 Raw transaction sent, signature:', signature);
             } else {
                 console.error('❌ No compatible wallet method found');
                 console.log('Available wallet methods:', Object.keys(this.wallet));
-                throw new Error('No compatible transaction method found');
+                throw new Error('No compatible transaction method found - wallet may not support required methods');
             }
             
             console.log('✅ Staking transaction sent:', signature);

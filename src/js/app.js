@@ -62,6 +62,12 @@ class VibesDApp {
                 this.log('Connected to fallback RPC', 'success');
             }
             
+            // Initialize program IDs (needed for read-only operations like loading buyers)
+            this.presaleProgramId = new solanaWeb3.PublicKey(PROGRAM_IDS.PRESALE_V3);
+            this.stakingProgramId = new solanaWeb3.PublicKey(PROGRAM_IDS.STAKING);
+            this.vestingProgramId = new solanaWeb3.PublicKey(PROGRAM_IDS.VESTING);
+            this.log('Program IDs initialized', 'success');
+            
             // Check if Phantom wallet is available (REQUIRED)
             if (window.solana && window.solana.isPhantom) {
                 this.wallet = window.solana;
@@ -91,7 +97,24 @@ class VibesDApp {
             
             // Try to auto-connect if previously connected
             if (WALLET_CONFIG.AUTO_CONNECT && this.wallet) {
-                await this.connectWallet();
+                // Check if wallet was previously connected
+                if (this.wallet.isConnected) {
+                    this.log('🔄 Auto-connecting to previously connected wallet...', 'info');
+                    await this.connectWallet();
+                } else {
+                    // Try eager connection (silent connection if user approved before)
+                    try {
+                        await this.wallet.connect({ onlyIfTrusted: true });
+                        this.isConnected = true;
+                        this.log('🔄 Eagerly connected to wallet', 'success');
+                        this.updateWalletUI();
+                        await this.loadUserData();
+                        await this.loadPresaleData();
+                    } catch (error) {
+                        // User hasn't approved before, that's fine
+                        this.log('ℹ️ No previous wallet connection found', 'info');
+                    }
+                }
             }
 
             this.log('DApp initialized successfully', 'success');
@@ -284,13 +307,67 @@ class VibesDApp {
             detailsEl.classList.remove('hidden');
             connectBtn.classList.add('hidden');
             disconnectBtn.classList.remove('hidden');
+            
+            // Update My BuyerState section
+            this.updateMyBuyerStateUI();
         } else {
             statusEl.textContent = 'Not Connected';
             statusEl.className = 'status error';
             detailsEl.classList.add('hidden');
             connectBtn.classList.remove('hidden');
             disconnectBtn.classList.add('hidden');
+            
+            // Clear My BuyerState section
+            this.clearMyBuyerStateUI();
         }
+    }
+    
+    // Update My BuyerState UI
+    updateMyBuyerStateUI() {
+        if (!this.wallet || !this.wallet.publicKey) return;
+        
+        try {
+            const walletAddress = this.wallet.publicKey.toString();
+            
+            // Calculate BuyerState PDA using TextEncoder (browser-compatible)
+            const textEncoder = new TextEncoder();
+            const [buyerStatePDA, bump] = solanaWeb3.PublicKey.findProgramAddressSync(
+                [
+                    textEncoder.encode("buyer_v3"),
+                    this.wallet.publicKey.toBuffer()
+                ],
+                this.presaleProgramId
+            );
+            
+            const buyerStateAddress = buyerStatePDA.toString();
+            
+            // Update wallet address
+            document.getElementById('my-wallet-address').textContent = walletAddress;
+            document.getElementById('my-wallet-link').href = `https://solscan.io/account/${walletAddress}?cluster=devnet`;
+            document.getElementById('my-wallet-link').style.display = 'inline';
+            
+            // Update BuyerState address
+            document.getElementById('my-buyerstate-address').textContent = buyerStateAddress;
+            document.getElementById('my-buyerstate-link').href = `https://solscan.io/account/${buyerStateAddress}?cluster=devnet`;
+            document.getElementById('my-buyerstate-link').style.display = 'inline';
+            
+            console.log('✅ My BuyerState calculated:', {
+                wallet: walletAddress,
+                buyerState: buyerStateAddress,
+                bump: bump
+            });
+            
+        } catch (error) {
+            console.error('Error calculating BuyerState:', error);
+        }
+    }
+    
+    // Clear My BuyerState UI
+    clearMyBuyerStateUI() {
+        document.getElementById('my-wallet-address').textContent = 'Connect wallet to see address';
+        document.getElementById('my-wallet-link').style.display = 'none';
+        document.getElementById('my-buyerstate-address').textContent = 'Connect wallet to calculate BuyerState';
+        document.getElementById('my-buyerstate-link').style.display = 'none';
     }
 
     // Load user data
@@ -1493,6 +1570,228 @@ class VibesDApp {
             this.log(`❌ Failed to export CSV report: ${error.message}`, 'error');
             console.error('Export error:', error);
         }
+    }
+
+    // Refresh buyers list
+    async refreshBuyersList() {
+        try {
+            this.log('🔄 Loading buyers and stakers data...', 'info');
+            await this.loadBuyersData();
+            this.log('✅ Buyers list loaded successfully', 'success');
+        } catch (error) {
+            this.log(`❌ Failed to load buyers: ${error.message}`, 'error');
+        }
+    }
+
+    // Load all buyers/stakers from the blockchain
+    async loadBuyersData() {
+        try {
+            if (!this.connection || !this.presaleProgramId) {
+                throw new Error('Connection or program ID not initialized');
+            }
+
+            // Show loading state
+            const container = document.getElementById('buyers-list-container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">⏳</div>
+                    <p>Loading buyers data from blockchain...</p>
+                </div>
+            `;
+
+            // Get all accounts owned by the presale program
+            const accounts = await this.connection.getProgramAccounts(
+                this.presaleProgramId,
+                {
+                    filters: [
+                        {
+                            dataSize: 185 // BuyerStateV3 size
+                        }
+                    ]
+                }
+            );
+
+            console.log(`📊 Found ${accounts.length} buyer accounts`);
+
+            // Parse each buyer account
+            const buyers = [];
+            for (const { pubkey, account } of accounts) {
+                try {
+                    const data = account.data;
+                    
+                    // Parse BuyerStateV3 structure
+                    // Skip discriminator (8 bytes)
+                    let offset = 8;
+                    
+                    // buyer: Pubkey (32 bytes)
+                    const buyer = new solanaWeb3.PublicKey(data.slice(offset, offset + 32));
+                    offset += 32;
+                    
+                    // total_purchased_vibes: u64 (8 bytes)
+                    const totalPurchasedVibes = Number(
+                        new BigInt64Array(data.slice(offset, offset + 8).buffer)[0]
+                    );
+                    offset += 8;
+                    
+                    // Skip sol_contributed and usdc_contributed (8 + 8 bytes)
+                    offset += 16;
+                    
+                    // is_staking: bool (1 byte)
+                    const isStaking = data[offset] === 1;
+                    offset += 1;
+                    
+                    // Skip padding (7 bytes)
+                    offset += 7;
+                    
+                    // staked_amount: u64 (8 bytes)
+                    const stakedAmount = Number(
+                        new BigInt64Array(data.slice(offset, offset + 8).buffer)[0]
+                    );
+                    offset += 8;
+                    
+                    // unstaked_amount: u64 (8 bytes)
+                    const unstakedAmount = Number(
+                        new BigInt64Array(data.slice(offset, offset + 8).buffer)[0]
+                    );
+                    
+                    buyers.push({
+                        buyerStateAddress: pubkey.toString(),
+                        buyerWallet: buyer.toString(),
+                        totalPurchased: totalPurchasedVibes / 1e9, // Convert to VIBES
+                        isStaking: isStaking,
+                        stakedAmount: stakedAmount / 1e9,
+                        unstakedAmount: unstakedAmount / 1e9
+                    });
+                    
+                } catch (parseError) {
+                    console.error('Error parsing buyer account:', parseError);
+                }
+            }
+
+            // Sort by total purchased (descending)
+            buyers.sort((a, b) => b.totalPurchased - a.totalPurchased);
+
+            console.log(`✅ Parsed ${buyers.length} buyers successfully`);
+            
+            // Store in instance
+            this.buyersData = buyers;
+            
+            // Update UI
+            this.updateBuyersUI(buyers);
+            
+            return buyers;
+            
+        } catch (error) {
+            console.error('❌ Error loading buyers data:', error);
+            
+            // Show error in UI
+            const container = document.getElementById('buyers-list-container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #f5576c;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">❌</div>
+                    <p>Failed to load buyers data</p>
+                    <p style="font-size: 0.9rem; color: #666;">${error.message}</p>
+                </div>
+            `;
+            
+            throw error;
+        }
+    }
+
+    // Update buyers UI
+    updateBuyersUI(buyers) {
+        const container = document.getElementById('buyers-list-container');
+        
+        if (!buyers || buyers.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">📭</div>
+                    <p>No buyers found</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Create buyers grid
+        let html = '<div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));">';
+        
+        buyers.forEach((buyer, index) => {
+            const stakingBadge = buyer.isStaking ? 
+                '<span style="background: #48bb78; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">✅ STAKING</span>' :
+                '<span style="background: #cbd5e0; color: #4a5568; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">❌ NO STAKING</span>';
+            
+            html += `
+                <div class="info-card" style="border-left: 4px solid ${buyer.isStaking ? '#48bb78' : '#cbd5e0'};">
+                    <h3 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span>👤 Buyer #${index + 1}</span>
+                        ${stakingBadge}
+                    </h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <p style="font-size: 0.85rem; color: #666; margin-bottom: 5px;"><strong>Wallet Address:</strong></p>
+                        <p style="font-family: monospace; font-size: 0.75rem; word-break: break-all; background: #f7fafc; padding: 8px; border-radius: 4px; margin-bottom: 5px;">
+                            ${buyer.buyerWallet}
+                        </p>
+                        <a href="https://solscan.io/account/${buyer.buyerWallet}?cluster=devnet" 
+                           target="_blank" 
+                           style="font-size: 0.85rem; color: #667eea; text-decoration: none;">
+                            🔗 View Wallet on Solscan
+                        </a>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px; padding: 10px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 6px;">
+                        <p style="font-size: 0.85rem; color: #666; margin-bottom: 5px;"><strong>📦 BuyerState PDA:</strong></p>
+                        <p style="font-family: monospace; font-size: 0.75rem; word-break: break-all; background: white; padding: 8px; border-radius: 4px; margin-bottom: 5px;">
+                            ${buyer.buyerStateAddress}
+                        </p>
+                        <a href="https://solscan.io/account/${buyer.buyerStateAddress}?cluster=devnet" 
+                           target="_blank" 
+                           style="font-size: 0.85rem; color: #667eea; text-decoration: none;">
+                            🔗 View BuyerState on Solscan
+                        </a>
+                    </div>
+                    
+                    <div style="background: #f7fafc; padding: 12px; border-radius: 6px;">
+                        <p><strong>💰 Total Purchased:</strong> ${buyer.totalPurchased.toLocaleString(undefined, {maximumFractionDigits: 3})} VIBES</p>
+                        <p><strong>🔒 Staked:</strong> ${buyer.stakedAmount.toLocaleString(undefined, {maximumFractionDigits: 3})} VIBES</p>
+                        <p><strong>🔓 Unstaked:</strong> ${buyer.unstakedAmount.toLocaleString(undefined, {maximumFractionDigits: 3})} VIBES</p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        
+        // Add summary at the top
+        const totalBuyers = buyers.length;
+        const stakingCount = buyers.filter(b => b.isStaking).length;
+        const totalStaked = buyers.reduce((sum, b) => sum + b.stakedAmount, 0);
+        const totalPurchased = buyers.reduce((sum, b) => sum + b.totalPurchased, 0);
+        
+        const summaryHtml = `
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center;">
+                    <div>
+                        <div style="font-size: 2rem; font-weight: bold;">${totalBuyers}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Total Buyers</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2rem; font-weight: bold;">${stakingCount}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Active Stakers</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2rem; font-weight: bold;">${totalStaked.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Total VIBES Staked</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2rem; font-weight: bold;">${totalPurchased.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Total VIBES Purchased</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = summaryHtml + html;
     }
 
     // Get or create token account

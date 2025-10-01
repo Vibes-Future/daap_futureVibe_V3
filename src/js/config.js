@@ -64,7 +64,7 @@ const WALLET_CONFIG = {
     // Supported wallet adapters
     SUPPORTED_WALLETS: ['Phantom', 'Solflare', 'Sollet'],
     // Auto-connect on page load
-    AUTO_CONNECT: false,
+    AUTO_CONNECT: true,
     // Connection timeout (ms)
     CONNECTION_TIMEOUT: 10000
 };
