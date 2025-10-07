@@ -3,187 +3,749 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIBES DeFi - Basic DApp</title>
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+    <title>VIBES DeFi - Admin Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+    <!-- Import VIBES Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* VIBES Design System - CSS Variables */
+        :root {
+            /* Primary VIBES Colors */
+            --primary-0: #798F1D;
+            --primary-1: #BCE70C;
+            --primary-2: #BCFFA4;
+            --primary-4: #0B0B12;
+            --primary-5: #28330A;
+            
+            /* Background Colors */
+            --bg-primary: #283D1F;
+            --bg-secondary: #28330A;
+            --bg-tertiary: #384925;
+            --bg-card: rgba(56, 73, 37, 0.7);
+            --bg-glass: rgba(40, 61, 31, 0.95);
+            
+            /* Highlight Colors */
+            --highlight-1: #FACD95;
+            --highlight-2: #F5D871;
+            --vibes-yellow: #C7F801;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(270deg, #C7F801 6.51%, #FACD95 63.52%);
+            --gradient-vertical: linear-gradient(180deg, #C7F801 0%, #FACD95 100%);
+            
+            /* Typography */
+            --font-heading: 'Lexend', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Spacing */
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            
+            /* Border Radius */
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.25rem;
+            
+            /* Shadows */
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-glow: 0 0 20px rgba(199, 248, 1, 0.3);
+            
+            /* Transitions */
+            --transition-fast: 150ms ease-in-out;
+            --transition-base: 250ms ease-in-out;
+            --transition-slow: 350ms ease-in-out;
+        }
+
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                font-family: var(--font-body);
+                background: var(--bg-primary);
             min-height: 100vh;
-            color: #333;
-        }
+                color: #FFFFFF;
+                line-height: 1.6;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                overflow-x: hidden;
+                position: relative;
+            }
 
+            /* Background decorative elements */
+            body::before {
+                content: '';
+                position: fixed;
+                top: -200px;
+                right: -200px;
+                width: 600px;
+                height: 600px;
+                background: radial-gradient(circle, rgba(199, 248, 1, 0.08) 0%, transparent 70%);
+                border-radius: 50%;
+                filter: blur(80px);
+                z-index: 0;
+                pointer-events: none;
+                animation: float 20s ease-in-out infinite;
+            }
+
+            body::after {
+                content: '';
+                position: fixed;
+                bottom: -200px;
+                left: -200px;
+                width: 600px;
+                height: 600px;
+                background: radial-gradient(circle, rgba(250, 205, 149, 0.06) 0%, transparent 70%);
+                border-radius: 50%;
+                filter: blur(80px);
+                z-index: 0;
+                pointer-events: none;
+                animation: float 25s ease-in-out infinite reverse;
+            }
+
+            @keyframes float {
+                0%, 100% { transform: translate(0, 0) scale(1); }
+                33% { transform: translate(30px, -30px) scale(1.1); }
+                66% { transform: translate(-20px, 20px) scale(0.9); }
+            }
+
+        /* Container */
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: var(--space-6);
+            animation: fadeIn 0.6s ease-out;
+            position: relative;
+            z-index: 1;
         }
 
+        /* Header with gradient and modern styling */
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            color: white;
+            margin-bottom: var(--space-8);
+            padding: var(--space-8) 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(199, 248, 1, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-3);
+            animation: slideUp 0.6s ease-out;
         }
 
-        .wallet-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .header p {
+            color: #ADB5BD;
+            font-size: clamp(0.875rem, 2vw, 1.125rem);
+            font-weight: 500;
+            animation: slideUp 0.6s ease-out 0.2s both;
         }
 
+        /* Production Cards */
+        .wallet-section,
         .section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(188, 231, 12, 0.15);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .wallet-section::before,
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.3), transparent);
+        }
+
+        .wallet-section:hover,
+        .section:hover {
+            transform: translateY(-4px);
+            border-color: rgba(188, 231, 12, 0.3);
+            box-shadow: 
+                var(--shadow-xl),
+                0 0 40px rgba(199, 248, 1, 0.1);
         }
 
         .section h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            font-family: var(--font-heading);
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+            font-weight: 700;
+            color: var(--vibes-yellow);
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 2px solid rgba(199, 248, 1, 0.2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
         }
 
+        .section h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--gradient-vertical);
+            border-radius: 2px;
+        }
+
+        /* Wallet Info */
         .wallet-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: var(--space-5);
+            flex-wrap: wrap;
+            gap: var(--space-4);
         }
 
         .wallet-address {
-            font-family: monospace;
-            background: #f5f5f5;
-            padding: 8px 12px;
-            border-radius: 8px;
+            font-family: 'Roboto Mono', monospace;
+            background: rgba(40, 51, 10, 0.6);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-lg);
             font-size: 0.9rem;
+            border: 1px solid rgba(188, 231, 12, 0.1);
+            transition: all var(--transition-base);
         }
 
+        .wallet-address:hover {
+            border-color: rgba(188, 231, 12, 0.3);
+            background: rgba(40, 51, 10, 0.8);
+        }
+
+        /* Modern Buttons */
         .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            background: var(--gradient-primary);
+            color: var(--primary-4);
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: var(--radius-lg);
             cursor: pointer;
+            font-family: var(--font-heading);
             font-size: 1rem;
-            transition: all 0.3s ease;
-            margin: 5px;
+            font-weight: 600;
+            transition: all var(--transition-base);
+            box-shadow: 0 4px 16px rgba(199, 248, 1, 0.2);
+            position: relative;
+            overflow: hidden;
+            margin: var(--space-2);
         }
 
-        .btn:hover {
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px rgba(199, 248, 1, 0.3);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
         }
 
         .btn:disabled {
-            background: #ccc;
+            opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
+            transform: none !important;
         }
 
         .btn-success {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
+            background: linear-gradient(135deg, #28A745 0%, #20c997 100%);
+            color: white;
         }
 
         .btn-danger {
-            background: linear-gradient(45deg, #f44336, #da190b);
+            background: linear-gradient(135deg, #DC3545 0%, #c82333 100%);
+            color: white;
         }
 
         .btn-warning {
-            background: linear-gradient(45deg, #ff9800, #f57c00);
+            background: linear-gradient(135deg, #FFC107 0%, #ff9800 100%);
+            color: var(--primary-4);
         }
 
+        .btn-secondary {
+            background: rgba(56, 73, 37, 0.6);
+            color: white;
+            border: 2px solid rgba(188, 231, 12, 0.3);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(56, 73, 37, 0.8);
+            border-color: rgba(188, 231, 12, 0.5);
+        }
+
+            /* Form Groups */
         .form-group {
-            margin-bottom: 15px;
+                margin-bottom: var(--space-5);
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
+                margin-bottom: var(--space-3);
+                font-weight: 600;
+                color: #FFFFFF;
+                font-size: 0.95rem;
+                font-family: var(--font-heading);
+                display: flex;
+                align-items: center;
+                gap: var(--space-2);
+            }
 
-        .form-group input, .form-group select {
+            .form-group label::before {
+                content: '';
+                width: 3px;
+                height: 14px;
+                background: var(--gradient-vertical);
+                border-radius: 2px;
+            }
+
+            .form-group input,
+            .form-group select {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+                padding: var(--space-4) var(--space-5);
+                background: rgba(40, 51, 10, 0.5);
+                backdrop-filter: blur(10px);
+                border: 2px solid rgba(188, 231, 12, 0.2);
+                border-radius: var(--radius-lg);
+                color: #FFFFFF;
             font-size: 1rem;
-        }
+                font-family: var(--font-body);
+                font-weight: 500;
+                transition: all var(--transition-base);
+            }
 
-        .form-group input:focus, .form-group select:focus {
+            .form-group input:hover,
+            .form-group select:hover {
+                border-color: rgba(188, 231, 12, 0.3);
+                background: rgba(40, 51, 10, 0.7);
+            }
+
+            .form-group input:focus,
+            .form-group select:focus {
             outline: none;
-            border-color: #667eea;
-        }
+                border-color: var(--vibes-yellow);
+                box-shadow: 0 0 0 3px rgba(199, 248, 1, 0.15), 0 0 20px rgba(199, 248, 1, 0.1);
+                background: rgba(40, 51, 10, 0.8);
+            }
 
+            .form-group input::placeholder {
+                color: rgba(255, 255, 255, 0.4);
+            }
+
+            /* Purchase Cards Enhanced */
+            .purchase-card {
+                background: linear-gradient(135deg, rgba(199, 248, 1, 0.05) 0%, rgba(56, 73, 37, 0.5) 100%);
+                border: 2px solid rgba(199, 248, 1, 0.15);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-6);
+                position: relative;
+                overflow: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .purchase-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--gradient-primary);
+            }
+
+            .purchase-card:hover {
+                transform: translateY(-4px);
+                border-color: rgba(199, 248, 1, 0.3);
+                box-shadow: 0 12px 40px rgba(199, 248, 1, 0.15);
+            }
+
+            .purchase-header {
+                display: flex;
+                align-items: center;
+                gap: var(--space-3);
+                margin-bottom: var(--space-5);
+            }
+
+            .purchase-icon {
+                width: 50px;
+                height: 50px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-xl);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+                box-shadow: 0 4px 16px rgba(199, 248, 1, 0.25);
+            }
+
+            .purchase-title {
+                font-family: var(--font-heading);
+                font-size: 20px;
+                font-weight: 700;
+                color: #FFFFFF;
+            }
+
+        /* Grid Layout */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: var(--space-6);
         }
 
+            /* Info Cards */
         .info-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
+                background: var(--bg-card);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(188, 231, 12, 0.15);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-6);
+                margin-bottom: var(--space-4);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+                box-shadow: var(--shadow-md);
+            }
+
+            .info-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.3), transparent);
+            }
+
+            .info-card:hover {
+                border-color: rgba(188, 231, 12, 0.3);
+                background: rgba(56, 73, 37, 0.8);
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-lg), 0 0 30px rgba(199, 248, 1, 0.1);
         }
 
         .info-card h3 {
-            color: #667eea;
-            margin-bottom: 10px;
+                font-family: var(--font-heading);
+                color: #FFFFFF;
+                margin-bottom: var(--space-5);
+                font-size: 1.25rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: var(--space-2);
+                padding-bottom: var(--space-3);
+                border-bottom: 1px solid rgba(199, 248, 1, 0.1);
+            }
+
+            .info-card h3::before {
+                content: '';
+                width: 4px;
+                height: 20px;
+                background: var(--gradient-vertical);
+                border-radius: 2px;
+            }
+
+            .info-card p {
+                color: rgba(255, 255, 255, 0.9);
+                margin-bottom: var(--space-3);
+                font-size: 0.95rem;
+                line-height: 1.6;
+            }
+
+            .info-card strong {
+                color: var(--vibes-yellow);
+                font-weight: 700;
+            }
+
+            /* Enhanced stat display within info cards */
+            .stat-display {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: var(--space-3);
+                background: rgba(40, 51, 10, 0.4);
+                border: 1px solid rgba(199, 248, 1, 0.1);
+                border-radius: var(--radius-lg);
+                margin-bottom: var(--space-2);
+                transition: all var(--transition-base);
+            }
+
+            .stat-display:hover {
+                background: rgba(40, 51, 10, 0.6);
+                border-color: rgba(199, 248, 1, 0.2);
+            }
+
+            .stat-label-display {
+                font-size: 14px;
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 500;
+            }
+
+            .stat-value-display {
+                font-size: 16px;
+                font-weight: 700;
+                color: var(--vibes-yellow);
+            }
+
+        /* Status Messages */
+        .status {
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-4);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            animation: slideUp 0.4s ease-out;
         }
 
-        .status {
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-weight: bold;
+        .status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
         .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: rgba(40, 167, 69, 0.1);
+            color: #28A745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .status.success::before {
+            background: #28A745;
         }
 
         .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: rgba(220, 53, 69, 0.1);
+            color: #DC3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .status.error::before {
+            background: #DC3545;
         }
 
         .status.warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
+            background: rgba(255, 193, 7, 0.1);
+            color: #FFC107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
+        .status.warning::before {
+            background: #FFC107;
+        }
+
+        /* Loading Spinner */
         .loading {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            border: 3px solid rgba(199, 248, 1, 0.2);
+            border-top: 3px solid var(--vibes-yellow);
             border-radius: 50%;
             animation: spin 1s linear infinite;
+        }
+
+        /* Balance Info */
+        .balance-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+            padding: var(--space-4);
+            background: rgba(32, 45, 20, 0.3);
+            border: 1px solid rgba(199, 248, 1, 0.1);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+        }
+
+        .balance-info:hover {
+            background: rgba(32, 45, 20, 0.5);
+            border-color: rgba(199, 248, 1, 0.2);
+        }
+
+        .balance-info span {
+            color: #FFFFFF;
+            font-weight: 500;
+        }
+
+        .balance-info span:last-child {
+            color: var(--vibes-yellow);
+            font-weight: 700;
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--space-4);
+            gap: var(--space-3);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--vibes-yellow);
+        }
+
+        .checkbox-group label {
+            color: #FFFFFF;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Transaction Log */
+        .transaction-log {
+            background: rgba(11, 11, 18, 0.5);
+            border: 1px solid rgba(188, 231, 12, 0.1);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.875rem;
+        }
+
+        .transaction-log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .transaction-log::-webkit-scrollbar-track {
+            background: rgba(40, 61, 31, 0.5);
+            border-radius: 4px;
+        }
+
+        .transaction-log::-webkit-scrollbar-thumb {
+            background: rgba(199, 248, 1, 0.3);
+            border-radius: 4px;
+        }
+
+        .transaction-log::-webkit-scrollbar-thumb:hover {
+            background: rgba(199, 248, 1, 0.5);
+        }
+
+        .log-entry {
+            margin-bottom: var(--space-2);
+            padding: var(--space-3);
+            border-radius: var(--radius-md);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .log-success {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28A745;
+            border-left: 3px solid #28A745;
+        }
+
+        .log-error {
+            background: rgba(220, 53, 69, 0.1);
+            color: #DC3545;
+            border-left: 3px solid #DC3545;
+        }
+
+        .log-info {
+            background: rgba(23, 162, 184, 0.1);
+            color: #17A2B8;
+            border-left: 3px solid #17A2B8;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes spin {
@@ -191,106 +753,1346 @@
             100% { transform: rotate(360deg); }
         }
 
-        .hidden {
-            display: none;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        .balance-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-4);
+            }
+
+            .wallet-section,
+            .section {
+                padding: var(--space-5);
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-4);
+            }
+
+            .wallet-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .btn {
+                width: 100%;
+                margin: var(--space-2) 0;
+            }
         }
 
-        .checkbox-group {
+        @media (max-width: 480px) {
+            .info-card {
+                padding: var(--space-4);
+            }
+
+            .section h2 {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Selection Styling */
+        ::selection {
+            background: rgba(199, 248, 1, 0.2);
+            color: #FFFFFF;
+        }
+
+        /* Focus Styles for Accessibility */
+        *:focus {
+            outline: 2px solid rgba(199, 248, 1, 0.5);
+            outline-offset: 2px;
+        }
+
+        button:focus,
+        input:focus,
+        select:focus {
+            outline: 2px solid var(--vibes-yellow);
+            outline-offset: 2px;
+        }
+
+        /* Link Styles */
+        a {
+            color: var(--vibes-yellow);
+            text-decoration: none;
+            transition: all var(--transition-base);
+            font-weight: 500;
+        }
+
+        a:hover {
+            color: var(--highlight-1);
+            text-decoration: underline;
+        }
+
+        /* Info Box Styling */
+        .info-box {
+            background: rgba(23, 162, 184, 0.1);
+            border: 1px solid rgba(23, 162, 184, 0.3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            margin: var(--space-4) 0;
+        }
+
+        .info-box p {
+            color: #17A2B8;
+            margin: 0;
+        }
+
+        /* Enhanced Monospace Display */
+        .monospace-display {
+            font-family: 'Roboto Mono', monospace;
+            background: rgba(40, 51, 10, 0.6);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(188, 231, 12, 0.1);
+            word-break: break-all;
+            font-size: 0.9rem;
+            transition: all var(--transition-base);
+        }
+
+        .monospace-display:hover {
+            border-color: rgba(188, 231, 12, 0.3);
+            background: rgba(40, 51, 10, 0.8);
+        }
+        /* Production Header Navigation */
+        .production-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(40, 61, 31, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(188, 231, 12, 0.2);
+            height: 80px;
+            transition: all var(--transition-base);
+        }
+
+        .production-header.scrolled {
+            box-shadow: 0 4px 32px rgba(0, 0, 0, 0.3);
+            border-bottom-color: rgba(188, 231, 12, 0.3);
+        }
+
+        .header-content {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            height: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
         }
 
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
-            margin-right: 10px;
+        /* Logo */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            text-decoration: none;
+            transition: opacity var(--transition-base);
         }
 
-        .transaction-log {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9rem;
+        .logo-container:hover {
+            opacity: 0.9;
         }
 
-        .log-entry {
-            margin-bottom: 5px;
-            padding: 5px;
+        .logo-icon-nav {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--primary-4);
+            box-shadow: 0 4px 16px rgba(199, 248, 1, 0.2);
+        }
+
+        .logo-text-nav {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title-nav {
+            font-family: var(--font-heading);
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .logo-subtitle-nav {
+            font-size: 11px;
+            color: #ADB5BD;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Navigation */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .nav-link-btn {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-family: var(--font-heading);
+            font-weight: 500;
+            font-size: 15px;
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-base);
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-link-btn:hover {
+            color: var(--vibes-yellow);
+            background: rgba(199, 248, 1, 0.1);
+        }
+
+        .nav-link-btn.active {
+            color: var(--vibes-yellow);
+            background: rgba(199, 248, 1, 0.15);
+        }
+
+        /* Production Wallet Button Styles - From Reference App */
+        
+        /* Connect Wallet Button */
+        .wallet-connect-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #C7F801 0%, #FACD95 100%);
+            color: #0B0B12;
+            font-family: 'Lexend', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 4px 16px rgba(199, 248, 1, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-connect-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .wallet-connect-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 32px rgba(199, 248, 1, 0.3),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+
+        .wallet-connect-button:hover::before {
+            left: 100%;
+        }
+
+        .wallet-connect-button:active {
+            transform: translateY(0);
+        }
+
+        .wallet-connect-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .wallet-icon {
+            width: 20px;
+            height: 20px;
+            color: currentColor;
+        }
+
+        .wallet-connect-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: wallet-spin 1s linear infinite;
+        }
+
+        @keyframes wallet-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Connected Wallet Container */
+        .wallet-connected-container {
+            position: relative;
+        }
+
+        /* Connected Wallet Button */
+        .wallet-connected-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(56, 73, 37, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(188, 231, 12, 0.2);
+            border-radius: 12px;
+            color: #FFFFFF;
+            font-family: 'Lexend', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .wallet-connected-button:hover {
+            background: rgba(56, 73, 37, 0.9);
+            border-color: rgba(188, 231, 12, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .wallet-status-indicator {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: #28A745;
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .wallet-adapter-icon {
+            width: 20px;
+            height: 20px;
             border-radius: 4px;
         }
 
-        .log-success {
-            background: #d4edda;
-            color: #155724;
+        .wallet-address {
+            color: #C7F801;
+            font-weight: 600;
+            letter-spacing: 0.3px;
         }
 
-        .log-error {
-            background: #f8d7da;
-            color: #721c24;
+        .wallet-dropdown-arrow {
+            transition: transform 0.2s ease;
+            color: #ADB5BD;
         }
 
-        .log-info {
-            background: #d1ecf1;
-            color: #0c5460;
+        .wallet-dropdown-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        /* Wallet Dropdown */
+        .wallet-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 280px;
+            background: rgba(40, 61, 31, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(188, 231, 12, 0.2);
+            border-radius: 16px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 80px rgba(199, 248, 1, 0.1);
+            overflow: hidden;
+            z-index: 1000;
+            animation: dropdownSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes dropdownSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .wallet-dropdown-header {
+            padding: 20px;
+            background: rgba(56, 73, 37, 0.3);
+        }
+
+        .wallet-dropdown-wallet-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-dropdown-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px;
+        }
+
+        .wallet-dropdown-name {
+            font-weight: 600;
+            color: #FFFFFF;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .wallet-dropdown-address {
+            color: #ADB5BD;
+            font-size: 13px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .wallet-dropdown-divider {
+            height: 1px;
+            background: rgba(188, 231, 12, 0.1);
+            margin: 0;
+        }
+
+        .wallet-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 16px 20px;
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-dropdown-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .wallet-dropdown-item:hover {
+            background: rgba(199, 248, 1, 0.1);
+            color: #C7F801;
+            padding-left: 24px;
+        }
+
+        .wallet-dropdown-item:hover::before {
+            left: 100%;
+        }
+
+        .wallet-dropdown-item:active {
+            background: rgba(199, 248, 1, 0.15);
+        }
+
+        .wallet-dropdown-item svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2;
+        }
+
+        .wallet-dropdown-disconnect {
+            color: #DC3545;
+        }
+
+        .wallet-dropdown-disconnect:hover {
+            background: rgba(220, 53, 69, 0.1);
+            color: #DC3545;
+        }
+
+        /* Wallet Selector Modal */
+        .wallet-selector-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .wallet-selector-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .wallet-selector-content {
+            position: relative;
+            background: rgba(40, 61, 31, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(188, 231, 12, 0.2);
+            border-radius: 20px;
+            max-width: 420px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 80px rgba(199, 248, 1, 0.1);
+            animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .wallet-selector-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(188, 231, 12, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .wallet-selector-header h3 {
+            color: #C7F801;
+            font-family: 'Lexend', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .wallet-selector-close {
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 32px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .wallet-selector-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .wallet-selector-body {
+            padding: 16px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(56, 73, 37, 0.3);
+            border: 1px solid rgba(188, 231, 12, 0.1);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .wallet-option:hover {
+            background: rgba(199, 248, 1, 0.1);
+            border-color: rgba(199, 248, 1, 0.3);
+            transform: translateX(4px);
+        }
+
+        .wallet-option:hover::before {
+            left: 100%;
+        }
+
+        .wallet-option:active {
+            transform: scale(0.98) translateX(4px);
+        }
+
+        .wallet-option-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .wallet-option-info {
+            flex: 1;
+        }
+
+        .wallet-option-name {
+            font-weight: 600;
+            color: #FFFFFF;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .wallet-option-status {
+            color: #ADB5BD;
+            font-size: 13px;
+        }
+
+        .wallet-option-status.detected {
+            color: #28A745;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            width: 44px;
+            height: 44px;
+            background: rgba(199, 248, 1, 0.1);
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .hamburger {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 16px;
+        }
+
+        .hamburger span {
+            position: absolute;
+            left: 0;
+            width: 24px;
+            height: 2px;
+            background: var(--vibes-yellow);
+            border-radius: 2px;
+            transition: all var(--transition-base);
+        }
+
+        .hamburger span:nth-child(1) { top: 0; }
+        .hamburger span:nth-child(2) { top: 7px; }
+        .hamburger span:nth-child(3) { top: 14px; }
+
+        .mobile-menu-toggle.open .hamburger span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .mobile-menu-toggle.open .hamburger span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.open .hamburger span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* Main content push down for fixed header */
+        .main-content {
+            margin-top: 80px;
+        }
+
+        /* Dashboard Stats Section */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .presale-stats-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(188, 231, 12, 0.15);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .presale-stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.3), transparent);
+        }
+
+        .presale-stats-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(188, 231, 12, 0.3);
+            box-shadow: var(--shadow-xl), 0 0 40px rgba(199, 248, 1, 0.1);
+        }
+
+        .card-header-stats {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid rgba(199, 248, 1, 0.1);
+        }
+
+        .card-icon-stats {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(199, 248, 1, 0.2);
+        }
+
+        .card-title-stats {
+            font-family: var(--font-heading);
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .card-subtitle-stats {
+            font-size: 13px;
+            color: #ADB5BD;
+            font-weight: 500;
+        }
+
+        .stats-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4);
+            background: rgba(40, 51, 10, 0.3);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(199, 248, 1, 0.05);
+            transition: all var(--transition-base);
+        }
+
+        .metric-row:hover {
+            background: rgba(40, 51, 10, 0.5);
+            border-color: rgba(199, 248, 1, 0.15);
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #ADB5BD;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--vibes-yellow);
+        }
+
+        .progress-section {
+            margin-top: var(--space-6);
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-2);
+        }
+
+        .progress-label-main {
+            font-size: 14px;
+            color: #ADB5BD;
+            font-weight: 500;
+        }
+
+        .progress-percentage-main {
+            font-size: 14px;
+            color: var(--vibes-yellow);
+            font-weight: 700;
+        }
+
+        .progress-bar-main {
+            width: 100%;
+            height: 10px;
+            background: rgba(40, 51, 10, 0.6);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(199, 248, 1, 0.1);
+        }
+
+        .progress-fill-main {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 5px;
+            transition: width 1.5s ease;
+            box-shadow: 0 0 20px rgba(199, 248, 1, 0.4);
+            animation: progressGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes progressGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(199, 248, 1, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(199, 248, 1, 0.6); }
+        }
+
+        /* Price Calendar Section */
+        .price-calendar-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(188, 231, 12, 0.15);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-calendar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.3), transparent);
+        }
+
+        .price-calendar-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(188, 231, 12, 0.3);
+            box-shadow: var(--shadow-xl), 0 0 40px rgba(199, 248, 1, 0.1);
+        }
+
+        .price-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+            flex-wrap: wrap;
+            gap: var(--space-4);
+        }
+
+        .current-price-display {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .price-label-display {
+            font-size: 13px;
+            color: #ADB5BD;
+            font-weight: 500;
+            margin-bottom: var(--space-1);
+        }
+
+        .price-amount {
+            font-size: 32px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .next-price-display {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .price-increase-badge {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .countdown-box {
+            background: rgba(199, 248, 1, 0.08);
+            border: 1px solid rgba(199, 248, 1, 0.2);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            margin-bottom: var(--space-4);
+        }
+
+        .countdown-title {
+            font-size: 14px;
+            color: var(--vibes-yellow);
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+            text-align: center;
+        }
+
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+        }
+
+        .countdown-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--vibes-yellow);
+            line-height: 1;
+            font-family: var(--font-heading);
+        }
+
+        .countdown-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            margin-top: var(--space-1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .countdown-separator {
+            font-size: 24px;
+            font-weight: 700;
+            color: rgba(199, 248, 1, 0.5);
+            align-self: center;
+            margin-top: -10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .logo-subtitle-nav {
+                display: none;
+            }
+
+            .logo-icon-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .logo-title-nav {
+                font-size: 20px;
+            }
+
+            .header-wallet-btn {
+                padding: var(--space-2) var(--space-4);
+                font-size: 14px;
+            }
+
+            .header-wallet-btn span {
+                display: none;
+            }
+
+            /* Wallet Button Mobile Styles */
+            .wallet-connect-button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .wallet-connected-button {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .wallet-adapter-icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            .wallet-dropdown {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                min-width: auto;
+                border-radius: 24px 24px 0 0;
+                animation: mobileSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            @keyframes mobileSlideUp {
+                from {
+                    transform: translateY(100%);
+                }
+                to {
+                    transform: translateY(0);
+                }
+            }
+
+            .wallet-dropdown-header {
+                padding: 24px;
+                border-radius: 24px 24px 0 0;
+                position: relative;
+            }
+
+            .wallet-dropdown-header::before {
+                content: '';
+                position: absolute;
+                top: 12px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 48px;
+                height: 4px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 2px;
+            }
+
+            .wallet-dropdown-item {
+                padding: 18px 24px;
+                font-size: 16px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-4);
+            }
+
+            .presale-stats-card,
+            .price-calendar-card {
+                padding: var(--space-5);
+            }
+
+            .price-amount {
+                font-size: 24px;
+            }
+
+            .countdown-number {
+                font-size: 24px;
+            }
+
+            .countdown-item {
+                min-width: 50px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Production Header Navigation -->
+    <header class="production-header">
+        <div class="header-content">
+            <!-- Logo -->
+            <a href="#" class="logo-container">
+                <div class="logo-icon-nav">V</div>
+                <div class="logo-text-nav">
+                    <div class="logo-title-nav">VIBES</div>
+                    <div class="logo-subtitle-nav">DeFi Ecosystem</div>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="nav-links">
+                <button class="nav-link-btn active" onclick="scrollToSection('dashboard')">Dashboard</button>
+                <button class="nav-link-btn" onclick="scrollToSection('presale')">Presale</button>
+                <button class="nav-link-btn" onclick="scrollToSection('staking')">Staking</button>
+                <button class="nav-link-btn" onclick="scrollToSection('vesting')">Vesting</button>
+            </nav>
+
+            <!-- Production Wallet Button -->
+            <div id="production-wallet-container">
+                <!-- Connect Button (shown when not connected) -->
+                <button id="wallet-connect-btn" class="wallet-connect-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="wallet-icon">
+                        <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Connect Wallet</span>
+                </button>
+
+                <!-- Connected Button with Dropdown (shown when connected) -->
+                <div id="wallet-connected-container" class="wallet-connected-container" style="display: none;">
+                    <button id="wallet-connected-btn" class="wallet-connected-button">
+                        <div class="wallet-status-indicator"></div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 128 128" id="wallet-phantom-icon" style="display: none;">
+                            <path fill="#AB9FF2" d="M120.81 35.05c0-14.47-6.93-26.93-17.4-34.2C97.57-2.8 89.45-1.42 82.2 2.4c-3.93 2.07-7.54 4.83-10.62 8.16-6.4 6.93-10.33 15.9-10.33 25.68 0 18.68 13.73 34.15 31.61 37.16.51.08 1.02.15 1.54.2 2.23.24 4.51.37 6.81.37 23.11 0 41.88-18.77 41.88-41.88 0-.37-.01-.74-.02-1.1-.05-.59-.11-1.17-.19-1.75l-.07-.19z"/>
+                            <path fill="#FFFFFF" d="M88.33 53.39c1.26 0 2.28-1.02 2.28-2.28s-1.02-2.28-2.28-2.28-2.28 1.02-2.28 2.28 1.02 2.28 2.28 2.28zm13.61 0c1.26 0 2.28-1.02 2.28-2.28s-1.02-2.28-2.28-2.28-2.28 1.02-2.28 2.28 1.02 2.28 2.28 2.28z"/>
+                        </svg>
+                        <span class="wallet-address" id="wallet-address-display">4b3x...7k9p</span>
+                        <svg class="wallet-dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div id="wallet-dropdown" class="wallet-dropdown" style="display: none;">
+                        <div class="wallet-dropdown-header">
+                            <div class="wallet-dropdown-wallet-info">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 128 128" class="wallet-dropdown-icon" id="dropdown-wallet-icon">
+                                    <path fill="#AB9FF2" d="M120.81 35.05c0-14.47-6.93-26.93-17.4-34.2C97.57-2.8 89.45-1.42 82.2 2.4c-3.93 2.07-7.54 4.83-10.62 8.16-6.4 6.93-10.33 15.9-10.33 25.68 0 18.68 13.73 34.15 31.61 37.16.51.08 1.02.15 1.54.2 2.23.24 4.51.37 6.81.37 23.11 0 41.88-18.77 41.88-41.88 0-.37-.01-.74-.02-1.10-.05-.59-.11-1.17-.19-1.75l-.07-.19z"/>
+                                    <path fill="#FFFFFF" d="M88.33 53.39c1.26 0 2.28-1.02 2.28-2.28s-1.02-2.28-2.28-2.28-2.28 1.02-2.28 2.28 1.02 2.28 2.28 2.28zm13.61 0c1.26 0 2.28-1.02 2.28-2.28s-1.02-2.28-2.28-2.28-2.28 1.02-2.28 2.28 1.02 2.28 2.28 2.28z"/>
+                                </svg>
+                                <div>
+                                    <div class="wallet-dropdown-name" id="dropdown-wallet-name">Phantom</div>
+                                    <div class="wallet-dropdown-address" id="dropdown-wallet-address">4b3x...7k9p</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="wallet-dropdown-divider"></div>
+
+                        <button id="copy-address-btn" class="wallet-dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 9H11C9.89543 9 9 9.89543 9 11V20C9 21.1046 9.89543 22 11 22H20C21.1046 22 22 21.1046 22 20V11C22 9.89543 21.1046 9 20 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M5 15H4C3.46957 15 2.96086 14.7893 2.58579 14.4142C2.21071 14.0391 2 13.5304 2 13V4C2 3.46957 2.21071 2.96086 2.58579 2.58579C2.96086 2.21071 3.46957 2 4 2H13C13.5304 2 14.0391 2.21071 14.4142 2.58579C14.7893 2.96086 15 3.46957 15 4V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span id="copy-address-text">Copy Address</span>
+                        </button>
+
+                        <div class="wallet-dropdown-divider"></div>
+
+                        <button id="disconnect-wallet-btn" class="wallet-dropdown-item wallet-dropdown-disconnect">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Disconnect</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🚀 VIBES DeFi Platform</h1>
-            <p>Basic Web3 DApp for Smart Contract Testing</p>
+                <h1>💎 VIBES Admin Dashboard</h1>
+                <p>Professional Web3 Administration Panel for Smart Contract Management</p>
         </div>
 
-        <!-- Wallet Connection Section -->
-        <div class="wallet-section">
-            <h2>🔗 Wallet Connection</h2>
-            <div class="wallet-info">
+            <!-- Dashboard Stats Grid -->
+            <div id="dashboard" class="dashboard-grid">
+                <!-- Presale Stats Card -->
+                <div class="presale-stats-card">
+                    <div class="card-header-stats">
+                        <div class="card-icon-stats">📊</div>
                 <div>
-                    <strong>Status:</strong> <span id="wallet-status">Not Connected</span>
+                            <div class="card-title-stats">Presale Stats</div>
+                            <div class="card-subtitle-stats">Real-time presale metrics</div>
                 </div>
+                    </div>
+                    
+                    <div class="stats-metrics">
+                        <div class="metric-row">
+                            <span class="metric-label">Total Raised (USD)</span>
+                            <span class="metric-value" id="stats-total-raised">$0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Total Buyers</span>
+                            <span class="metric-value" id="stats-total-buyers">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Current Price Tier</span>
+                            <span class="metric-value" id="stats-price-tier">Tier 1</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Tokens Sold</span>
+                            <span class="metric-value" id="stats-tokens-sold">0 VIBES</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-info">
+                            <span class="progress-label-main">Progress to Hard Cap</span>
+                            <span class="progress-percentage-main" id="stats-progress-percent">0%</span>
+                        </div>
+                        <div class="progress-bar-main">
+                            <div class="progress-fill-main" id="stats-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Calendar Card -->
+                <div class="price-calendar-card">
+                    <div class="card-header-stats">
+                        <div class="card-icon-stats">⏰</div>
                 <div>
-                    <button id="connect-wallet" class="btn">Connect Wallet</button>
-                    <button id="disconnect-wallet" class="btn btn-danger hidden">Disconnect</button>
+                            <div class="card-title-stats">Price Calendar</div>
+                            <div class="card-subtitle-stats">Time until next price increase</div>
                 </div>
             </div>
+
+                    <div class="price-display">
+                        <div class="current-price-display">
+                            <span class="price-label-display">Current Price</span>
+                            <span class="price-amount" id="calendar-current-price">$0.08</span>
+                </div>
+                        <div class="next-price-display">
+                            <span class="price-label-display">Next Price</span>
+                            <span class="price-amount" id="calendar-next-price">$0.10</span>
+                </div>
+            </div>
+
+                    <div class="countdown-box">
+                        <div class="countdown-title">⏱️ TIME UNTIL PRICE INCREASE</div>
+                        <div class="countdown-display">
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-days">00</span>
+                                <span class="countdown-label">Days</span>
+                            </div>
+                            <span class="countdown-separator">:</span>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-hours">00</span>
+                                <span class="countdown-label">Hours</span>
+                            </div>
+                            <span class="countdown-separator">:</span>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-minutes">00</span>
+                                <span class="countdown-label">Minutes</span>
+                            </div>
+                            <span class="countdown-separator">:</span>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="countdown-seconds">00</span>
+                                <span class="countdown-label">Seconds</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-row">
+                        <span class="metric-label">Price Increase</span>
+                        <span class="price-increase-badge" id="calendar-increase">+25%</span>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Wallet Selector Modal -->
+        <div id="wallet-selector-modal" class="wallet-selector-modal" style="display: none;">
+            <div class="wallet-selector-overlay"></div>
+            <div class="wallet-selector-content">
+                <div class="wallet-selector-header">
+                    <h3>Connect Wallet</h3>
+                    <button class="wallet-selector-close" id="close-wallet-selector">×</button>
+                </div>
+                <div class="wallet-selector-body" id="wallet-selector-list">
+                    <!-- Wallets will be inserted here dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden elements for app.js compatibility -->
+        <div style="display: none;">
+            <span id="wallet-status">Not Connected</span>
+            <span id="wallet-address"></span>
             <div id="wallet-details" class="hidden">
-                <div class="wallet-address">
-                    <strong>Address:</strong> <span id="wallet-address"></span>
-                </div>
-                <div class="balance-info">
-                    <span>SOL Balance: <span id="sol-balance">0</span></span>
-                    <span>USDC Balance: <span id="usdc-balance">0</span></span>
-                </div>
+                <span id="sol-balance">0</span>
+                <span id="usdc-balance">0</span>
             </div>
+            <button id="connect-wallet">Hidden Connect</button>
+            <button id="disconnect-wallet" class="hidden">Hidden Disconnect</button>
         </div>
 
         <!-- My BuyerState Section -->
         <div class="section">
             <h2>📦 My BuyerState Account</h2>
-            <div class="info-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <h3 style="color: white; margin-bottom: 15px;">🔑 Your Account Addresses</h3>
+            <div class="info-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.15) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); box-shadow: 0 0 40px rgba(199, 248, 1, 0.15);">
+                <h3 style="margin-bottom: 15px; font-size: 1.5rem;">🔑 Your Account Addresses</h3>
                 
                 <div style="margin-bottom: 20px;">
                     <p style="margin-bottom: 8px; opacity: 0.9;"><strong>👤 Your Wallet:</strong></p>
                     <p id="my-wallet-address" style="font-family: monospace; font-size: 0.9rem; word-break: break-all; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 6px; margin-bottom: 8px;">
                         Connect wallet to see address
                     </p>
-                    <a id="my-wallet-link" href="#" target="_blank" style="color: white; text-decoration: underline; font-size: 0.9rem; display: none;">
-                        🔗 View Wallet on Solscan
+                    <a id="my-wallet-link" href="#" target="_blank" style="color: var(--vibes-yellow); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: none; transition: all 0.2s ease;">
+                        🔗 View Wallet on Solscan →
                     </a>
                 </div>
                 
@@ -299,8 +2101,8 @@
                     <p id="my-buyerstate-address" style="font-family: monospace; font-size: 0.9rem; word-break: break-all; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 6px; margin-bottom: 8px;">
                         Connect wallet to calculate BuyerState
                     </p>
-                    <a id="my-buyerstate-link" href="#" target="_blank" style="color: white; text-decoration: underline; font-size: 0.9rem; display: none;">
-                        🔗 View BuyerState on Solscan
+                    <a id="my-buyerstate-link" href="#" target="_blank" style="color: var(--vibes-yellow); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: none; transition: all 0.2s ease;">
+                        🔗 View BuyerState on Solscan →
                     </a>
                 </div>
                 
@@ -343,41 +2145,51 @@
         </div>
 
         <!-- Purchase Section -->
-        <div class="section">
+            <div id="presale" class="section">
             <h2>💰 Purchase VIBES Tokens</h2>
             <div class="grid">
                 <!-- SOL Purchase -->
-                <div class="info-card">
-                    <h3>Buy with SOL</h3>
+                    <div class="purchase-card">
+                        <div class="purchase-header">
+                            <div class="purchase-icon">◎</div>
+                            <div class="purchase-title">Buy with SOL</div>
+                        </div>
                     <div class="form-group">
-                        <label for="sol-amount">SOL Amount:</label>
-                        <input type="number" id="sol-amount" step="0.01" min="0" placeholder="0.1">
+                            <label for="sol-amount">SOL Amount</label>
+                            <input type="number" id="sol-amount" step="0.01" min="0" placeholder="Enter SOL amount (e.g., 0.1)">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="sol-staking">
-                        <label for="sol-staking">Opt into staking (40% APY)</label>
+                            <label for="sol-staking">🏦 Opt into staking (40% APY)</label>
                     </div>
-                    <button id="buy-sol" class="btn btn-success">Buy with SOL</button>
+                        <button id="buy-sol" class="btn btn-success" style="width: 100%; margin: 10px 0 0 0;">
+                            Buy with SOL ◎
+                        </button>
                 </div>
 
                 <!-- USDC Purchase -->
-                <div class="info-card">
-                    <h3>Buy with USDC</h3>
+                    <div class="purchase-card">
+                        <div class="purchase-header">
+                            <div class="purchase-icon">💵</div>
+                            <div class="purchase-title">Buy with USDC</div>
+                        </div>
                     <div class="form-group">
-                        <label for="usdc-amount">USDC Amount:</label>
-                        <input type="number" id="usdc-amount" step="0.01" min="0" placeholder="10">
+                            <label for="usdc-amount">USDC Amount</label>
+                            <input type="number" id="usdc-amount" step="0.01" min="0" placeholder="Enter USDC amount (e.g., 10)">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="usdc-staking">
-                        <label for="usdc-staking">Opt into staking (40% APY)</label>
+                            <label for="usdc-staking">🏦 Opt into staking (40% APY)</label>
                     </div>
-                    <button id="buy-usdc" class="btn btn-success">Buy with USDC</button>
+                        <button id="buy-usdc" class="btn btn-success" style="width: 100%; margin: 10px 0 0 0;">
+                            Buy with USDC 💵
+                        </button>
                 </div>
             </div>
         </div>
 
         <!-- Staking Section -->
-        <div class="section">
+        <div id="staking" class="section">
             <h2>🏦 Staking Management</h2>
             <div class="grid">
                 <div class="info-card">
@@ -399,7 +2211,7 @@
         </div>
 
         <!-- Vesting Section -->
-        <div class="section">
+        <div id="vesting" class="section">
             <h2>⏰ Vesting Management</h2>
             <div class="grid">
                 <div class="info-card">
@@ -417,8 +2229,8 @@
             <h2>📊 Admin Fund Monitor</h2>
             
             <!-- Summary Card -->
-            <div class="info-card" style="margin-bottom: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <h3 style="color: white; margin-bottom: 15px;">💰 Fund Distribution Summary</h3>
+            <div class="info-card" style="margin-bottom: 20px; background: linear-gradient(135deg, rgba(199, 248, 1, 0.12) 0%, rgba(56, 73, 37, 0.9) 100%); border: 2px solid rgba(199, 248, 1, 0.25); box-shadow: 0 0 30px rgba(199, 248, 1, 0.1);">
+                <h3 style="margin-bottom: 15px; font-size: 1.5rem;">💰 Fund Distribution Summary</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
                         <p><strong>Total SOL Raised:</strong> <span id="admin-total-sol">0</span> SOL</p>
@@ -426,7 +2238,7 @@
                     </div>
                     <div>
                         <p><strong>Last Updated:</strong> <span id="admin-last-updated">Never</span></p>
-                        <button id="refresh-admin-data" class="btn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">🔄 Refresh</button>
+                        <button id="refresh-admin-data" class="btn btn-secondary" style="margin: 0; margin-top: 10px;">🔄 Refresh Data</button>
                     </div>
                 </div>
             </div>
@@ -529,6 +2341,482 @@
             <button id="clear-log" class="btn btn-danger">Clear Log</button>
         </div>
     </div>
+    </div><!-- End main-content -->
+
+        <!-- Header Navigation & Scroll Script -->
+        <script>
+            // Smooth scroll to section function
+            function scrollToSection(sectionId) {
+                const element = document.getElementById(sectionId);
+                if (element) {
+                    const headerOffset = 100; // Header height + some padding
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    event.target.classList.add('active');
+                }
+            }
+
+            // Header scroll effect
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('.production-header');
+                if (window.scrollY > 20) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Production Wallet Button - Complete functionality
+            (function() {
+                let showDropdown = false;
+                let copied = false;
+
+                const elements = {
+                    connectBtn: document.getElementById('wallet-connect-btn'),
+                    connectedContainer: document.getElementById('wallet-connected-container'),
+                    connectedBtn: document.getElementById('wallet-connected-btn'),
+                    dropdown: document.getElementById('wallet-dropdown'),
+                    dropdownArrow: document.querySelector('.wallet-dropdown-arrow'),
+                    addressDisplay: document.getElementById('wallet-address-display'),
+                    dropdownAddress: document.getElementById('dropdown-wallet-address'),
+                    dropdownName: document.getElementById('dropdown-wallet-name'),
+                    copyBtn: document.getElementById('copy-address-btn'),
+                    copyText: document.getElementById('copy-address-text'),
+                    disconnectBtn: document.getElementById('disconnect-wallet-btn'),
+                    mainConnectBtn: document.getElementById('connect-wallet'),
+                    mainDisconnectBtn: document.getElementById('disconnect-wallet')
+                };
+
+                // Format wallet address (4 chars...4 chars)
+                function formatAddress(address) {
+                    if (!address) return '';
+                    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+                }
+
+                // Toggle dropdown
+                function toggleDropdown() {
+                    showDropdown = !showDropdown;
+                    elements.dropdown.style.display = showDropdown ? 'block' : 'none';
+                    if (elements.dropdownArrow) {
+                        elements.dropdownArrow.classList.toggle('open', showDropdown);
+                    }
+                }
+
+                // Close dropdown when clicking outside
+                function handleClickOutside(event) {
+                    if (elements.connectedContainer && !elements.connectedContainer.contains(event.target)) {
+                        showDropdown = false;
+                        elements.dropdown.style.display = 'none';
+                        if (elements.dropdownArrow) {
+                            elements.dropdownArrow.classList.remove('open');
+                        }
+                    }
+                }
+
+                // Copy address to clipboard
+                async function handleCopyAddress() {
+                    const address = elements.addressDisplay.textContent;
+                    const fullAddress = window.vibesWalletAddress || address;
+                    
+                    try {
+                        await navigator.clipboard.writeText(fullAddress);
+                        copied = true;
+                        elements.copyText.textContent = 'Copied!';
+                        console.log('✅ Address copied to clipboard');
+                        
+                        setTimeout(() => {
+                            copied = false;
+                            elements.copyText.textContent = 'Copy Address';
+                        }, 2000);
+                    } catch (err) {
+                        console.error('❌ Failed to copy address:', err);
+                    }
+                }
+
+                // Connect wallet
+                function handleConnect() {
+                    console.log('🔗 Connect clicked');
+                    
+                    if (window.app?.showWalletSelector) {
+                        window.app.showWalletSelector();
+                    } else if (window.vibesDApp?.showWalletSelector) {
+                        window.vibesDApp.showWalletSelector();
+                    } else if (elements.mainConnectBtn) {
+                        elements.mainConnectBtn.click();
+                    }
+                }
+
+                // Disconnect wallet
+                function handleDisconnect() {
+                    console.log('🔌 Production Wallet Button: Disconnect clicked');
+                    toggleDropdown(); // Close dropdown first
+                    if (elements.mainDisconnectBtn) {
+                        elements.mainDisconnectBtn.click();
+                    }
+                }
+
+                // Update wallet UI state
+                window.updateProductionWalletButton = function(isConnected, walletAddress, walletName = 'Phantom') {
+                    console.log('🔄 Updating production wallet button:', { isConnected, walletAddress, walletName });
+
+                    if (isConnected && walletAddress) {
+                        // Store full address globally
+                        window.vibesWalletAddress = walletAddress;
+
+                        // Hide connect button, show connected button
+                        elements.connectBtn.style.display = 'none';
+                        elements.connectedContainer.style.display = 'block';
+
+                        // Update address displays
+                        const shortAddress = formatAddress(walletAddress);
+                        elements.addressDisplay.textContent = shortAddress;
+                        elements.dropdownAddress.textContent = shortAddress;
+                        elements.dropdownName.textContent = walletName;
+
+                        // Show wallet icon (Phantom)
+                        const walletIcon = document.getElementById('wallet-phantom-icon');
+                        if (walletIcon) {
+                            walletIcon.style.display = 'block';
+                        }
+
+                        console.log('✅ Production wallet button: Connected -', shortAddress);
+                    } else {
+                        // Show connect button, hide connected button
+                        elements.connectBtn.style.display = 'inline-flex';
+                        elements.connectedContainer.style.display = 'none';
+
+                        // Close dropdown if open
+                        showDropdown = false;
+                        elements.dropdown.style.display = 'none';
+                        if (elements.dropdownArrow) {
+                            elements.dropdownArrow.classList.remove('open');
+                        }
+
+                        console.log('✅ Production wallet button: Disconnected');
+                    }
+                };
+
+                // Event listeners
+                if (elements.connectBtn) {
+                    elements.connectBtn.addEventListener('click', handleConnect);
+                }
+
+                if (elements.connectedBtn) {
+                    elements.connectedBtn.addEventListener('click', toggleDropdown);
+                }
+
+                if (elements.copyBtn) {
+                    elements.copyBtn.addEventListener('click', handleCopyAddress);
+                }
+
+                if (elements.disconnectBtn) {
+                    elements.disconnectBtn.addEventListener('click', handleDisconnect);
+                }
+
+                // Click outside to close dropdown
+                document.addEventListener('mousedown', handleClickOutside);
+
+                console.log('✅ Production Wallet Button initialized');
+            })();
+
+            // Wallet Selector Modal
+            (function() {
+                const modal = document.getElementById('wallet-selector-modal');
+                const overlay = document.querySelector('.wallet-selector-overlay');
+                const closeBtn = document.getElementById('close-wallet-selector');
+                const walletList = document.getElementById('wallet-selector-list');
+                let onSelectCallback = null;
+
+                // Wallet icons map
+                const walletIcons = {
+                    phantom: '👻',
+                    solflare: '🔥',
+                    trust: '🛡️',
+                    backpack: '🎒',
+                    coinbase: '🔵',
+                    brave: '🦁',
+                    wallet: '💼'
+                };
+
+                // Show wallet selector modal
+                window.showWalletSelectorModal = function(wallets, callback) {
+                    console.log('📱 Showing', wallets.length, 'wallet(s)');
+                    onSelectCallback = callback;
+                    
+                    // Clear previous wallets
+                    walletList.innerHTML = '';
+                    
+                    // Add wallet options
+                    wallets.forEach(wallet => {
+                        const option = document.createElement('div');
+                        option.className = 'wallet-option';
+                        option.onclick = () => selectWallet(wallet);
+                        
+                        const icon = walletIcons[wallet.icon] || '💼';
+                        
+                        option.innerHTML = `
+                            <div class="wallet-option-icon">${icon}</div>
+                            <div class="wallet-option-info">
+                                <div class="wallet-option-name">${wallet.name}</div>
+                                <div class="wallet-option-status detected">✓ Detected</div>
+                            </div>
+                        `;
+                        
+                        walletList.appendChild(option);
+                    });
+                    
+                    // Show modal
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                };
+
+                // Select wallet
+                function selectWallet(wallet) {
+                    console.log('✅ Selected:', wallet.name);
+                    
+                    // Save callback before closing
+                    const callback = onSelectCallback;
+                    closeModal();
+                    
+                    // Call callback
+                    if (callback) {
+                        callback(wallet);
+                    }
+                }
+
+                // Close modal
+                function closeModal() {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    onSelectCallback = null;
+                }
+
+                // Event listeners
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeModal);
+                }
+
+                if (overlay) {
+                    overlay.addEventListener('click', closeModal);
+                }
+
+                // ESC key to close
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && modal.style.display === 'flex') {
+                        closeModal();
+                    }
+                });
+
+                console.log('✅ Wallet Selector Modal initialized');
+                
+                // Log system ready state
+                setTimeout(() => {
+                    console.log('🎉 VIBES DApp System Ready!');
+                    console.log('📊 System Status:', {
+                        app: !!window.app,
+                        vibesDApp: !!window.vibesDApp,
+                        showWalletSelectorModal: typeof window.showWalletSelectorModal,
+                        updateProductionWalletButton: typeof window.updateProductionWalletButton
+                    });
+                }, 2000);
+            })();
+
+            // Mobile menu toggle (future implementation)
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    this.classList.toggle('open');
+                    // Mobile menu implementation here
+                });
+            }
+        </script>
+
+        <!-- Dashboard Stats & Price Calendar Script -->
+        <script>
+            // Price Calendar Countdown Timer
+            function updateCountdown() {
+                // Calculate next price increase time (example: 7 days from now)
+                // In production, this should come from contract data
+                const now = new Date().getTime();
+                const nextPriceIncrease = new Date(now + (7 * 24 * 60 * 60 * 1000)).getTime(); // 7 days from now
+                
+                function updateTimer() {
+                    const currentTime = new Date().getTime();
+                    const distance = nextPriceIncrease - currentTime;
+                    
+                    if (distance < 0) {
+                        // Countdown finished
+                        document.getElementById('countdown-days').textContent = '00';
+                        document.getElementById('countdown-hours').textContent = '00';
+                        document.getElementById('countdown-minutes').textContent = '00';
+                        document.getElementById('countdown-seconds').textContent = '00';
+                        return;
+                    }
+                    
+                    // Calculate time components
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    
+                    // Pad with zeros and update display
+                    document.getElementById('countdown-days').textContent = String(days).padStart(2, '0');
+                    document.getElementById('countdown-hours').textContent = String(hours).padStart(2, '0');
+                    document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
+                    document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
+                }
+                
+                // Update immediately and then every second
+                updateTimer();
+                setInterval(updateTimer, 1000);
+            }
+
+            // Update Dashboard Stats from contract data
+            function updateDashboardStats(presaleData) {
+                if (!presaleData) {
+                    console.warn('⚠️ updateDashboardStats called with no data');
+                    return;
+                }
+
+                try {
+                    console.log('🔄 Updating dashboard with:', presaleData);
+                    
+                    // Calculate total raised in USD (SOL + USDC)
+                    const solRaised = presaleData.totalSolRaised || 0;
+                    const usdcRaised = presaleData.totalUsdcRaised || 0;
+                    const solPrice = 150; // Match price from app.js
+                    const totalRaisedUSD = (solRaised * solPrice) + usdcRaised;
+
+                    console.log('💰 Calculated Total Raised:', {
+                        solRaised,
+                        usdcRaised,
+                        solPrice,
+                        totalRaisedUSD
+                    });
+
+                    // Update stats display with verification
+                    const statsElements = {
+                        totalRaised: document.getElementById('stats-total-raised'),
+                        totalBuyers: document.getElementById('stats-total-buyers'),
+                        priceTier: document.getElementById('stats-price-tier'),
+                        tokensSold: document.getElementById('stats-tokens-sold'),
+                        progressPercent: document.getElementById('stats-progress-percent'),
+                        progressBar: document.getElementById('stats-progress-bar'),
+                        currentPrice: document.getElementById('calendar-current-price'),
+                        nextPrice: document.getElementById('calendar-next-price'),
+                        priceIncrease: document.getElementById('calendar-increase')
+                    };
+
+                    // Verify all elements exist
+                    Object.keys(statsElements).forEach(key => {
+                        if (!statsElements[key]) {
+                            console.error(`❌ Element not found: ${key}`);
+                        }
+                    });
+
+                    // Update Total Raised
+                    if (statsElements.totalRaised) {
+                        statsElements.totalRaised.textContent = 
+                            '$' + totalRaisedUSD.toLocaleString('en-US', { maximumFractionDigits: 0 });
+                    }
+                    
+                    // Update Total Buyers
+                    if (statsElements.totalBuyers) {
+                        const buyersCount = presaleData.totalBuyers || 0;
+                        statsElements.totalBuyers.textContent = buyersCount.toLocaleString('en-US');
+                        console.log('👥 Updated buyers count to:', buyersCount);
+                    }
+                    
+                    // Update Price Tier
+                    if (statsElements.priceTier) {
+                        statsElements.priceTier.textContent = 
+                            'Tier ' + (presaleData.currentPriceTier || 1);
+                    }
+                    
+                    // Update Tokens Sold
+                    if (statsElements.tokensSold) {
+                        const tokensSold = presaleData.tokensSold || 0;
+                        statsElements.tokensSold.textContent = 
+                            tokensSold.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' VIBES';
+                        console.log('🪙 Updated tokens sold to:', tokensSold);
+                    }
+
+                    // Calculate progress percentage
+                    const hardCapUSD = 5000000; // $5M hard cap
+                    const progressPercent = Math.min((totalRaisedUSD / hardCapUSD) * 100, 100);
+                    
+                    if (statsElements.progressPercent) {
+                        statsElements.progressPercent.textContent = 
+                            progressPercent.toFixed(1) + '%';
+                    }
+                    
+                    if (statsElements.progressBar) {
+                        statsElements.progressBar.style.width = progressPercent + '%';
+                    }
+
+                    // Update price calendar
+                    const currentPrice = presaleData.currentPrice || 0.08;
+                    const nextPrice = presaleData.nextPrice || 0.10;
+                    const priceIncrease = ((nextPrice - currentPrice) / currentPrice * 100).toFixed(0);
+
+                    if (statsElements.currentPrice) {
+                        statsElements.currentPrice.textContent = '$' + currentPrice.toFixed(4);
+                    }
+                    
+                    if (statsElements.nextPrice) {
+                        statsElements.nextPrice.textContent = '$' + nextPrice.toFixed(4);
+                    }
+                    
+                    if (statsElements.priceIncrease) {
+                        statsElements.priceIncrease.textContent = '+' + priceIncrease + '%';
+                    }
+                    
+                    console.log('✅ Dashboard stats updated successfully');
+                    console.log('📊 Final UI values:', {
+                        totalRaised: totalRaisedUSD,
+                        totalBuyers: presaleData.totalBuyers,
+                        tokensSold: presaleData.tokensSold,
+                        currentPrice,
+                        nextPrice,
+                        priceIncrease: priceIncrease + '%'
+                    });
+                    
+                } catch (error) {
+                    console.error('❌ Error updating dashboard stats:', error);
+                    console.error('Error stack:', error.stack);
+                }
+            }
+
+            // Initialize countdown on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('🚀 Initializing dashboard features...');
+                updateCountdown();
+                
+                // Set initial demo values
+                updateDashboardStats({
+                    totalSolRaised: 120.5,
+                    totalUsdcRaised: 3450,
+                    totalBuyers: 42,
+                    currentPriceTier: 1,
+                    tokensSold: 125000,
+                    currentPrice: 0.08,
+                    nextPrice: 0.10
+                });
+            });
+
+            // Make updateDashboardStats globally available so app.js can call it
+            window.updateDashboardStats = updateDashboardStats;
+        </script>
 
     <!-- Essential Scripts Only -->
     <script src="https://unpkg.com/@solana/web3.js@1.91.0/lib/index.iife.min.js"></script>
@@ -572,6 +2860,7 @@
             // Load scripts in order
             const scripts = [
                 'src/js/config.js',
+                'src/js/wallet-adapter.js',
                 'src/js/idls.js', 
                 'src/js/direct-contract.js?v=1757960000',
                 'src/js/app.js?v=1757960000'
@@ -602,6 +2891,94 @@
                 console.error('❌ Error loading scripts:', error);
             });
         });
+        
+        // Debug functions for wallet detection testing
+        window.testWalletDetection = function() {
+            console.log('🧪 Testing wallet detection...');
+            if (window.vibesDApp) {
+                const wallets = window.vibesDApp.detectAvailableWallets();
+                console.log('📊 Detection results:', wallets);
+                return wallets;
+            } else {
+                console.log('❌ vibesDApp not loaded yet');
+                return [];
+            }
+        };
+        
+        // Debug wallet adapter
+        window.debugWalletAdapter = function() {
+            console.log('🔍 Debugging wallet adapter...');
+            if (window.vibesApp) {
+                return window.vibesApp.debugWalletAdapter();
+            } else {
+                console.log('❌ VibesApp not available');
+                return null;
+            }
+        };
+        
+        // Enhanced debug function to check all wallet indicators
+        window.debugAllWallets = function() {
+            console.log('🔍 [DEBUG] Complete wallet detection analysis...');
+            console.log('='.repeat(50));
+            
+            // Check window.solana
+            console.log('🔍 window.solana:', {
+                exists: !!window.solana,
+                isPhantom: window.solana?.isPhantom,
+                isTrust: window.solana?.isTrust,
+                isBraveWallet: window.solana?.isBraveWallet,
+                isCoinbaseWallet: window.solana?.isCoinbaseWallet,
+                isBackpack: window.solana?.isBackpack,
+                isSolflare: window.solana?.isSolflare,
+                providers: window.solana?.providers?.length || 0,
+                connect: typeof window.solana?.connect,
+                disconnect: typeof window.solana?.disconnect
+            });
+            
+            // Check individual wallet objects
+            const walletObjects = [
+                'solflare', 'backpack', 'trustwallet', 'coinbaseSolana', 
+                'braveSolana', 'torus', 'slope', 'bitpie', 'blocto', 
+                'tokenpocket', 'coin98', 'clover', 'safepal'
+            ];
+            
+            walletObjects.forEach(objName => {
+                const obj = window[objName];
+                if (obj) {
+                    console.log(`🔍 window.${objName}:`, {
+                        exists: true,
+                        isPhantom: obj.isPhantom,
+                        isTrust: obj.isTrust,
+                        isSolflare: obj.isSolflare,
+                        isBackpack: obj.isBackpack,
+                        isCoinbaseWallet: obj.isCoinbaseWallet,
+                        isBraveWallet: obj.isBraveWallet,
+                        connect: typeof obj.connect,
+                        disconnect: typeof obj.disconnect
+                    });
+                }
+            });
+            
+            // Check ethereum provider
+            console.log('🔍 window.ethereum:', {
+                exists: !!window.ethereum,
+                isTrust: window.ethereum?.isTrust,
+                isMetaMask: window.ethereum?.isMetaMask,
+                solana: !!window.ethereum?.solana
+            });
+            
+            // Run actual detection
+            console.log('='.repeat(50));
+            console.log('🎯 Running actual detection...');
+            if (window.vibesDApp) {
+                const wallets = window.vibesDApp.detectAvailableWallets();
+                console.log('📊 Final results:', wallets);
+                return wallets;
+            } else {
+                console.log('❌ vibesDApp not loaded yet');
+                return [];
+            }
+        };
     </script>
 </body>
 </html>

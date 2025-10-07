@@ -62,9 +62,9 @@ const DAPP_LIMITS = {
 // Wallet Configuration
 const WALLET_CONFIG = {
     // Supported wallet adapters
-    SUPPORTED_WALLETS: ['Phantom', 'Solflare', 'Sollet'],
-    // Auto-connect on page load
-    AUTO_CONNECT: true,
+    SUPPORTED_WALLETS: ['Phantom', 'Solflare', 'Sollet', 'Trust Wallet', 'Backpack', 'Coinbase'],
+    // Auto-connect on page load (disabled for multi-wallet support)
+    AUTO_CONNECT: false,
     // Connection timeout (ms)
     CONNECTION_TIMEOUT: 10000
 };
