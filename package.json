@@ -1,38 +1,33 @@
 {
-  "name": "vibes-defi-basic-dapp",
+  "name": "vibes-defi-admin-dapp",
   "version": "2.0.0",
-  "description": "Production-ready DApp for VIBES token presale with staking and vesting",
+  "description": "Professional Admin DApp for VIBES token presale - Vanilla JavaScript implementation with Solana Wallet Standard",
   "main": "index.html",
   "scripts": {
     "start": "npx http-server . -p 8080 -c-1 --cors",
     "dev": "npx http-server . -p 8080 -c-1 --cors",
-    "build": "echo 'Building for production...' && npm run validate",
-    "validate": "echo 'Validating configuration...' && node -e \"console.log('✅ Configuration valid')\"",
-    "test": "echo 'Running tests...' && npm run validate",
-    "clean": "echo 'Cleaning temporary files...' && rm -f *.bak *.tmp src/js/*.backup",
-    "lint": "echo 'Linting code...' && echo '✅ Code style valid'",
-    "deploy": "echo 'Deploy to your hosting platform' && npm run build"
+    "build": "echo '✅ Building for production...' && npm run validate",
+    "validate": "echo '✅ Validating configuration...' && node -e \"console.log('✅ Configuration valid')\"",
+    "test": "echo '✅ Running tests...' && npm run validate",
+    "clean": "echo '🧹 Cleaning temporary files...' && rm -f *.bak *.tmp src/js/*.backup",
+    "lint": "echo '✅ Linting code...' && echo '✅ Code style valid'",
+    "deploy": "echo '🚀 Deploy to your hosting platform' && npm run build"
   },
   "keywords": [
     "solana",
     "defi",
     "dapp",
     "presale",
-    "staking",
-    "vesting",
+    "admin",
     "blockchain",
-    "web3"
+    "web3",
+    "vanilla-javascript",
+    "wallet-standard"
   ],
   "author": "VIBES DeFi Team",
   "license": "MIT",
   "dependencies": {
     "@solana/web3.js": "^1.98.4",
-    "@solana/wallet-adapter-base": "^0.9.27",
-    "@solana/wallet-adapter-phantom": "^0.9.28",
-    "@solana/wallet-adapter-react": "^0.15.39",
-    "@solana/wallet-adapter-react-ui": "^0.9.39",
-    "@solana/wallet-adapter-solflare": "^0.6.32",
-    "@solana/wallet-adapter-wallets": "^0.19.37",
     "dotenv": "^17.2.3"
   },
   "devDependencies": {
@@ -43,10 +38,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vibes-defi/basic-dapp.git"
+    "url": "https://github.com/vibes-defi/admin-dapp.git"
   },
   "bugs": {
-    "url": "https://github.com/vibes-defi/basic-dapp/issues"
-  },
-  "homepage": "https://vibes-defi.github.io/basic-dapp"
+    "url": "https://github.com/vibes-defi/admin-dapp/issues"
+  }
 }

@@ -1,204 +1,398 @@
-# VIBES DeFi Basic DApp
+# 💎 VIBES DeFi - Admin Dashboard
 
-A production-ready decentralized application for the VIBES token presale with staking and vesting functionality.
+> **Professional Admin DApp for VIBES Token Presale**  
+> Built with Vanilla JavaScript + Solana Wallet Standard
 
-## 🚀 Features
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/vibes-defi/admin-dapp)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Solana](https://img.shields.io/badge/Solana-Devnet-purple.svg)](https://solana.com)
 
-- **Token Purchase**: Buy VIBES tokens with SOL or USDC
-- **Purchase Limits**: 250,000 VIBES maximum per wallet (business policy)
-- **Staking System**: Optional staking during purchase with 40% APY
-- **Vesting**: 12-month vesting for unstaked tokens
-- **Admin Dashboard**: Fund distribution monitoring and CSV reports
-- **Real-time Data**: Live price tiers, raised amounts, and user balances
-
-## 🔧 Technology Stack
-
-- **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
-- **Blockchain**: Solana (Devnet)
-- **Wallet Integration**: Phantom Wallet
-- **Smart Contracts**: Anchor Framework (Rust)
-
-## 📁 Project Structure
-
-```
-basic-dapp/
-├── src/
-│   ├── js/
-│   │   ├── app.js           # Main application logic
-│   │   ├── config.js        # Configuration constants
-│   │   ├── direct-contract.js # Direct contract interaction
-│   │   └── idls.js          # Smart contract IDLs
-│   └── css/                 # Stylesheets
-├── index.html               # Main HTML file
-├── package.json             # Dependencies
-└── README.md               # Documentation
-```
+---
 
 ## 🚀 Quick Start
 
-### Prerequisites
+```bash
+# Install dependencies
+npm install
 
-- Node.js (v16 or higher)
-- Phantom Wallet browser extension
-- SOL/USDC on Solana Devnet
+# Start development server
+npm start
 
-### Installation
+# Open browser
+http://localhost:8080
+```
 
-1. **Clone and install dependencies**:
-   ```bash
-   cd basic-dapp
-   npm install
-   ```
+**That's it!** The app will be running and ready to connect your wallet.
 
-2. **Set up environment**:
-   ```bash
-   cp env.example .env
-   # Edit .env with your configuration
-   ```
+---
 
-3. **Start development server**:
-   ```bash
-   # Simple HTTP server
-   npx http-server . -p 8080
-   
-   # Or use Python
-   python -m http.server 8080
-   ```
+## ✨ Features
 
-4. **Open in browser**:
-   ```
-   http://localhost:8080
-   ```
+### 🔐 Wallet Management
+- **Multi-Wallet Support**: Phantom, Solflare, Trust Wallet, Coinbase, Backpack
+- **Solana Wallet Standard**: Professional implementation following official protocol
+- **Auto-Detection**: Automatically detects installed wallets
+- **Auto-Reconnect**: Maintains connection after page refresh 🆕
+- **Secure Connection**: User-controlled, non-custodial wallet integration
+
+### 📊 Admin Dashboard
+- **Presale Information**: Visual cards showing pricing, countdown, and staking APY
+- **Real-Time Stats**: User balances and wallet information
+- **Live Updates**: Automatic balance refresh and data sync
+- **Clean Interface**: Streamlined UI focused on core functionality
+- **Fund Distribution**: Monitor treasury allocation
+
+### 🎯 Smart Contract Integration
+- **Direct Contract Calls**: No intermediaries, maximum reliability
+- **Transaction Signing**: Secure transaction approval flow
+- **Error Handling**: Professional error messages and recovery
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  VIBES Admin DApp                       │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  ┌──────────────┐        ┌─────────────────────────┐  │
+│  │VibesAdminApp │  ◄────►│ SolanaWalletManager     │  │
+│  │(app-new.js)  │        │(Wallet Standard v2.0)   │  │
+│  └──────────────┘        └─────────────────────────┘  │
+│         │                          │                   │
+│         ▼                          ▼                   │
+│  ┌──────────────┐        ┌─────────────────────────┐  │
+│  │Solana RPC    │        │Wallet Providers         │  │
+│  │Connection    │        │- Phantom                │  │
+│  └──────────────┘        │- Solflare               │  │
+│                          │- Trust Wallet           │  │
+│                          │- Coinbase & more        │  │
+│                          └─────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📦 Technology Stack
+
+| Component | Technology |
+|-----------|-----------|
+| **Frontend** | Vanilla JavaScript (ES6+) |
+| **Blockchain** | Solana (Devnet/Mainnet) |
+| **Wallet Integration** | Solana Wallet Standard v2.0 |
+| **Smart Contracts** | Anchor Framework (Rust) |
+| **Network** | Solana Web3.js |
+| **Styling** | CSS3 with VIBES Design System |
+
+---
 
 ## 🔧 Configuration
 
-### Environment Variables
+### Environment Setup
 
+1. **Copy environment template**:
 ```bash
+   cp env.example .env
+   ```
+
+2. **Edit `.env` file**:
+   ```env
 # Network Configuration
 RPC_URL=https://api.devnet.solana.com
 NETWORK=devnet
 
-# Contract Addresses
+   # Contract Addresses (Devnet)
 PRESALE_PROGRAM_ID=HNPuLPxycypT4YtD5vMZPdcrr53MLKAajYrQwNTv4ujH
 USDC_MINT=4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
 VIBES_MINT=C4SeJZr8wJ6BrNUJP52vGZf6QMunWFRgx6kbkb56j3vW
 ```
 
-### Business Rules
+### Smart Contract Addresses (Devnet)
 
-- **Max Purchase**: 250,000 VIBES per wallet (DApp policy)
-- **Min Purchase**: 0.1 SOL or 1 USDC
-- **Staking APY**: 40% annual percentage yield
-- **Vesting Period**: 12 months for unstaked tokens
-- **Fee Structure**: 0.5% platform fee, 80/20 treasury distribution
+| Contract | Address |
+|----------|---------|
+| **Presale V3** | `HNPuLPxycypT4YtD5vMZPdcrr53MLKAajYrQwNTv4ujH` |
+| **Staking** | `3ZaKegZktvjwt4SreDvitLECG47UnPdd4EFzNAnyHDaW` |
+| **Vesting** | `3EnPSZpZbKDwVetAiXo9bos4XMDvqg1yqJvew8zh4keP` |
 
-## 📊 Smart Contract Integration
+---
 
-### Contract Addresses (Devnet)
+## 🎯 Usage
 
-- **Presale V3**: `HNPuLPxycypT4YtD5vMZPdcrr53MLKAajYrQwNTv4ujH`
-- **Staking**: `3ZaKegZktvjwt4SreDvitLECG47UnPdd4EFzNAnyHDaW`
-- **Vesting**: `3EnPSZpZbKDwVetAiXo9bos4XMDvqg1yqJvew8zh4keP`
+### Connecting Your Wallet
 
-### Key Functions
+1. **Install a Solana Wallet**:
+   - [Phantom](https://phantom.app/) (Recommended)
+   - [Solflare](https://solflare.com/)
+   - [Trust Wallet](https://trustwallet.com/)
+   - [Coinbase Wallet](https://www.coinbase.com/wallet)
 
-- `buy_with_sol_v3`: Purchase tokens with SOL
-- `buy_with_usdc_v3`: Purchase tokens with USDC
-- `opt_into_staking`: Enable staking for purchased tokens
-- `claim_staking_rewards`: Claim accumulated staking rewards
+2. **Click "Connect Wallet"** in the app
 
-## 🛡️ Security Features
+3. **Approve the connection** in your wallet
 
-- **Purchase Validation**: Client-side and contract-level limits
-- **Wallet Verification**: Phantom wallet integration with signature verification
-- **Transaction Simulation**: Pre-flight checks before real transactions
-- **Error Handling**: Comprehensive error messages and fallbacks
+4. **Start using the admin features**
 
-## 📈 Monitoring & Analytics
+### Using the Admin Dashboard
 
-### Admin Dashboard Features
+```javascript
+// Access the app instance in browser console
+window.app
 
-- **Fund Distribution**: Real-time treasury, secondary, and fee tracking
-- **Transaction History**: Detailed purchase and staking analytics
-- **CSV Reports**: Exportable financial summaries
-- **Contract Limits**: Verification of business rules compliance
+// Check connection status
+app.isConnected()
 
-### User Interface
+// Get wallet address
+app.getPublicKey()?.toString()
 
-- **Real-time Balances**: SOL, USDC, and VIBES token balances
-- **Purchase Progress**: Track personal purchase limits
-- **Staking Rewards**: Live calculation of pending rewards
-- **Vesting Schedule**: Timeline for token release
+// Get available wallets
+app.getWalletManager().getAvailableWallets()
+
+// Refresh data manually
+app.refreshData()
+```
+
+---
+
+## 📁 Project Structure
+
+```
+vibe-dapp-admin/
+├── src/
+│   └── js/
+│       ├── config.js                    # Configuration & constants
+│       ├── solana-wallet-standard.js    # Wallet manager (NEW ✨)
+│       ├── app-new.js                   # Main app logic (NEW ✨)
+│       ├── idls.js                      # Smart contract IDLs
+│       └── direct-contract.js           # Contract interactions
+├── docs/
+│   ├── WALLET_CONNECTION_SOLUTION.md    # Detailed technical docs
+│   ├── QUICK_START_GUIDE.md            # Quick start guide
+│   └── [other docs]
+├── index.html                           # Main HTML file
+├── package.json                         # Dependencies
+├── env.example                          # Environment template
+└── README.md                           # This file
+```
+
+---
+
+## 🔐 Security Features
+
+- ✅ **Non-Custodial**: Your keys never leave your wallet
+- ✅ **User Approval**: All transactions require explicit approval
+- ✅ **No Private Keys**: Application never handles private keys
+- ✅ **Secure Communication**: Standard Solana wallet protocols
+- ✅ **Input Validation**: All inputs validated before processing
+- ✅ **Error Isolation**: Errors don't expose sensitive information
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| **"No wallet detected"** | Install a Solana wallet and refresh the page |
+| **"Connection failed"** | Unlock your wallet and try again |
+| **"NETWORK_CONFIG not available"** | Check that `config.js` loaded correctly |
+| **"Transaction failed"** | Ensure sufficient SOL for gas fees |
+
+### Debug Commands
+
+Open browser console (F12) and try:
+
+```javascript
+// Test wallet detection
+app.getWalletManager().detectWallets()
+
+// Check app status
+app.isConnected()
+
+// View configuration
+console.log(NETWORK_CONFIG)
+
+// Connect manually
+app.connectWallet('Phantom')
+```
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Quick Start Guide](docs/QUICK_START_GUIDE.md) | Get started in 5 minutes |
+| [Wallet Connection Solution](docs/WALLET_CONNECTION_SOLUTION.md) | Technical implementation details |
+| [Auto-Reconnect Feature](docs/AUTO_RECONNECT_FEATURE.md) | How auto-reconnect works 🆕 |
+| [Implementation Progress](docs/IMPLEMENTATION_PROGRESS.md) | Development history |
+
+---
 
 ## 🚀 Deployment
 
-### Production Checklist
-
-- [ ] Update contract addresses for mainnet
-- [ ] Configure production RPC endpoints
-- [ ] Set up SSL/TLS certificates
-- [ ] Enable content compression
-- [ ] Configure CDN for static assets
-- [ ] Set up monitoring and alerting
-
-### Build for Production
+### Production Build
 
 ```bash
-# Minify and optimize assets
+# Validate configuration
+npm run validate
+
+# Build for production
 npm run build
 
-# Deploy to hosting platform
+# Deploy (configure your hosting)
 npm run deploy
 ```
 
-## 🔧 Development
+### Production Checklist
 
-### Code Style
+- [ ] Update RPC endpoints for mainnet
+- [ ] Update contract addresses for mainnet
+- [ ] Configure SSL/TLS certificates
+- [ ] Set up monitoring and alerts
+- [ ] Enable CDN for static assets
+- [ ] Test all wallet providers
+- [ ] Review security settings
 
-- **ES6+ JavaScript**: Modern syntax and features
-- **Modular Architecture**: Separation of concerns
-- **Error-First Callbacks**: Consistent error handling
-- **Descriptive Naming**: Self-documenting code
+---
 
-### Testing
+## 🧪 Testing
+
+### Manual Testing
+
+1. **Wallet Connection**:
+   - Test with multiple wallets (Phantom, Solflare, etc.)
+   - Verify connection/disconnection
+   - Check account switching
+
+2. **Admin Features**:
+   - Verify stats display correctly
+   - Test data refresh functionality
+   - Check balance updates
+
+3. **Error Handling**:
+   - Test with wallet locked
+   - Test with insufficient balance
+   - Test network errors
+
+### Automated Testing
 
 ```bash
 # Run validation tests
 npm run test
 
-# Check contract integration
-npm run test:contracts
+# Validate configuration
+npm run validate
 ```
-
-## 📞 Support
-
-### Troubleshooting
-
-1. **Wallet Connection Issues**: Ensure Phantom wallet is installed and unlocked
-2. **Transaction Failures**: Check SOL balance for gas fees
-3. **Purchase Limits**: Verify 250K VIBES wallet limit not exceeded
-4. **Network Issues**: Confirm devnet connectivity
-
-### Common Errors
-
-- `INSUFFICIENT_BALANCE`: Add SOL/USDC to wallet
-- `WALLET_LIMIT_EXCEEDED`: Reduce purchase amount
-- `PRESALE_NOT_ACTIVE`: Check presale timing
-- `NETWORK_ERROR`: Switch to devnet in wallet
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
 
 ---
 
-**Built with ❤️ for the VIBES DeFi ecosystem**
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Coding Standards
+
+- ✅ Use ES6+ JavaScript syntax
+- ✅ Comment all functions in English
+- ✅ Follow the existing code structure
+- ✅ Handle errors professionally
+- ✅ Use `.env` for secrets (never hardcode)
+
+---
+
+## 📞 Support
+
+### Need Help?
+
+- 📖 [Read the Documentation](docs/)
+- 🐛 [Report Issues](https://github.com/vibes-defi/admin-dapp/issues)
+- 💬 Join our [Discord Community](https://discord.gg/vibes-defi)
+- 📧 Email: support@vibes-defi.com
+
+### Resources
+
+- [Solana Documentation](https://docs.solana.com/)
+- [Solana Wallet Standard](https://github.com/solana-labs/wallet-standard)
+- [Solana Web3.js](https://solana-labs.github.io/solana-web3.js/)
+- [Anchor Framework](https://www.anchor-lang.com/)
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🎯 What's New in v2.0.1
+
+### ✨ Latest Features (v2.0.1)
+
+- 🔄 **Auto-Reconnect**: Wallet stays connected after page refresh
+- 💾 **Connection Persistence**: Saves wallet preference in localStorage
+- 🔒 **Smart Cleanup**: Respects manual disconnections
+- 🧹 **UI Cleanup**: Removed BuyerState Account, Your Purchase, Admin Fund Monitor, and Transaction Log sections for cleaner interface
+- 📊 **Presale Info Cards**: Added visual presale information cards with pricing and countdown
+- 🏦 **Enhanced Staking**: Complete staking management with visual cards, stake functionality (unstake/claim coming soon)
+- ⏰ **Vesting Management**: Visual vesting cards with claim functionality (disabled until presale ends)
+- 📱 **Mobile Responsive**: Complete mobile optimization with hamburger menu and touch-friendly interface
+- 🎨 **Enhanced UI**: Improved navbar layout, wallet dropdown styling, and mobile menu functionality
+- 💎 **Professional Mobile UX**: Side-by-side wallet and menu buttons, modal wallet dropdown with backdrop
+- ⚡ **Simplified Dropdown**: Clean, simple wallet dropdown implementation that just works
+
+### ✨ Major Improvements (v2.0.0)
+
+- 🔐 **Professional Wallet Integration**: Complete rewrite using Solana Wallet Standard
+- 🏗️ **Better Architecture**: Clean separation of concerns, modular design
+- 🐛 **Bug Fixes**: Resolved all wallet connection issues
+- 📚 **Comprehensive Documentation**: Detailed guides and technical docs
+- 🧪 **Better Testing**: Debug commands and troubleshooting tools
+
+### 🔄 Migration from v1.x
+
+If you're upgrading from v1.x:
+
+1. Remove old wallet files (`wallet-adapter.js`, `wallet-config.js`)
+2. Update your imports to use new files (`app-new.js`, `solana-wallet-standard.js`)
+3. Update HTML to load new scripts
+4. Test wallet connection with your preferred wallet
+
+See [WALLET_CONNECTION_SOLUTION.md](docs/WALLET_CONNECTION_SOLUTION.md) for complete migration guide.
+
+---
+
+## 🌟 Credits
+
+Built with ❤️ by the **VIBES DeFi Team**
+
+Special thanks to:
+- Solana Foundation for the blockchain infrastructure
+- Wallet providers for their excellent integrations
+- The DeFi community for continuous support
+
+---
+
+## 📊 Stats
+
+![Lines of Code](https://img.shields.io/badge/lines%20of%20code-2000%2B-blue)
+![Wallets Supported](https://img.shields.io/badge/wallets-5%2B-green)
+![Status](https://img.shields.io/badge/status-production%20ready-brightgreen)
+
+---
+
+<div align="center">
+
+**[Get Started](#-quick-start)** • **[Documentation](docs/)** • **[Report Bug](https://github.com/vibes-defi/admin-dapp/issues)**
+
+Made with 💎 for the Solana ecosystem
+
+</div>

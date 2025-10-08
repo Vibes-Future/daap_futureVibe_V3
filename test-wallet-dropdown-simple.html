@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Wallet Dropdown</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #283D1F;
+            min-height: 100vh;
+            padding: 100px 20px 20px;
+        }
+
+        /* Header fixed */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: rgba(40, 61, 31, 0.98);
+            border-bottom: 1px solid rgba(188, 231, 12, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 20px;
+            z-index: 900;
+        }
+
+        /* Wallet button connected */
+        .wallet-button {
+            padding: 10px 20px;
+            background: rgba(56, 73, 37, 0.8);
+            border: 1px solid rgba(188, 231, 12, 0.2);
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Container for wallet dropdown */
+        .wallet-container {
+            position: relative;
+        }
+
+        /* Dropdown - Desktop */
+        .wallet-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 280px;
+            background: rgba(40, 61, 31, 0.98);
+            border: 1px solid rgba(188, 231, 12, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+            display: none;
+        }
+
+        .wallet-dropdown.show {
+            display: block;
+        }
+
+        /* Header section */
+        .dropdown-header {
+            padding: 20px;
+            background: rgba(56, 73, 37, 0.5);
+            border-bottom: 1px solid rgba(188, 231, 12, 0.1);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .wallet-name {
+            font-weight: 600;
+            color: white;
+            font-size: 16px;
+        }
+
+        .wallet-address {
+            color: #ADB5BD;
+            font-size: 13px;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: rgba(188, 231, 12, 0.1);
+        }
+
+        /* Menu items */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 16px 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: left;
+            border-bottom: 1px solid rgba(188, 231, 12, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background: rgba(199, 248, 1, 0.15);
+            color: #C7F801;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .menu-item.disconnect {
+            color: #DC3545;
+        }
+
+        .menu-item.disconnect:hover {
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        /* Backdrop */
+        .backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+
+        .backdrop.show {
+            display: block;
+        }
+
+        /* MOBILE STYLES */
+        @media (max-width: 768px) {
+            .wallet-dropdown {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                max-height: 70vh;
+                border-radius: 24px 24px 0 0;
+            }
+
+            .dropdown-header {
+                padding: 28px 24px 20px;
+                border-radius: 24px 24px 0 0;
+                position: sticky;
+                top: 0;
+                background: rgba(56, 73, 37, 0.95);
+                z-index: 1;
+            }
+
+            /* Handle drag indicator */
+            .dropdown-header::before {
+                content: '';
+                position: absolute;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 40px;
+                height: 4px;
+                background: rgba(188, 231, 12, 0.4);
+                border-radius: 2px;
+            }
+
+            .wallet-info {
+                padding-top: 8px;
+            }
+
+            .menu-item {
+                padding: 18px 24px;
+                font-size: 15px;
+            }
+
+            /* Prevent body scroll when dropdown open */
+            body.dropdown-open {
+                overflow: hidden;
+                position: fixed;
+                width: 100%;
+            }
+        }
+
+        /* Test content */
+        .content {
+            color: white;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .test-section {
+            background: rgba(56, 73, 37, 0.5);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .test-section h2 {
+            color: #C7F801;
+            margin-bottom: 10px;
+        }
+
+        .test-section p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Header -->
+    <div class="header">
+        <div class="wallet-container">
+            <button class="wallet-button" id="walletBtn">
+                👻 4b3x...7k9p ▼
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="wallet-dropdown" id="dropdown">
+                <div class="dropdown-header">
+                    <div class="wallet-info">
+                        <div class="wallet-icon">👻</div>
+                        <div>
+                            <div class="wallet-name">Phantom</div>
+                            <div class="wallet-address">4b3x...7k9p</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <button class="menu-item" onclick="alert('Copy Address')">
+                    📋 Copy Address
+                </button>
+
+                <div class="divider"></div>
+
+                <button class="menu-item" onclick="alert('View on Explorer')">
+                    🔍 View on Explorer
+                </button>
+
+                <div class="divider"></div>
+
+                <button class="menu-item disconnect" onclick="handleDisconnect()">
+                    🚪 Disconnect
+                </button>
+            </div>
+
+            <!-- Backdrop -->
+            <div class="backdrop" id="backdrop"></div>
+        </div>
+    </div>
+
+    <!-- Test Content -->
+    <div class="content">
+        <h1 style="color: #C7F801; margin-bottom: 30px;">Test Wallet Dropdown</h1>
+        
+        <div class="test-section">
+            <h2>🧪 Testing Instructions</h2>
+            <p><strong>1. Desktop/Tablet:</strong> Click the wallet button in the header. Dropdown should appear below it.</p>
+            <p><strong>2. Mobile:</strong> Click the wallet button. Dropdown should slide up from bottom.</p>
+            <p><strong>3. Test Scrolling:</strong> On mobile, try scrolling inside the dropdown - it should scroll DOWN (not up).</p>
+            <p><strong>4. Close:</strong> Click outside (backdrop) or click disconnect.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>Expected Behavior</h2>
+            <p>✅ Mobile: Bottom sheet that slides up, content scrolls downward</p>
+            <p>✅ Desktop: Dropdown below button, no horizontal scroll</p>
+            <p>✅ Background doesn't scroll when dropdown is open</p>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Content (Scroll Test)</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>More Content</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>Even More Content</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+    </div>
+
+    <script>
+        const walletBtn = document.getElementById('walletBtn');
+        const dropdown = document.getElementById('dropdown');
+        const backdrop = document.getElementById('backdrop');
+        let isOpen = false;
+
+        // Toggle dropdown
+        walletBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+
+        // Close on backdrop click
+        backdrop.addEventListener('click', () => {
+            closeDropdown();
+        });
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (isOpen && !dropdown.contains(e.target) && !walletBtn.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        function toggleDropdown() {
+            isOpen = !isOpen;
+            
+            if (isOpen) {
+                dropdown.classList.add('show');
+                
+                // Show backdrop on mobile
+                if (window.innerWidth <= 768) {
+                    backdrop.classList.add('show');
+                    document.body.classList.add('dropdown-open');
+                }
+            } else {
+                closeDropdown();
+            }
+        }
+
+        function closeDropdown() {
+            isOpen = false;
+            dropdown.classList.remove('show');
+            backdrop.classList.remove('show');
+            document.body.classList.remove('dropdown-open');
+        }
+
+        function handleDisconnect() {
+            alert('Disconnect clicked');
+            closeDropdown();
+        }
+
+        // Log screen size for debugging
+        console.log('Screen width:', window.innerWidth);
+        window.addEventListener('resize', () => {
+            console.log('Screen width:', window.innerWidth);
+        });
+    </script>
+</body>
+</html>
+

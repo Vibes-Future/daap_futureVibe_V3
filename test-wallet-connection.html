@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Wallet Connection Test - VIBES Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .test-result {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .test-result.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .test-result.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .test-result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .wallet-info {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .wallet-info h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .wallet-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .wallet-item:last-child {
+            border-bottom: none;
+        }
+        
+        .wallet-item .label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .wallet-item .value {
+            color: #666;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .console-line {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid transparent;
+        }
+        
+        .console-line.success { border-left-color: #4caf50; color: #81c784; }
+        .console-line.error { border-left-color: #f44336; color: #e57373; }
+        .console-line.warning { border-left-color: #ff9800; color: #ffb74d; }
+        .console-line.info { border-left-color: #2196f3; color: #64b5f6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Wallet Connection Test</h1>
+        <p class="subtitle">Testing Solana Wallet Standard Implementation</p>
+        
+        <div class="test-section">
+            <h2>📋 Dependency Check</h2>
+            <div id="dependencies"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔍 Wallet Detection</h2>
+            <div id="wallet-detection"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔌 Connection Test</h2>
+            <button id="test-connect" onclick="testConnection()">Test Connection</button>
+            <button id="test-disconnect" onclick="testDisconnection()" disabled>Test Disconnection</button>
+            <div id="connection-result"></div>
+        </div>
+        
+        <div class="wallet-info" id="wallet-info" style="display: none;">
+            <h3>💼 Wallet Information</h3>
+            <div id="wallet-details"></div>
+        </div>
+        
+        <div class="console-output" id="console"></div>
+    </div>
+    
+    <!-- Load Solana Web3.js -->
+    <script src="https://unpkg.com/@solana/web3.js@1.91.0/lib/index.iife.min.js"></script>
+    
+    <!-- Load App Scripts -->
+    <script src="src/js/config.js"></script>
+    <script src="src/js/solana-wallet-standard.js"></script>
+    
+    <script>
+        let walletManager = null;
+        let testResults = {
+            dependencies: [],
+            wallets: [],
+            connection: []
+        };
+        
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(line);
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        function addTestResult(container, message, type) {
+            const result = document.createElement('div');
+            result.className = `test-result ${type}`;
+            result.textContent = message;
+            container.appendChild(result);
+        }
+        
+        // Test 1: Check Dependencies
+        function testDependencies() {
+            const container = document.getElementById('dependencies');
+            
+            const tests = [
+                { name: 'Solana Web3.js', check: () => typeof window.solanaWeb3 !== 'undefined' && window.solanaWeb3.Connection },
+                { name: 'NETWORK_CONFIG', check: () => typeof window.NETWORK_CONFIG !== 'undefined' },
+                { name: 'SolanaWalletManager', check: () => typeof window.SolanaWalletManager !== 'undefined' },
+                { name: 'PROGRAM_IDS', check: () => typeof window.PROGRAM_IDS !== 'undefined' },
+                { name: 'TOKEN_CONFIG', check: () => typeof window.TOKEN_CONFIG !== 'undefined' }
+            ];
+            
+            tests.forEach(test => {
+                const passed = test.check();
+                addTestResult(
+                    container,
+                    `${passed ? '✅' : '❌'} ${test.name}`,
+                    passed ? 'success' : 'error'
+                );
+                log(`Dependency ${test.name}: ${passed ? 'PASS' : 'FAIL'}`, passed ? 'success' : 'error');
+            });
+        }
+        
+        // Test 2: Wallet Detection
+        function testWalletDetection() {
+            const container = document.getElementById('wallet-detection');
+            
+            try {
+                walletManager = new SolanaWalletManager();
+                log('✅ SolanaWalletManager initialized', 'success');
+                
+                const wallets = walletManager.getAvailableWallets();
+                
+                if (wallets.length === 0) {
+                    addTestResult(
+                        container,
+                        '⚠️ No wallets detected. Please install Phantom, Solflare, or another Solana wallet.',
+                        'warning'
+                    );
+                    log('⚠️ No wallets detected', 'warning');
+                } else {
+                    wallets.forEach(wallet => {
+                        addTestResult(
+                            container,
+                            `✅ ${wallet.name} detected`,
+                            'success'
+                        );
+                        log(`✅ Wallet detected: ${wallet.name}`, 'success');
+                    });
+                }
+                
+                // Show wallet count
+                addTestResult(
+                    container,
+                    `ℹ️ Total wallets: ${wallets.length}`,
+                    'info'
+                );
+                
+            } catch (error) {
+                addTestResult(
+                    container,
+                    `❌ Error: ${error.message}`,
+                    'error'
+                );
+                log(`❌ Wallet detection error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test 3: Connection
+        async function testConnection() {
+            const container = document.getElementById('connection-result');
+            const connectBtn = document.getElementById('test-connect');
+            const disconnectBtn = document.getElementById('test-disconnect');
+            
+            container.innerHTML = '';
+            connectBtn.disabled = true;
+            
+            try {
+                log('🔌 Testing wallet connection...', 'info');
+                
+                const result = await walletManager.connect();
+                
+                if (result && result.publicKey) {
+                    addTestResult(
+                        container,
+                        `✅ Connection successful! Address: ${result.publicKey.toString()}`,
+                        'success'
+                    );
+                    log(`✅ Connected: ${result.publicKey.toString()}`, 'success');
+                    
+                    // Show wallet info
+                    showWalletInfo(result);
+                    
+                    disconnectBtn.disabled = false;
+                    
+                } else {
+                    throw new Error('No public key received');
+                }
+                
+            } catch (error) {
+                addTestResult(
+                    container,
+                    `❌ Connection failed: ${error.message}`,
+                    'error'
+                );
+                log(`❌ Connection error: ${error.message}`, 'error');
+                connectBtn.disabled = false;
+            }
+        }
+        
+        // Test 4: Disconnection
+        async function testDisconnection() {
+            const container = document.getElementById('connection-result');
+            const connectBtn = document.getElementById('test-connect');
+            const disconnectBtn = document.getElementById('test-disconnect');
+            
+            container.innerHTML = '';
+            
+            try {
+                log('🔌 Testing wallet disconnection...', 'info');
+                
+                await walletManager.disconnect();
+                
+                addTestResult(
+                    container,
+                    '✅ Disconnection successful!',
+                    'success'
+                );
+                log('✅ Disconnected successfully', 'success');
+                
+                // Hide wallet info
+                document.getElementById('wallet-info').style.display = 'none';
+                
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                
+            } catch (error) {
+                addTestResult(
+                    container,
+                    `❌ Disconnection failed: ${error.message}`,
+                    'error'
+                );
+                log(`❌ Disconnection error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Show wallet information
+        function showWalletInfo(data) {
+            const walletInfo = document.getElementById('wallet-info');
+            const walletDetails = document.getElementById('wallet-details');
+            
+            walletDetails.innerHTML = `
+                <div class="wallet-item">
+                    <span class="label">Wallet:</span>
+                    <span class="value">${data.wallet?.name || 'Unknown'}</span>
+                </div>
+                <div class="wallet-item">
+                    <span class="label">Address:</span>
+                    <span class="value">${data.publicKey.toString()}</span>
+                </div>
+                <div class="wallet-item">
+                    <span class="label">Connected:</span>
+                    <span class="value">✅ Yes</span>
+                </div>
+            `;
+            
+            walletInfo.style.display = 'block';
+        }
+        
+        // Run tests on load
+        window.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Starting wallet connection tests...', 'info');
+            
+            setTimeout(() => {
+                testDependencies();
+                testWalletDetection();
+                log('✅ All tests completed', 'success');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
+

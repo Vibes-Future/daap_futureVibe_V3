@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>VIBES DeFi - Admin Dashboard</title>
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
     <!-- Import VIBES Fonts -->
@@ -867,7 +870,7 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1000;
+            z-index: 900;
             background: rgba(40, 61, 31, 0.98);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(188, 231, 12, 0.2);
@@ -888,6 +891,22 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 var(--space-6);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            flex-shrink: 0;
+        }
+
+        #production-wallet-container {
+            position: relative;
+            z-index: 1001;
+        }
+
+        .wallet-connected-container {
+            position: relative;
         }
 
         /* Logo */
@@ -1055,83 +1074,134 @@
             position: relative;
         }
 
-        /* Connected Wallet Button */
+        /* Connected Wallet Button - ELEGANT & MINIMAL */
         .wallet-connected-button {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            background: rgba(56, 73, 37, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(188, 231, 12, 0.2);
-            border-radius: 12px;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(40, 61, 31, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(199, 248, 1, 0.15);
+            border-radius: 100px;
             color: #FFFFFF;
             font-family: 'Lexend', sans-serif;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle shine effect */
+        .wallet-connected-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.1), transparent);
+            transition: left 0.6s ease;
         }
 
         .wallet-connected-button:hover {
-            background: rgba(56, 73, 37, 0.9);
-            border-color: rgba(188, 231, 12, 0.4);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            background: rgba(40, 61, 31, 0.8);
+            border-color: rgba(199, 248, 1, 0.3);
+            box-shadow: 
+                0 8px 24px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(199, 248, 1, 0.1);
+            transform: translateY(-2px);
         }
 
+        .wallet-connected-button:hover::before {
+            left: 100%;
+        }
+
+        .wallet-connected-button:active {
+            transform: translateY(0);
+        }
+
+        /* Status indicator - elegant pulse */
         .wallet-status-indicator {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: #28A745;
             border-radius: 50%;
-            border: 2px solid var(--bg-primary);
-            animation: pulse 2s infinite;
+            box-shadow: 
+                0 0 0 2px rgba(40, 61, 31, 0.8),
+                0 0 8px rgba(40, 167, 69, 0.6);
+            animation: statusPulse 2s ease-in-out infinite;
         }
 
+        @keyframes statusPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 0 2px rgba(40, 61, 31, 0.8),
+                    0 0 8px rgba(40, 167, 69, 0.6);
+            }
+            50% {
+                box-shadow: 
+                    0 0 0 2px rgba(40, 61, 31, 0.8),
+                    0 0 12px rgba(40, 167, 69, 0.8);
+            }
+        }
+
+        /* Wallet icon */
         .wallet-adapter-icon {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 4px;
+            flex-shrink: 0;
         }
 
+        /* Address text - elegant */
         .wallet-address {
-            color: #C7F801;
-            font-weight: 600;
-            letter-spacing: 0.3px;
+            color: #FFFFFF;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
         }
 
+        /* Dropdown arrow - minimal */
         .wallet-dropdown-arrow {
-            transition: transform 0.2s ease;
-            color: #ADB5BD;
+            width: 14px;
+            height: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
         }
 
         .wallet-dropdown-arrow.open {
             transform: rotate(180deg);
+            color: #C7F801;
         }
 
-        /* Wallet Dropdown */
-        .wallet-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            min-width: 280px;
-            background: rgba(40, 61, 31, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(188, 231, 12, 0.2);
-            border-radius: 16px;
+        .wallet-connected-button:hover .wallet-dropdown-arrow {
+            color: #C7F801;
+        }
+
+        /* Wallet Dropdown - ELEGANT VERSION */
+        #wallet-dropdown {
+            background: rgba(40, 61, 31, 0.95);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(199, 248, 1, 0.2);
             box-shadow: 
                 0 20px 40px rgba(0, 0, 0, 0.4),
-                0 0 80px rgba(199, 248, 1, 0.1);
-            overflow: hidden;
-            z-index: 1000;
-            animation: dropdownSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                0 8px 32px rgba(199, 248, 1, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            z-index: 10000;
+            /* Desktop default */
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 300px;
+            border-radius: 16px;
         }
 
+        /* Desktop animation */
         @keyframes dropdownSlideIn {
             from {
                 opacity: 0;
@@ -1143,57 +1213,92 @@
             }
         }
 
+        /* Mobile animation */
+        @keyframes mobileSlideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        /* MOBILE ONLY - Use ID for maximum specificity */
+        @media (max-width: 768px) {
+            #wallet-dropdown {
+                position: fixed !important;
+                top: auto !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                max-height: 70vh !important;
+                border-radius: 24px 24px 0 0 !important;
+                animation: mobileSlideUp 0.3s ease-out !important;
+            }
+        }
+
         .wallet-dropdown-header {
             padding: 20px;
             background: rgba(56, 73, 37, 0.3);
+            border-bottom: 1px solid rgba(199, 248, 1, 0.08);
+            border-radius: 16px 16px 0 0;
         }
 
         .wallet-dropdown-wallet-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
         .wallet-dropdown-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(199, 248, 1, 0.08);
             padding: 2px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-dropdown-wallet-info:hover .wallet-dropdown-icon {
+            background: rgba(199, 248, 1, 0.12);
+            transform: scale(1.05);
         }
 
         .wallet-dropdown-name {
             font-weight: 600;
             color: #FFFFFF;
-            font-size: 16px;
+            font-size: 15px;
             margin-bottom: 4px;
         }
 
         .wallet-dropdown-address {
             color: #ADB5BD;
-            font-size: 13px;
+            font-size: 12px;
             font-family: 'Roboto Mono', monospace;
+            letter-spacing: 0.5px;
         }
 
         .wallet-dropdown-divider {
             height: 1px;
-            background: rgba(188, 231, 12, 0.1);
+            background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.1), transparent);
             margin: 0;
         }
 
         .wallet-dropdown-item {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             width: 100%;
-            padding: 16px 20px;
+            padding: 14px 20px;
             background: none;
             border: none;
             color: #FFFFFF;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: left;
             position: relative;
             overflow: hidden;
@@ -1202,41 +1307,58 @@
         .wallet-dropdown-item::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.1), transparent);
-            transition: left 0.5s ease;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: #C7F801;
+            transition: height 0.3s ease;
+            border-radius: 0 2px 2px 0;
         }
 
         .wallet-dropdown-item:hover {
-            background: rgba(199, 248, 1, 0.1);
+            background: rgba(199, 248, 1, 0.08);
             color: #C7F801;
-            padding-left: 24px;
+            padding-left: 26px;
         }
 
         .wallet-dropdown-item:hover::before {
-            left: 100%;
+            height: 60%;
+        }
+
+        .wallet-dropdown-item:last-child {
+            border-radius: 0 0 16px 16px;
         }
 
         .wallet-dropdown-item:active {
             background: rgba(199, 248, 1, 0.15);
+            transform: scale(0.98);
         }
 
         .wallet-dropdown-item svg {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             stroke-width: 2;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .wallet-dropdown-item:hover svg {
+            transform: scale(1.1);
         }
 
         .wallet-dropdown-disconnect {
-            color: #DC3545;
+            color: #FF6B6B;
         }
 
         .wallet-dropdown-disconnect:hover {
-            background: rgba(220, 53, 69, 0.1);
-            color: #DC3545;
+            background: rgba(255, 107, 107, 0.08);
+            color: #FF6B6B;
+        }
+
+        .wallet-dropdown-disconnect:hover::before {
+            background: #FF6B6B;
         }
 
         /* Wallet Selector Modal */
@@ -1738,14 +1860,175 @@
             margin-top: -10px;
         }
 
-        /* Responsive */
+        /* Mobile Wallet Dropdown Backdrop */
+        .wallet-dropdown-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
         @media (max-width: 768px) {
+            .wallet-dropdown-backdrop.active {
+                display: block;
+            }
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+        }
+
+        .mobile-menu-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: #FFFFFF;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Mobile Navigation Menu */
+        .mobile-nav {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            background: rgba(40, 61, 31, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(188, 231, 12, 0.2);
+            padding: 20px;
+            transform: translateY(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 899;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .mobile-nav.active {
+            transform: translateY(0);
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .mobile-nav-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-family: var(--font-heading);
+            font-weight: 500;
+            font-size: 16px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mobile-nav-link:hover,
+        .mobile-nav-link.active {
+            color: var(--vibes-yellow);
+            background: rgba(199, 248, 1, 0.15);
+            transform: translateX(8px);
+        }
+
+        .mobile-nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(199, 248, 1, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .mobile-nav-link:hover::before {
+            left: 100%;
+        }
+
+        /* Tablet & Desktop - Fix horizontal scroll */
+        @media (min-width: 769px) {
+            .wallet-dropdown {
+                /* Ensure dropdown doesn't cause horizontal scroll */
+                right: 0;
+                left: auto;
+            }
+            
+            body {
+                overflow-x: hidden;
+            }
+        }
+
+        /* Responsive Mobile */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 var(--space-4);
+                gap: var(--space-4);
+            }
+
             .nav-links {
                 display: none;
             }
 
             .mobile-menu-toggle {
-                display: block;
+                display: flex;
+                order: 2;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex-shrink: 0;
+            }
+
+            #production-wallet-container {
+                order: 1;
             }
 
             .logo-subtitle-nav {
@@ -1762,72 +2045,106 @@
                 font-size: 20px;
             }
 
-            .header-wallet-btn {
-                padding: var(--space-2) var(--space-4);
+            /* Wallet Button Mobile Styles */
+            .wallet-connect-button {
+                padding: 10px 16px;
                 font-size: 14px;
+                gap: 8px;
+                white-space: nowrap;
             }
 
-            .header-wallet-btn span {
+            .wallet-connect-button span {
                 display: none;
             }
 
-            /* Wallet Button Mobile Styles */
-            .wallet-connect-button {
-                padding: 12px 20px;
-                font-size: 14px;
+            .wallet-connect-button .wallet-icon {
+                width: 20px;
+                height: 20px;
             }
 
             .wallet-connected-button {
-                padding: 8px 16px;
-                font-size: 13px;
+                padding: 6px 12px;
+                font-size: 12px;
+                gap: 8px;
+                white-space: nowrap;
             }
 
-            .wallet-adapter-icon {
-                width: 18px;
-                height: 18px;
+            .wallet-address {
+                font-size: 11px;
             }
 
-            .wallet-dropdown {
-                position: fixed;
-                top: auto;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                min-width: auto;
-                border-radius: 24px 24px 0 0;
-                animation: mobileSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            .wallet-adapter-icon,
+            #wallet-phantom-icon {
+                width: 16px;
+                height: 16px;
             }
 
-            @keyframes mobileSlideUp {
-                from {
-                    transform: translateY(100%);
-                }
-                to {
-                    transform: translateY(0);
-                }
+            .wallet-dropdown-arrow {
+                width: 12px;
+                height: 12px;
             }
 
+            .wallet-status-indicator {
+                width: 5px;
+                height: 5px;
+            }
+
+            /* Mobile header and item overrides - moved from duplicated section */
             .wallet-dropdown-header {
-                padding: 24px;
+                padding: 28px 24px 20px;
                 border-radius: 24px 24px 0 0;
-                position: relative;
+                position: sticky;
+                top: 0;
+                background: rgba(56, 73, 37, 0.95);
+                backdrop-filter: blur(20px);
+                z-index: 1;
             }
 
             .wallet-dropdown-header::before {
                 content: '';
                 position: absolute;
-                top: 12px;
+                top: 10px;
                 left: 50%;
                 transform: translateX(-50%);
-                width: 48px;
+                width: 40px;
                 height: 4px;
-                background: rgba(255, 255, 255, 0.2);
+                background: rgba(188, 231, 12, 0.4);
                 border-radius: 2px;
+            }
+
+            .wallet-dropdown-wallet-info {
+                padding-top: 8px;
+            }
+
+            .wallet-dropdown-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .wallet-dropdown-name {
+                font-size: 15px;
+            }
+
+            .wallet-dropdown-address {
+                font-size: 12px;
             }
 
             .wallet-dropdown-item {
                 padding: 18px 24px;
-                font-size: 16px;
+                font-size: 15px;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .wallet-dropdown-item svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            /* Disable body scroll when dropdown is open on mobile */
+            body.wallet-dropdown-open {
+                overflow: hidden;
+                position: fixed;
+                width: 100%;
             }
 
             .dashboard-grid {
@@ -1850,6 +2167,144 @@
 
             .countdown-item {
                 min-width: 50px;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .header-content {
+                padding: 0 var(--space-3);
+                gap: var(--space-3);
+            }
+
+            .header-right {
+                gap: 10px;
+            }
+
+            .logo-icon-nav {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+
+            .logo-title-nav {
+                font-size: 18px;
+            }
+
+            .wallet-connect-button {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .wallet-connect-button .wallet-icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            .wallet-connected-button {
+                padding: 6px 10px;
+                font-size: 11px;
+                gap: 4px;
+            }
+
+            .wallet-address {
+                font-size: 10px;
+            }
+
+            .wallet-adapter-icon,
+            #wallet-phantom-icon {
+                width: 14px;
+                height: 14px;
+            }
+
+            .wallet-dropdown-arrow {
+                width: 8px;
+                height: 8px;
+            }
+
+            .mobile-menu-toggle {
+                width: 28px;
+                height: 28px;
+            }
+
+            .mobile-menu-toggle span {
+                width: 22px;
+            }
+
+            .mobile-nav {
+                padding: 15px;
+            }
+
+            .mobile-nav-link {
+                font-size: 15px;
+                padding: 14px 16px;
+            }
+
+            .main-content {
+                padding-top: 100px;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+            .header-content {
+                padding: 0 var(--space-2);
+                gap: var(--space-2);
+            }
+
+            .header-right {
+                gap: 8px;
+            }
+
+            .logo-icon-nav {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .logo-title-nav {
+                font-size: 16px;
+            }
+
+            .wallet-connect-button {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .wallet-connect-button .wallet-icon {
+                width: 16px;
+                height: 16px;
+            }
+
+            .wallet-connected-button {
+                padding: 5px 8px;
+                font-size: 10px;
+                gap: 3px;
+            }
+
+            .wallet-address {
+                font-size: 9px;
+            }
+
+            .wallet-adapter-icon,
+            #wallet-phantom-icon {
+                width: 12px;
+                height: 12px;
+            }
+
+            .wallet-dropdown-arrow {
+                width: 7px;
+                height: 7px;
+            }
+
+            .mobile-menu-toggle {
+                width: 26px;
+                height: 26px;
+            }
+
+            .mobile-menu-toggle span {
+                width: 20px;
+                height: 2px;
             }
         }
     </style>
@@ -1875,10 +2330,12 @@
                 <button class="nav-link-btn" onclick="scrollToSection('vesting')">Vesting</button>
             </nav>
 
-            <!-- Production Wallet Button -->
-            <div id="production-wallet-container">
-                <!-- Connect Button (shown when not connected) -->
-                <button id="wallet-connect-btn" class="wallet-connect-button">
+            <!-- Right Side Container -->
+            <div class="header-right">
+                <!-- Production Wallet Button -->
+                <div id="production-wallet-container">
+                    <!-- Connect Button (shown when not connected) -->
+                    <button id="wallet-connect-btn" class="wallet-connect-button">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="wallet-icon">
                         <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1927,6 +2384,17 @@
 
                         <div class="wallet-dropdown-divider"></div>
 
+                        <button class="wallet-dropdown-item" onclick="window.open('https://solscan.io/account/' + (window.vibesWalletAddress || ''), '_blank')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15 3h6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>View on Explorer</span>
+                        </button>
+
+                        <div class="wallet-dropdown-divider"></div>
+
                         <button id="disconnect-wallet-btn" class="wallet-dropdown-item wallet-dropdown-disconnect">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1936,27 +2404,39 @@
                             <span>Disconnect</span>
                         </button>
                     </div>
-                </div>
-            </div>
 
-            <!-- Mobile Menu Toggle -->
-            <button class="mobile-menu-toggle" id="mobile-menu-toggle">
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <!-- Wallet Dropdown Backdrop (Mobile) -->
+                    <div id="wallet-dropdown-backdrop" class="wallet-dropdown-backdrop"></div>
                 </div>
-            </button>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
     </header>
+
+    <!-- Mobile Navigation Menu -->
+    <nav class="mobile-nav" id="mobile-nav">
+        <div class="mobile-nav-links">
+            <button class="mobile-nav-link active" onclick="scrollToSection('dashboard')">Dashboard</button>
+            <button class="mobile-nav-link" onclick="scrollToSection('presale')">Presale</button>
+            <button class="mobile-nav-link" onclick="scrollToSection('staking')">Staking</button>
+            <button class="mobile-nav-link" onclick="scrollToSection('vesting')">Vesting</button>
+        </div>
+    </nav>
 
     <!-- Main Content -->
     <div class="main-content">
     <div class="container">
         <!-- Header -->
         <div class="header">
-                <h1>💎 VIBES Admin Dashboard</h1>
-                <p>Professional Web3 Administration Panel for Smart Contract Management</p>
+                <h1>💎 VIBES DeFi</h1>
+                <p>FutureVibes combines crypto & charity – shaping the Future of DeFi with purpose, profit, and impact.</p>
         </div>
 
             <!-- Dashboard Stats Grid -->
@@ -2049,7 +2529,7 @@
 
                     <div class="metric-row">
                         <span class="metric-label">Price Increase</span>
-                        <span class="price-increase-badge" id="calendar-increase">+25%</span>
+                        <span class="price-increase-badge" id="calendar-increase">+10%</span>
                     </div>
                 </div>
             </div>
@@ -2080,73 +2560,40 @@
             <button id="disconnect-wallet" class="hidden">Hidden Disconnect</button>
         </div>
 
-        <!-- My BuyerState Section -->
-        <div class="section">
-            <h2>📦 My BuyerState Account</h2>
-            <div class="info-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.15) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); box-shadow: 0 0 40px rgba(199, 248, 1, 0.15);">
-                <h3 style="margin-bottom: 15px; font-size: 1.5rem;">🔑 Your Account Addresses</h3>
-                
-                <div style="margin-bottom: 20px;">
-                    <p style="margin-bottom: 8px; opacity: 0.9;"><strong>👤 Your Wallet:</strong></p>
-                    <p id="my-wallet-address" style="font-family: monospace; font-size: 0.9rem; word-break: break-all; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 6px; margin-bottom: 8px;">
-                        Connect wallet to see address
-                    </p>
-                    <a id="my-wallet-link" href="#" target="_blank" style="color: var(--vibes-yellow); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: none; transition: all 0.2s ease;">
-                        🔗 View Wallet on Solscan →
-                    </a>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <p style="margin-bottom: 8px; opacity: 0.9;"><strong>📦 Your BuyerState PDA:</strong></p>
-                    <p id="my-buyerstate-address" style="font-family: monospace; font-size: 0.9rem; word-break: break-all; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 6px; margin-bottom: 8px;">
-                        Connect wallet to calculate BuyerState
-                    </p>
-                    <a id="my-buyerstate-link" href="#" target="_blank" style="color: var(--vibes-yellow); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: none; transition: all 0.2s ease;">
-                        🔗 View BuyerState on Solscan →
-                    </a>
-                </div>
-                
-                <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px; font-size: 0.9rem;">
-                    <p style="margin: 0;">ℹ️ <strong>What is BuyerState?</strong></p>
-                    <p style="margin: 8px 0 0 0; opacity: 0.95;">
-                        Your BuyerState is a PDA (Program Derived Address) where your presale purchase data, staking info, and rewards are stored on the blockchain.
-                    </p>
-                </div>
-            </div>
-        </div>
 
-        <!-- Presale Information Section -->
-        <div class="section">
-            <h2>📊 Presale Information</h2>
-            <div class="grid">
-                <div class="info-card">
-                    <h3>Presale Status</h3>
-                    <div id="presale-status" class="status">Loading...</div>
-                    <p><strong>Start Time:</strong> <span id="presale-start"></span></p>
-                    <p><strong>End Time:</strong> <span id="presale-end"></span></p>
-                    <p><strong>Hard Cap:</strong> <span id="presale-hardcap"></span></p>
-                </div>
-                <div class="info-card">
-                    <h3>Current Price</h3>
-                    <p><strong>Price Tier:</strong> <span id="current-price-tier"></span></p>
-                    <p><strong>Price (USD):</strong> $<span id="current-price-usd"></span></p>
-                    <p><strong>SOL Raised:</strong> <span id="sol-raised"></span></p>
-                    <p><strong>USDC Raised:</strong> <span id="usdc-raised"></span></p>
-                </div>
-                <div class="info-card">
-                    <h3>Your Purchase</h3>
-                    <p><strong>Total VIBES:</strong> <span id="user-vibes">0</span></p>
-                    <p><strong>SOL Contributed:</strong> <span id="user-sol">0</span></p>
-                    <p><strong>USDC Contributed:</strong> <span id="user-usdc">0</span></p>
-                    <p><strong>Staking Status:</strong> <span id="user-staking">No</span></p>
-                </div>
-            </div>
-            <button id="refresh-presale" class="btn">Refresh Presale Data</button>
-        </div>
 
         <!-- Purchase Section -->
             <div id="presale" class="section">
-            <h2>💰 Purchase VIBES Tokens</h2>
+            <h2>💰 Presale</h2>
+           
+            
+            <!-- Presale Information Cards -->
+            <div class="presale-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="presale-info-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div id="starting-price" style="font-size: 2rem; font-weight: bold; color: #c7f801; margin-bottom: 8px;">Loading...</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">Starting Price</div>
+                </div>
+                
+                <div class="presale-info-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div id="current-price" style="font-size: 2rem; font-weight: bold; color: #c7f801; margin-bottom: 8px;">Loading...</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">Current Price</div>
+                </div>
+                
+                <div class="presale-info-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div id="days-left" style="font-size: 2rem; font-weight: bold; color: #ffffff; margin-bottom: 8px;">Loading...</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">days time left</div>
+                </div>
+                
+                <div class="presale-info-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div id="staking-apy" style="font-size: 2rem; font-weight: bold; color: #c7f801; margin-bottom: 8px;">Loading...</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">Staking APY</div>
+                </div>
+            </div>
+            
+            
+            <!-- Purchase Section Title -->
+            <h2 style="margin: 30px 0 20px 0;">👉 Purchase VIBES Tokens</h2>
+            
             <div class="grid">
                 <!-- SOL Purchase -->
                     <div class="purchase-card">
@@ -2191,21 +2638,66 @@
         <!-- Staking Section -->
         <div id="staking" class="section">
             <h2>🏦 Staking Management</h2>
+            
+            <!-- Staking Overview Cards -->
+            <div class="staking-overview-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <!-- Total Staked -->
+                <div class="staking-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div style="font-size: 2rem; font-weight: bold; color: #c7f801; margin-bottom: 8px;" id="total-staked-amount">0</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">Total Staked</div>
+                </div>
+                
+                <!-- Unstaked -->
+                <div class="staking-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div style="font-size: 2rem; font-weight: bold; color: #c7f801; margin-bottom: 8px;" id="unstaked-amount">0</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">Unstaked</div>
+                </div>
+                
+                <!-- APY -->
+                <div class="staking-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div style="font-size: 2rem; font-weight: bold; color: #c7f801; margin-bottom: 8px;" id="staking-apy-display">40%</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">APY</div>
+                </div>
+            </div>
+            
+            <!-- Staking Actions -->
             <div class="grid">
                 <div class="info-card">
-                    <h3>Staking Information</h3>
-                    <p><strong>APY:</strong> <span id="staking-apy">40%</span></p>
-                    <p><strong>Staked Amount:</strong> <span id="staked-amount">0</span> VIBES</p>
-                    <p><strong>Unstaked Amount:</strong> <span id="unstaked-amount">0</span> VIBES</p>
-                    <p><strong>Pending Rewards:</strong> <span id="pending-rewards">0</span> VIBES</p>
-                </div>
-                <div class="info-card">
-                    <h3>Staking Actions</h3>
+                    <h3>🏦 Stake Tokens</h3>
                     <div class="form-group">
                         <label for="stake-amount">Amount to Stake:</label>
-                        <input type="number" id="stake-amount" step="0.01" min="0" placeholder="100">
+                        <input type="number" id="stake-amount" step="0.01" min="0" placeholder="Enter amount to stake">
                     </div>
-                    <button id="opt-into-staking" class="btn btn-success">Opt Into Staking</button>
+                    <button id="stake-tokens" class="btn btn-success" style="width: 100%; margin-bottom: 10px;">Stake VIBES</button>
+                    <p style="color: #a0a0a0; font-size: 0.9rem; text-align: center;">Stake your VIBES tokens to earn rewards</p>
+                </div>
+                
+                <div class="info-card" style="opacity: 0.5; pointer-events: none;">
+                    <h3>💰 Unstake Tokens</h3>
+                    <div class="form-group">
+                        <label for="unstake-amount">Amount to Unstake:</label>
+                        <input type="number" id="unstake-amount" step="0.01" min="0" placeholder="Enter amount to unstake" disabled>
+                    </div>
+                    <button id="unstake-tokens" class="btn btn-warning" style="width: 100%; margin-bottom: 10px;" disabled>Unstake VIBES (Coming Soon)</button>
+                    <p style="color: #a0a0a0; font-size: 0.9rem; text-align: center;">Unstake your VIBES tokens</p>
+                </div>
+                
+                <div class="info-card" style="opacity: 0.5; pointer-events: none;">
+                    <h3>🎁 Claim Rewards</h3>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #a0a0a0; margin-bottom: 5px;" id="pending-rewards-display">0</div>
+                        <div style="font-size: 0.9rem; color: #a0a0a0;">Pending Rewards</div>
+                    </div>
+                    <button id="claim-rewards" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" disabled>Claim Rewards (Coming Soon)</button>
+                    <p style="color: #a0a0a0; font-size: 0.9rem; text-align: center;">Claim your staking rewards</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>📊 Staking Status</h3>
+                    <p><strong>Status:</strong> <span id="staking-status" style="color: #c7f801;">Not Staking</span></p>
+                    <p><strong>Staking Start:</strong> <span id="staking-start-date">-</span></p>
+                    <p><strong>Last Update:</strong> <span id="last-update-date">-</span></p>
+                    <p><strong>Total Rewards Claimed:</strong> <span id="total-rewards-claimed">0</span> VIBES</p>
                 </div>
             </div>
         </div>
@@ -2213,133 +2705,50 @@
         <!-- Vesting Section -->
         <div id="vesting" class="section">
             <h2>⏰ Vesting Management</h2>
-            <div class="grid">
-                <div class="info-card">
-                    <h3>Vesting Information</h3>
-                    <p><strong>Vesting Status:</strong> <span id="vesting-status">Not Available</span></p>
-                    <p><strong>Total Vesting:</strong> <span id="vesting-total">0</span> VIBES</p>
-                    <p><strong>Released:</strong> <span id="vesting-released">0</span> VIBES</p>
-                    <p><strong>Remaining:</strong> <span id="vesting-remaining">0</span> VIBES</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Admin Fund Monitor Section -->
-        <div class="section">
-            <h2>📊 Admin Fund Monitor</h2>
             
-            <!-- Summary Card -->
-            <div class="info-card" style="margin-bottom: 20px; background: linear-gradient(135deg, rgba(199, 248, 1, 0.12) 0%, rgba(56, 73, 37, 0.9) 100%); border: 2px solid rgba(199, 248, 1, 0.25); box-shadow: 0 0 30px rgba(199, 248, 1, 0.1);">
-                <h3 style="margin-bottom: 15px; font-size: 1.5rem;">💰 Fund Distribution Summary</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div>
-                        <p><strong>Total SOL Raised:</strong> <span id="admin-total-sol">0</span> SOL</p>
-                        <p><strong>Total USDC Raised:</strong> <span id="admin-total-usdc">0</span> USDC</p>
-                    </div>
-                    <div>
-                        <p><strong>Last Updated:</strong> <span id="admin-last-updated">Never</span></p>
-                        <button id="refresh-admin-data" class="btn btn-secondary" style="margin: 0; margin-top: 10px;">🔄 Refresh Data</button>
-                    </div>
+            <!-- Vesting Overview Cards -->
+            <div class="vesting-overview-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <!-- Total Vesting -->
+                <div class="vesting-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div style="font-size: 2rem; font-weight: bold; color: #c7f801; margin-bottom: 8px;" id="vesting-total-display">0</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">Total Vesting</div>
+                </div>
+                
+                <!-- Released -->
+                <div class="vesting-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div style="font-size: 2rem; font-weight: bold; color: #c7f801; margin-bottom: 8px;" id="vesting-released-display">0</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">Released</div>
+                </div>
+                
+                <!-- Remaining -->
+                <div class="vesting-card" style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.1) 0%, rgba(56, 73, 37, 0.8) 100%); border: 2px solid rgba(199, 248, 1, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
+                    <div style="font-size: 2rem; font-weight: bold; color: #c7f801; margin-bottom: 8px;" id="vesting-remaining-display">0</div>
+                    <div style="font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 1px;">Remaining</div>
                 </div>
             </div>
-
-            <!-- Wallet Details Grid -->
+            
             <div class="grid">
-                <!-- Fee Collector SOL -->
                 <div class="info-card">
-                    <h3>💸 Fee Collector SOL (0.5%)</h3>
-                    <p><strong>Amount:</strong> <span id="fee-sol-amount">0</span> SOL</p>
-                    <p><strong>Address:</strong></p>
-                    <p style="font-family: monospace; font-size: 0.85rem; word-break: break-all; margin: 5px 0;">
-                        <a id="fee-sol-link" href="" target="_blank" style="color: #667eea; text-decoration: none;">
-                            6xW2ZYh16AhRR3teKAWK8v1BDkUTDyTPBEqvLyhPpSos
-                        </a>
-                    </p>
-                    <p style="color: #666; font-size: 0.9rem;">Gebure platform fee collection</p>
+                    <h3>📊 Vesting Information</h3>
+                    <p><strong>Vesting Status:</strong> <span id="vesting-status" style="color: #ff6b6b;">Not Available</span></p>
+                    <p><strong>Presale Status:</strong> <span id="presale-status" style="color: #c7f801;">Active</span></p>
+                    <p><strong>Vesting Start:</strong> <span id="vesting-start-date">-</span></p>
+                    <p><strong>Last Claim:</strong> <span id="last-claim-date">-</span></p>
                 </div>
-
-                <!-- Fee Collector USDC -->
-                <div class="info-card">
-                    <h3>💸 Fee Collector USDC (0.5%)</h3>
-                    <p><strong>Amount:</strong> <span id="fee-usdc-amount">0</span> USDC</p>
-                    <p><strong>Token Account (ATA):</strong></p>
-                    <p style="font-family: monospace; font-size: 0.85rem; word-break: break-all; margin: 5px 0;">
-                        <a id="fee-usdc-link" href="" target="_blank" style="color: #667eea; text-decoration: none;">
-                            Loading...
-                        </a>
-                    </p>
-                    <p style="color: #666; font-size: 0.9rem;">USDC platform fees (ATA of 6bHam5U8Z5Qnrky86HMQfCGaWX7ie5hdyvKpJzAAjGHj)</p>
-                </div>
-
-                <!-- Treasury SOL -->
-                <div class="info-card">
-                    <h3>🏦 Treasury SOL (80%)</h3>
-                    <p><strong>Amount:</strong> <span id="treasury-sol-amount">0</span> SOL</p>
-                    <p><strong>Address:</strong></p>
-                    <p style="font-family: monospace; font-size: 0.85rem; word-break: break-all; margin: 5px 0;">
-                        <a id="treasury-sol-link" href="" target="_blank" style="color: #667eea; text-decoration: none;">
-                            5zKuHDrHFsaB6WbGGxjwRAtX2dP6Sze7qUWX9vyNq1AR
-                        </a>
-                    </p>
-                    <p style="color: #666; font-size: 0.9rem;">Main treasury for project funds</p>
-                </div>
-
-                <!-- Secondary SOL -->
-                <div class="info-card">
-                    <h3>📊 Secondary SOL (20%)</h3>
-                    <p><strong>Amount:</strong> <span id="secondary-sol-amount">0</span> SOL</p>
-                    <p><strong>Address:</strong></p>
-                    <p style="font-family: monospace; font-size: 0.85rem; word-break: break-all; margin: 5px 0;">
-                        <a id="secondary-sol-link" href="" target="_blank" style="color: #667eea; text-decoration: none;">
-                            9JqWNcKYQCTGNM2aRdNAPk3hXfFBVUZHNdr668C9DcSn
-                        </a>
-                    </p>
-                    <p style="color: #666; font-size: 0.9rem;">Secondary allocation wallet</p>
-                </div>
-
-                <!-- Treasury USDC -->
-                <div class="info-card">
-                    <h3>🏦 Treasury USDC (80%)</h3>
-                    <p><strong>Amount:</strong> <span id="treasury-usdc-amount">0</span> USDC</p>
-                    <p><strong>Token Account (ATA):</strong></p>
-                    <p style="font-family: monospace; font-size: 0.85rem; word-break: break-all; margin: 5px 0;">
-                        <a id="treasury-usdc-link" href="" target="_blank" style="color: #667eea; text-decoration: none;">
-                            GYujzmGHChT63exMwzqGP75gAXUH7meJaZDHxU7REFeZ
-                        </a>
-                    </p>
-                    <p style="color: #666; font-size: 0.9rem;">USDC treasury (ATA of Fypp3b43LduLMPWoTEaBimTbgdMzgSs2iYbcSXs9jf5R)</p>
-                </div>
-
-                <!-- Secondary USDC -->
-                <div class="info-card">
-                    <h3>📊 Secondary USDC (20%)</h3>
-                    <p><strong>Amount:</strong> <span id="secondary-usdc-amount">0</span> USDC</p>
-                    <p><strong>Token Account (ATA):</strong></p>
-                    <p style="font-family: monospace; font-size: 0.85rem; word-break: break-all; margin: 5px 0;">
-                        <a id="secondary-usdc-link" href="" target="_blank" style="color: #667eea; text-decoration: none;">
-                            Loading...
-                        </a>
-                    </p>
-                    <p style="color: #666; font-size: 0.9rem;">USDC secondary allocation (ATA of 3549ZVcu7jL55NNMyZgRAFYBJr5PUB2LVtcsD79G8KKX)</p>
-                </div>
-
-                <!-- Export -->
-                <div class="info-card">
-                    <h3>📄 Export Data</h3>
-                    <button id="export-fund-report" class="btn btn-success" style="width: 100%; margin-bottom: 10px;">📊 Export CSV Report</button>
-                    <p style="color: #666; font-size: 0.9rem; text-align: center;">Download CSV with all wallet addresses, amounts and links</p>
+                
+                <div class="info-card" id="vesting-claim-card" style="opacity: 0.5; pointer-events: none;">
+                    <h3>🎁 Claim Vested Tokens</h3>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #a0a0a0; margin-bottom: 5px;" id="claimable-amount">0</div>
+                        <div style="font-size: 0.9rem; color: #a0a0a0;">Claimable VIBES</div>
+                    </div>
+                    <button id="claim-vested-tokens" class="btn btn-success" style="width: 100%; margin-bottom: 10px;" disabled>Claim VIBES (Presale Active)</button>
+                    <p style="color: #a0a0a0; font-size: 0.9rem; text-align: center;">Claim your vested VIBES tokens after presale ends</p>
                 </div>
             </div>
         </div>
 
-        <!-- Transaction Log -->
-        <div class="section">
-            <h2>📝 Transaction Log</h2>
-            <div id="transaction-log" class="transaction-log">
-                <div class="log-entry log-info">DApp initialized. Connect your wallet to start.</div>
-            </div>
-            <button id="clear-log" class="btn btn-danger">Clear Log</button>
-        </div>
+
     </div>
     </div><!-- End main-content -->
 
@@ -2361,8 +2770,10 @@
                     // Update active nav link
                     document.querySelectorAll('.nav-link-btn').forEach(btn => {
                         btn.classList.remove('active');
+                        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(sectionId)) {
+                            btn.classList.add('active');
+                        }
                     });
-                    event.target.classList.add('active');
                 }
             }
 
@@ -2375,6 +2786,82 @@
                     header.classList.remove('scrolled');
                 }
             });
+
+            // Mobile Menu Toggle
+            (function() {
+                const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+                const mobileNav = document.getElementById('mobile-nav');
+                const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+                let isMenuOpen = false;
+
+                // Toggle mobile menu
+                function toggleMobileMenu() {
+                    isMenuOpen = !isMenuOpen;
+                    mobileMenuToggle.classList.toggle('active', isMenuOpen);
+                    mobileNav.classList.toggle('active', isMenuOpen);
+                    
+                    // Prevent body scroll when menu is open
+                    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+                }
+
+                // Close mobile menu
+                function closeMobileMenu() {
+                    isMenuOpen = false;
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+
+                // Handle mobile nav link clicks
+                function handleMobileNavClick(event) {
+                    const sectionId = event.target.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    
+                    // Update active states
+                    mobileNavLinks.forEach(link => link.classList.remove('active'));
+                    event.target.classList.add('active');
+                    
+                    // Update desktop nav active states
+                    document.querySelectorAll('.nav-link-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.getAttribute('onclick').includes(sectionId)) {
+                            btn.classList.add('active');
+                        }
+                    });
+                    
+                    // Close mobile menu
+                    closeMobileMenu();
+                    
+                    // Scroll to section
+                    scrollToSection(sectionId);
+                }
+
+                // Event listeners
+                if (mobileMenuToggle) {
+                    mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+                }
+
+                mobileNavLinks.forEach(link => {
+                    link.addEventListener('click', handleMobileNavClick);
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (isMenuOpen && 
+                        !mobileNav.contains(event.target) && 
+                        !mobileMenuToggle.contains(event.target)) {
+                        closeMobileMenu();
+                    }
+                });
+
+                // Close menu on window resize
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && isMenuOpen) {
+                        closeMobileMenu();
+                    }
+                });
+
+                console.log('✅ Mobile menu initialized');
+            })();
 
             // Production Wallet Button - Complete functionality
             (function() {
@@ -2394,7 +2881,8 @@
                     copyText: document.getElementById('copy-address-text'),
                     disconnectBtn: document.getElementById('disconnect-wallet-btn'),
                     mainConnectBtn: document.getElementById('connect-wallet'),
-                    mainDisconnectBtn: document.getElementById('disconnect-wallet')
+                    mainDisconnectBtn: document.getElementById('disconnect-wallet'),
+                    backdrop: document.getElementById('wallet-dropdown-backdrop')
                 };
 
                 // Format wallet address (4 chars...4 chars)
@@ -2403,23 +2891,157 @@
                     return `${address.slice(0, 4)}...${address.slice(-4)}`;
                 }
 
-                // Toggle dropdown
-                function toggleDropdown() {
+                // Store original parent for dropdown and backdrop
+                let dropdownOriginalParent = null;
+                let dropdownOriginalNextSibling = null;
+                let backdropOriginalParent = null;
+                let backdropOriginalNextSibling = null;
+
+                // Toggle dropdown - WITH MOBILE REPOSITIONING TO BODY
+                function toggleDropdown(event) {
+                    if (event) event.stopPropagation();
+                    
                     showDropdown = !showDropdown;
-                    elements.dropdown.style.display = showDropdown ? 'block' : 'none';
-                    if (elements.dropdownArrow) {
-                        elements.dropdownArrow.classList.toggle('open', showDropdown);
+                    const isMobile = window.innerWidth <= 768;
+                    
+                    if (showDropdown) {
+                        // MOBILE: Move dropdown AND backdrop to body to escape parent positioning
+                        if (isMobile) {
+                            // Store original positions
+                            if (!dropdownOriginalParent) {
+                                dropdownOriginalParent = elements.dropdown.parentNode;
+                                dropdownOriginalNextSibling = elements.dropdown.nextSibling;
+                            }
+                            if (elements.backdrop && !backdropOriginalParent) {
+                                backdropOriginalParent = elements.backdrop.parentNode;
+                                backdropOriginalNextSibling = elements.backdrop.nextSibling;
+                            }
+                            
+                            // Move backdrop to body first (so it's behind dropdown)
+                            if (elements.backdrop) {
+                                document.body.appendChild(elements.backdrop);
+                                elements.backdrop.classList.add('active');
+                            }
+                            
+                            // Move dropdown to body
+                            document.body.appendChild(elements.dropdown);
+                            
+                            // Force mobile styles
+                            elements.dropdown.style.position = 'fixed';
+                            elements.dropdown.style.top = 'auto';
+                            elements.dropdown.style.bottom = '0';
+                            elements.dropdown.style.left = '0';
+                            elements.dropdown.style.right = '0';
+                            elements.dropdown.style.width = '100%';
+                            elements.dropdown.style.maxHeight = '70vh';
+                            elements.dropdown.style.borderRadius = '24px 24px 0 0';
+                            elements.dropdown.style.transform = 'none';
+                            
+                            document.body.classList.add('wallet-dropdown-open');
+                        } else {
+                            // DESKTOP: Keep in place, reset styles
+                            elements.dropdown.style.position = '';
+                            elements.dropdown.style.top = '';
+                            elements.dropdown.style.bottom = '';
+                            elements.dropdown.style.left = '';
+                            elements.dropdown.style.right = '';
+                            elements.dropdown.style.width = '';
+                            elements.dropdown.style.maxHeight = '';
+                            elements.dropdown.style.borderRadius = '';
+                            elements.dropdown.style.transform = '';
+                        }
+                        
+                        // Show dropdown
+                        elements.dropdown.style.display = 'block';
+                        
+                        // Update arrow
+                        if (elements.dropdownArrow) {
+                            elements.dropdownArrow.classList.add('open');
+                        }
+                    } else {
+                        // CLOSE: Hide and restore positions
+                        elements.dropdown.style.display = 'none';
+                        
+                        // Move dropdown back to original parent
+                        if (dropdownOriginalParent && elements.dropdown.parentNode === document.body) {
+                            if (dropdownOriginalNextSibling) {
+                                dropdownOriginalParent.insertBefore(elements.dropdown, dropdownOriginalNextSibling);
+                            } else {
+                                dropdownOriginalParent.appendChild(elements.dropdown);
+                            }
+                        }
+                        
+                        // Move backdrop back to original parent
+                        if (elements.backdrop && backdropOriginalParent && elements.backdrop.parentNode === document.body) {
+                            elements.backdrop.classList.remove('active');
+                            if (backdropOriginalNextSibling) {
+                                backdropOriginalParent.insertBefore(elements.backdrop, backdropOriginalNextSibling);
+                            } else {
+                                backdropOriginalParent.appendChild(elements.backdrop);
+                            }
+                        }
+                        
+                        // Update arrow
+                        if (elements.dropdownArrow) {
+                            elements.dropdownArrow.classList.remove('open');
+                        }
+                        
+                        // Clean up body scroll
+                        document.body.classList.remove('wallet-dropdown-open');
                     }
+                }
+
+                // Close dropdown
+                function closeDropdown() {
+                    if (!showDropdown) return;
+                    
+                    showDropdown = false;
+                    elements.dropdown.style.display = 'none';
+                    
+                    // Move dropdown back to original parent if it was moved to body
+                    if (dropdownOriginalParent && elements.dropdown.parentNode === document.body) {
+                        if (dropdownOriginalNextSibling) {
+                            dropdownOriginalParent.insertBefore(elements.dropdown, dropdownOriginalNextSibling);
+                        } else {
+                            dropdownOriginalParent.appendChild(elements.dropdown);
+                        }
+                    }
+                    
+                    // Move backdrop back to original parent if it was moved to body
+                    if (elements.backdrop && backdropOriginalParent && elements.backdrop.parentNode === document.body) {
+                        elements.backdrop.classList.remove('active');
+                        if (backdropOriginalNextSibling) {
+                            backdropOriginalParent.insertBefore(elements.backdrop, backdropOriginalNextSibling);
+                        } else {
+                            backdropOriginalParent.appendChild(elements.backdrop);
+                        }
+                    } else if (elements.backdrop) {
+                        elements.backdrop.classList.remove('active');
+                    }
+                    
+                    if (elements.dropdownArrow) {
+                        elements.dropdownArrow.classList.remove('open');
+                    }
+                    
+                    document.body.classList.remove('wallet-dropdown-open');
                 }
 
                 // Close dropdown when clicking outside
                 function handleClickOutside(event) {
-                    if (elements.connectedContainer && !elements.connectedContainer.contains(event.target)) {
-                        showDropdown = false;
-                        elements.dropdown.style.display = 'none';
-                        if (elements.dropdownArrow) {
-                            elements.dropdownArrow.classList.remove('open');
-                        }
+                    // Don't close if clicking inside the connected container
+                    if (elements.connectedContainer && elements.connectedContainer.contains(event.target)) {
+                        return;
+                    }
+                    
+                    // Close if clicking backdrop
+                    if (elements.backdrop && event.target === elements.backdrop) {
+                        closeDropdown();
+                        return;
+                    }
+                    
+                    // Close if clicking outside
+                    if (showDropdown) {
+                        closeDropdown();
                     }
                 }
 
@@ -2458,8 +3080,9 @@
 
                 // Disconnect wallet
                 function handleDisconnect() {
-                    console.log('🔌 Production Wallet Button: Disconnect clicked');
-                    toggleDropdown(); // Close dropdown first
+                    console.log('🔌 Disconnect clicked');
+                    closeDropdown();
+                    
                     if (elements.mainDisconnectBtn) {
                         elements.mainDisconnectBtn.click();
                     }
@@ -2495,14 +3118,12 @@
                         elements.connectBtn.style.display = 'inline-flex';
                         elements.connectedContainer.style.display = 'none';
 
-                        // Close dropdown if open
-                        showDropdown = false;
-                        elements.dropdown.style.display = 'none';
-                        if (elements.dropdownArrow) {
-                            elements.dropdownArrow.classList.remove('open');
+                        // Close dropdown if open and cleanup
+                        if (showDropdown) {
+                            closeDropdown();
                         }
 
-                        console.log('✅ Production wallet button: Disconnected');
+                        console.log('✅ Wallet button: Disconnected');
                     }
                 };
 
@@ -2512,21 +3133,36 @@
                 }
 
                 if (elements.connectedBtn) {
-                    elements.connectedBtn.addEventListener('click', toggleDropdown);
+                    elements.connectedBtn.addEventListener('click', (e) => toggleDropdown(e));
                 }
 
                 if (elements.copyBtn) {
-                    elements.copyBtn.addEventListener('click', handleCopyAddress);
+                    elements.copyBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handleCopyAddress();
+                    });
                 }
 
                 if (elements.disconnectBtn) {
-                    elements.disconnectBtn.addEventListener('click', handleDisconnect);
+                    elements.disconnectBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handleDisconnect();
+                    });
                 }
 
                 // Click outside to close dropdown
-                document.addEventListener('mousedown', handleClickOutside);
+                document.addEventListener('click', handleClickOutside);
+                
+                // Close dropdown when clicking backdrop on mobile
+                if (elements.backdrop) {
+                    elements.backdrop.addEventListener('click', () => {
+                        if (showDropdown) {
+                            closeDropdown();
+                        }
+                    });
+                }
 
-                console.log('✅ Production Wallet Button initialized');
+                console.log('✅ Wallet button initialized');
             })();
 
             // Wallet Selector Modal
@@ -2577,7 +3213,7 @@
                     
                     // Show modal
                     modal.style.display = 'flex';
-                    document.body.style.overflow = 'hidden';
+                    document.body.classList.add('wallet-dropdown-open');
                 };
 
                 // Select wallet
@@ -2597,7 +3233,7 @@
                 // Close modal
                 function closeModal() {
                     modal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
+                    document.body.classList.remove('wallet-dropdown-open');
                     onSelectCallback = null;
                 }
 
@@ -2860,10 +3496,10 @@
             // Load scripts in order
             const scripts = [
                 'src/js/config.js',
-                'src/js/wallet-adapter.js',
+                'src/js/solana-wallet-standard.js',
                 'src/js/idls.js', 
                 'src/js/direct-contract.js?v=1757960000',
-                'src/js/app.js?v=1757960000'
+                'src/js/app-new.js?v=' + Date.now()
             ];
             
             function loadScript(src) {

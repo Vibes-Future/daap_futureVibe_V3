@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Test Mobile Navbar</title>
+    <style>
+        :root {
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --vibes-yellow: #C7F801;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #283D1F;
+            color: white;
+        }
+
+        .production-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(40, 61, 31, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(188, 231, 12, 0.2);
+            height: 80px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            flex-shrink: 0;
+            border: 2px solid red; /* Para debug */
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--vibes-yellow);
+        }
+
+        .wallet-button {
+            padding: 10px 20px;
+            background: rgba(56, 73, 37, 0.8);
+            border: 1px solid rgba(188, 231, 12, 0.2);
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .mobile-menu-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: #FFFFFF;
+            margin: 3px 0;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 var(--space-4);
+                gap: var(--space-4);
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex-shrink: 0;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+                order: 2;
+            }
+
+            .wallet-button {
+                order: 1;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        .content {
+            padding-top: 100px;
+            padding: 100px 20px 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="production-header">
+        <div class="header-content">
+            <div class="logo-text">VIBES</div>
+            
+            <div class="header-right">
+                <div class="wallet-container">
+                    <button class="wallet-button">Connect Wallet</button>
+                </div>
+                <button class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="content">
+        <h1>Test Mobile Navbar</h1>
+        <p>En móvil (&lt;768px), el botón de wallet y el menú hamburguesa deberían estar uno al lado del otro.</p>
+        <p>El header-right tiene un borde rojo para debug.</p>
+        <p>Reduce el ancho de la ventana para ver el comportamiento móvil.</p>
+    </div>
+</body>
+</html>
+

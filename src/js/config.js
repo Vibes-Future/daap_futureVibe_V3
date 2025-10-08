@@ -105,7 +105,24 @@ const SUCCESS_MESSAGES = {
     VESTING_TRANSFERRED: 'Tokens transferred to vesting successfully'
 };
 
-// Export configuration for use in other files
+// Export configuration for use in browser (global window object)
+if (typeof window !== 'undefined') {
+    window.PROGRAM_IDS = PROGRAM_IDS;
+    window.NETWORK_CONFIG = NETWORK_CONFIG;
+    window.TOKEN_CONFIG = TOKEN_CONFIG;
+    window.PRESALE_CONFIG = PRESALE_CONFIG;
+    window.DAPP_LIMITS = DAPP_LIMITS;
+    window.WALLET_CONFIG = WALLET_CONFIG;
+    window.UI_CONFIG = UI_CONFIG;
+    window.ERROR_MESSAGES = ERROR_MESSAGES;
+    window.SUCCESS_MESSAGES = SUCCESS_MESSAGES;
+    
+    console.log('✅ Configuration loaded successfully');
+    console.log('📊 Network:', NETWORK_CONFIG.NETWORK);
+    console.log('🔗 RPC URL:', NETWORK_CONFIG.RPC_URL);
+}
+
+// Export configuration for Node.js (if needed)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         PROGRAM_IDS,
