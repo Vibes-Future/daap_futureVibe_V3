@@ -989,7 +989,7 @@ class VibesAdminApp {
     }
 
     /**
-     * Stake tokens
+     * Stake tokens - REAL CONTRACT VERSION
      */
     async stakeTokens() {
         if (!this.connected || !this.contractClient) {
@@ -1004,24 +1004,49 @@ class VibesAdminApp {
         }
         
         try {
-            console.log('🏦 Staking tokens:', amount);
-            this.showMessage('Staking tokens...', 'info');
+            console.log('🏦 Staking tokens:', amount, 'VIBES');
+            this.showMessage('Preparing staking transaction...', 'info');
             
-            // Here you would call the contract method to stake tokens
-            // For now, we'll simulate the action
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Call the real contract method to opt into staking
+            console.log('📡 Calling contract optIntoStaking...');
+            const signature = await this.contractClient.optIntoStaking(amount);
             
-            this.showMessage(`Successfully staked ${amount} VIBES tokens`, 'success');
+            console.log('✅ Stake transaction confirmed:', signature);
+            this.showMessage(`Successfully staked ${amount} VIBES tokens!`, 'success');
             
             // Clear the input
             document.getElementById('stake-amount').value = '';
             
-            // Update staking display
-            this.loadStakingData();
+            // CRITICAL: Refresh staking data from contract after successful stake
+            console.log('🔄 Refreshing staking data from blockchain...');
+            
+            // Wait a moment for blockchain to update
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Update staking stats using the global function from index.html
+            if (typeof window.updateStakingStats === 'function') {
+                await window.updateStakingStats();
+                console.log('✅ Staking stats refreshed successfully');
+            } else {
+                console.warn('⚠️ updateStakingStats function not available');
+                // Fallback: call loadStakingData
+                this.loadStakingData();
+            }
             
         } catch (error) {
             console.error('❌ Staking failed:', error);
-            this.showMessage('Staking failed. Please try again.', 'error');
+            
+            // Provide user-friendly error message
+            let errorMessage = 'Staking failed. Please try again.';
+            if (error.message.includes('rejected') || error.message.includes('cancelled')) {
+                errorMessage = 'Transaction cancelled by user';
+            } else if (error.message.includes('Insufficient')) {
+                errorMessage = 'Insufficient unstaked tokens to stake';
+            } else if (error.message) {
+                errorMessage = `Staking failed: ${error.message}`;
+            }
+            
+            this.showMessage(errorMessage, 'error');
         }
     }
 
@@ -1138,27 +1163,37 @@ class VibesAdminApp {
      * Update vesting display with real data
      */
     updateVestingDisplay(vestingData) {
-        // Update overview cards
+        // Update overview cards with $VIBES suffix
         const totalVestingEl = document.getElementById('vesting-total-display');
         if (totalVestingEl) {
-            totalVestingEl.textContent = vestingData.totalVesting || '0';
+            const totalValue = vestingData.totalVesting || '0';
+            totalVestingEl.textContent = `${totalValue} $VIBES`;
         }
         
         const releasedEl = document.getElementById('vesting-released-display');
         if (releasedEl) {
-            releasedEl.textContent = vestingData.released || '0';
+            const releasedValue = vestingData.released || '0';
+            releasedEl.textContent = `${releasedValue} $VIBES`;
         }
         
         const remainingEl = document.getElementById('vesting-remaining-display');
         if (remainingEl) {
-            remainingEl.textContent = vestingData.remaining || '0';
+            const remainingValue = vestingData.remaining || '0';
+            remainingEl.textContent = `${remainingValue} $VIBES`;
         }
         
-        // Update vesting information
+        // Update vesting information with color coding
         const statusEl = document.getElementById('vesting-status');
         if (statusEl) {
             statusEl.textContent = vestingData.status || 'Not Available';
-            statusEl.style.color = vestingData.status === 'Active' ? '#c7f801' : '#ff6b6b';
+            // Color based on status
+            if (vestingData.status === 'Active' || vestingData.status === 'Completed') {
+                statusEl.style.color = '#c7f801';
+            } else if (vestingData.status === 'Pending Transfer' || vestingData.status === 'Not Created') {
+                statusEl.style.color = '#FACD95'; // Orange/yellow for pending states
+            } else {
+                statusEl.style.color = '#ff6b6b'; // Red for error/not available
+            }
         }
         
         const presaleStatusEl = document.getElementById('presale-status');
@@ -1177,24 +1212,28 @@ class VibesAdminApp {
             lastClaimEl.textContent = vestingData.lastClaim || '-';
         }
         
-        // Update claimable amount
+        // Update claimable amount with $VIBES suffix
         const claimableEl = document.getElementById('claimable-amount');
         if (claimableEl) {
-            claimableEl.textContent = vestingData.claimable || '0';
+            const claimableValue = vestingData.claimable || '0';
+            claimableEl.textContent = `${claimableValue} $VIBES`;
         }
         
-        // Enable/disable claim functionality based on presale status
-        this.updateVestingClaimStatus(vestingData.presaleActive);
+        // Enable/disable claim functionality based on presale status and claimable amount
+        this.updateVestingClaimStatus(vestingData.presaleActive, vestingData.claimable);
     }
 
     /**
-     * Update vesting claim button status
+     * Update vesting claim button status based on presale status and claimable amount
      */
-    updateVestingClaimStatus(presaleActive) {
+    updateVestingClaimStatus(presaleActive, claimableAmount = '0') {
         const claimCard = document.getElementById('vesting-claim-card');
         const claimBtn = document.getElementById('claim-vested-tokens');
         
         if (!claimCard || !claimBtn) return;
+        
+        // Parse claimable amount (remove commas and convert to number)
+        const claimable = parseFloat(claimableAmount.toString().replace(/,/g, '')) || 0;
         
         if (presaleActive) {
             // Presale is active - disable claim
@@ -1203,8 +1242,15 @@ class VibesAdminApp {
             claimBtn.disabled = true;
             claimBtn.textContent = 'Claim VIBES (Presale Active)';
             claimBtn.style.backgroundColor = '#666';
+        } else if (claimable <= 0) {
+            // Presale ended but no claimable tokens
+            claimCard.style.opacity = '0.7';
+            claimCard.style.pointerEvents = 'auto';
+            claimBtn.disabled = true;
+            claimBtn.textContent = 'No Claimable Tokens';
+            claimBtn.style.backgroundColor = '#666';
         } else {
-            // Presale ended - enable claim
+            // Presale ended and tokens available - enable claim
             claimCard.style.opacity = '1';
             claimCard.style.pointerEvents = 'auto';
             claimBtn.disabled = false;
@@ -1242,7 +1288,7 @@ class VibesAdminApp {
     }
 
     /**
-     * Load vesting data from contract
+     * Load vesting data from contract - REAL CONTRACT VERSION
      */
     async loadVestingData() {
         if (!this.connected || !this.contractClient) {
@@ -1261,27 +1307,134 @@ class VibesAdminApp {
         }
         
         try {
-            console.log('📊 Loading vesting data...');
+            console.log('📊 Loading vesting data from contract...');
             
-            // Here you would load real vesting data from the contract
-            // For now, we'll use mock data
+            // Get presale state to check if presale is active
+            const presaleState = await this.contractClient.getPresaleStateFromContract();
+            const now = Math.floor(Date.now() / 1000);
+            const presaleActive = now >= presaleState.startTs && now <= presaleState.endTs && !presaleState.isFinalized;
+            
+            console.log('📅 Presale status:', {
+                active: presaleActive,
+                startTs: new Date(presaleState.startTs * 1000).toISOString(),
+                endTs: new Date(presaleState.endTs * 1000).toISOString(),
+                finalized: presaleState.isFinalized || false
+            });
+            
+            // Get buyer state to check if transferred to vesting
+            const buyerState = await this.contractClient.getBuyerStateData(this.publicKey);
+            
+            if (!buyerState || !buyerState.exists) {
+                console.log('📭 No buyer state found - user has not purchased');
+                this.updateVestingDisplay({
+                    totalVesting: '0',
+                    released: '0',
+                    remaining: '0',
+                    status: 'No Purchases',
+                    presaleActive: presaleActive,
+                    vestingStart: '-',
+                    lastClaim: '-',
+                    claimable: '0'
+                });
+                return;
+            }
+            
+            console.log('📊 Buyer state:', {
+                transferredToVesting: buyerState.transferredToVesting,
+                finalVestingAmount: (buyerState.finalVestingAmount / 1e9).toFixed(2) + ' VIBES'
+            });
+            
+            // If not transferred to vesting yet, show buyer's purchased tokens as potential vesting
+            if (!buyerState.transferredToVesting) {
+                // Show total purchased tokens as "pending vesting"
+                const totalPurchased = buyerState.totalPurchasedVibes / 1e9;
+                
+                this.updateVestingDisplay({
+                    totalVesting: totalPurchased.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                    released: '0.00',
+                    remaining: totalPurchased.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                    status: 'Pending Transfer',
+                    presaleActive: presaleActive,
+                    vestingStart: '-',
+                    lastClaim: '-',
+                    claimable: '0.00'
+                });
+                
+                console.log('✅ Vesting data loaded (pending transfer)');
+                return;
+            }
+            
+            // Get vesting schedule data from contract
+            const vestingSchedule = await this.contractClient.getVestingScheduleData(this.publicKey);
+            
+            if (!vestingSchedule || !vestingSchedule.exists) {
+                console.log('📭 No vesting schedule found - user has not created vesting yet');
+                this.updateVestingDisplay({
+                    totalVesting: (buyerState.finalVestingAmount / 1e9).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                    released: '0.00',
+                    remaining: (buyerState.finalVestingAmount / 1e9).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                    status: 'Not Created',
+                    presaleActive: presaleActive,
+                    vestingStart: '-',
+                    lastClaim: '-',
+                    claimable: '0.00'
+                });
+                return;
+            }
+            
+            // Parse and format vesting data
+            const totalVesting = vestingSchedule.total / 1e9;
+            const released = vestingSchedule.released / 1e9;
+            const remaining = vestingSchedule.remaining / 1e9;
+            const claimable = vestingSchedule.claimable / 1e9;
+            
+            // Determine vesting status
+            let status = 'Active';
+            if (vestingSchedule.isCancelled) {
+                status = 'Cancelled';
+            } else if (remaining <= 0) {
+                status = 'Completed';
+            }
+            
+            // Format dates
+            const vestingStart = vestingSchedule.listingTs > 0 
+                ? new Date(vestingSchedule.listingTs * 1000).toLocaleDateString()
+                : '-';
+            
+            // Last claim date - if released > 0, show current date (approximation)
+            const lastClaim = released > 0 
+                ? new Date().toLocaleDateString()
+                : '-';
+            
             const vestingData = {
-                totalVesting: '5,000.00',
-                released: '1,250.00',
-                remaining: '3,750.00',
-                status: 'Active',
-                presaleActive: true, // This would be determined by checking presale end time
-                vestingStart: '2024-02-01',
-                lastClaim: '2024-01-15',
-                claimable: '0' // No claimable tokens while presale is active
+                totalVesting: totalVesting.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                released: released.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                remaining: remaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                status: status,
+                presaleActive: presaleActive,
+                vestingStart: vestingStart,
+                lastClaim: lastClaim,
+                claimable: claimable.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
             };
             
             this.updateVestingDisplay(vestingData);
-            console.log('✅ Vesting data loaded successfully');
+            console.log('✅ Vesting data loaded successfully from contract');
             
         } catch (error) {
             console.error('❌ Failed to load vesting data:', error);
             this.showMessage('Failed to load vesting data', 'error');
+            
+            // Show error state
+            this.updateVestingDisplay({
+                totalVesting: '0',
+                released: '0',
+                remaining: '0',
+                status: 'Error Loading',
+                presaleActive: true,
+                vestingStart: '-',
+                lastClaim: '-',
+                claimable: '0'
+            });
         }
     }
 
