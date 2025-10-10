@@ -345,6 +345,9 @@ class VibesAdminApp {
             console.warn('⚠️ DirectContractClient not available');
         }
         
+        // Update global wallet reference for staking stats
+        window.currentWalletPublicKey = this.publicKey;
+        
         // Update UI
         this.updateWalletUI();
         
@@ -362,6 +365,11 @@ class VibesAdminApp {
         
         // Load staking data
         await this.loadStakingData();
+        
+        // Update staking stats with wallet-specific data
+        if (typeof window.updateStakingStats === 'function') {
+            await window.updateStakingStats();
+        }
         
         // Load vesting data
         await this.loadVestingData();
@@ -381,9 +389,19 @@ class VibesAdminApp {
         console.log('🔌 Wallet disconnected');
         this.showMessage('Wallet disconnected', 'info');
         
+        // Clear global wallet reference
+        window.currentWalletPublicKey = null;
+        
         // Update production wallet button if available
         if (typeof window.updateProductionWalletButton === 'function') {
             window.updateProductionWalletButton(false, null);
+        }
+        
+        // Reset staking stats to zeros
+        if (typeof window.updateStakingStats === 'function') {
+            window.updateStakingStats(null).catch(err => {
+                console.warn('⚠️ Could not reset staking stats:', err);
+            });
         }
         
         // Update UI
@@ -399,8 +417,20 @@ class VibesAdminApp {
         console.log('🔄 Account changed:', this.publicKey?.toString());
         this.showMessage('Account changed', 'info');
         
+        // Update global wallet reference
+        window.currentWalletPublicKey = this.publicKey;
+        
         // Reload user data
         await this.loadUserData();
+        
+        // Update staking stats with new wallet data
+        if (typeof window.updateStakingStats === 'function') {
+            await window.updateStakingStats();
+        }
+        
+        // Update presale and vesting data
+        await this.loadPresaleData();
+        await this.loadVestingData();
     }
 
     /**
@@ -1012,7 +1042,17 @@ class VibesAdminApp {
             const signature = await this.contractClient.optIntoStaking(amount);
             
             console.log('✅ Stake transaction confirmed:', signature);
-            this.showMessage(`Successfully staked ${amount} VIBES tokens!`, 'success');
+            
+            // Show success notification with transaction link
+            if (window.notifications) {
+                window.notifications.transaction(
+                    `Successfully staked ${amount} VIBES tokens!`,
+                    signature,
+                    { title: '🏦 Staking Successful' }
+                );
+            } else {
+                this.showMessage(`Successfully staked ${amount} VIBES tokens!`, 'success');
+            }
             
             // Clear the input
             document.getElementById('stake-amount').value = '';
@@ -1490,7 +1530,17 @@ class VibesAdminApp {
             const signature = await this.contractClient.buyWithSol(amount, optIntoStaking);
             
             console.log('✅ Purchase successful:', signature);
-            this.showMessage(`Purchase successful! Transaction: ${signature.slice(0, 8)}...`, 'success');
+            
+            // Show success notification with transaction link
+            if (window.notifications) {
+                window.notifications.transaction(
+                    `Successfully purchased VIBES with ${amount} SOL!`,
+                    signature,
+                    { title: '🎉 Purchase Successful' }
+                );
+            } else {
+                this.showMessage(`Purchase successful! Transaction: ${signature.slice(0, 8)}...`, 'success');
+            }
             
             // Clear input and refresh data
             amountInput.value = '';
@@ -1540,7 +1590,17 @@ class VibesAdminApp {
             const signature = await this.contractClient.buyWithUsdc(amount, optIntoStaking);
             
             console.log('✅ Purchase successful:', signature);
-            this.showMessage(`Purchase successful! Transaction: ${signature.slice(0, 8)}...`, 'success');
+            
+            // Show success notification with transaction link
+            if (window.notifications) {
+                window.notifications.transaction(
+                    `Successfully purchased VIBES with ${amount} USDC!`,
+                    signature,
+                    { title: '🎉 Purchase Successful' }
+                );
+            } else {
+                this.showMessage(`Purchase successful! Transaction: ${signature.slice(0, 8)}...`, 'success');
+            }
             
             // Clear input and refresh data
             amountInput.value = '';
@@ -1587,7 +1647,17 @@ class VibesAdminApp {
             const signature = await this.contractClient.optIntoStaking(amount);
             
             console.log('✅ Staking successful:', signature);
-            this.showMessage(`Staking successful! Transaction: ${signature.slice(0, 8)}...`, 'success');
+            
+            // Show success notification with transaction link
+            if (window.notifications) {
+                window.notifications.transaction(
+                    `Successfully opted into staking with ${amount} VIBES!`,
+                    signature,
+                    { title: '🏦 Staking Successful' }
+                );
+            } else {
+                this.showMessage(`Staking successful! Transaction: ${signature.slice(0, 8)}...`, 'success');
+            }
             
             // Clear input and refresh data
             amountInput.value = '';
@@ -1643,16 +1713,36 @@ class VibesAdminApp {
             genericLog.scrollTop = genericLog.scrollHeight;
         }
         
-        // Show notification toast if available
-        const notification = document.getElementById('notification');
-        if (notification) {
-            notification.textContent = message;
-            notification.className = `notification notification-${type}`;
-            notification.style.display = 'block';
-            
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
+        // Use new notification system if available
+        if (window.notifications) {
+            // Map type to notification method
+            switch (type) {
+                case 'success':
+                    window.notifications.success(message);
+                    break;
+                case 'error':
+                    window.notifications.error(message);
+                    break;
+                case 'warning':
+                    window.notifications.warning(message);
+                    break;
+                case 'info':
+                default:
+                    window.notifications.info(message);
+                    break;
+            }
+        } else {
+            // Fallback to old notification if new system not loaded yet
+            const notification = document.getElementById('notification');
+            if (notification) {
+                notification.textContent = message;
+                notification.className = `notification notification-${type}`;
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
         }
     }
 

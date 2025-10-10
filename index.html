@@ -2327,6 +2327,222 @@
                 height: 2px;
             }
         }
+
+        /* ==========================================
+           NOTIFICATION SYSTEM STYLES
+           Professional toast notification system
+           ========================================== */
+        
+        .notification-container {
+            position: fixed;
+            top: 100px; /* Below header */
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+            max-width: 400px;
+        }
+
+        .notification {
+            background: rgba(56, 73, 37, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                        0 0 20px rgba(199, 248, 1, 0.1);
+            border: 1px solid rgba(199, 248, 1, 0.2);
+            pointer-events: auto;
+            opacity: 0;
+            transform: translateX(400px);
+            transition: all var(--transition-base);
+            min-width: 320px;
+            max-width: 400px;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.hide {
+            opacity: 0;
+            transform: translateX(400px);
+        }
+
+        /* Notification Types */
+        .notification-success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification-error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification-warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification-info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .notification-transaction {
+            border-left: 4px solid var(--vibes-yellow);
+        }
+
+        /* Notification Icon */
+        .notification-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-success .notification-icon {
+            color: #10b981;
+        }
+
+        .notification-error .notification-icon {
+            color: #ef4444;
+        }
+
+        .notification-warning .notification-icon {
+            color: #f59e0b;
+        }
+
+        .notification-info .notification-icon {
+            color: #3b82f6;
+        }
+
+        .notification-transaction .notification-icon {
+            color: var(--vibes-yellow);
+        }
+
+        /* Notification Content */
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 14px;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .notification-action {
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: var(--gradient-primary);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-heading);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .notification-action:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* Close Button */
+        .notification-close {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all var(--transition-fast);
+            padding: 0;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .notification-container {
+                left: 12px;
+                right: 12px;
+                top: 80px;
+                max-width: none;
+            }
+
+            .notification {
+                min-width: auto;
+                max-width: none;
+                padding: 14px;
+            }
+
+            .notification {
+                transform: translateY(-100px);
+            }
+
+            .notification.show {
+                transform: translateY(0);
+            }
+
+            .notification.hide {
+                transform: translateY(-100px);
+            }
+
+            .notification-title {
+                font-size: 13px;
+            }
+
+            .notification-message {
+                font-size: 12px;
+            }
+        }
+
+        /* Animation for progress bar (optional) */
+        @keyframes notificationProgress {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+
+        .notification-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            animation: notificationProgress 5s linear forwards;
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+        }
     </style>
 </head>
 <body>
@@ -3636,7 +3852,20 @@
                     let connection = null;
                     let walletPublicKey = null;
                     
-                    if (!stakingData && window.solanaWeb3 && window.solanaWeb3.Connection && window.DirectContractClient) {
+                    // Check if explicitly passed null (wallet disconnected)
+                    if (stakingData === null && arguments.length > 0 && !window.currentWalletPublicKey && !window.vibesApp?.publicKey) {
+                        console.log('🔌 Wallet disconnected - resetting to zeros');
+                        buyerData = {
+                            exists: false,
+                            stakedAmount: 0,
+                            unstakedAmount: 0,
+                            accumulatedRewards: 0,
+                            totalRewardsClaimed: 0,
+                            lastStakeTs: 0,
+                            lastUpdateTs: 0,
+                            isStaking: false
+                        };
+                    } else if (!stakingData && window.solanaWeb3 && window.solanaWeb3.Connection && window.DirectContractClient) {
                         try {
                             console.log('📡 Fetching wallet-specific staking data from contract...');
                             
@@ -3645,11 +3874,16 @@
                             
                             connection = new window.solanaWeb3.Connection(rpcUrl, 'confirmed');
                             
-                            // Get connected wallet
-                            if (window.solana && window.solana.publicKey) {
-                                walletPublicKey = window.solana.publicKey;
-                            } else if (window.currentWalletPublicKey) {
+                            // Get connected wallet - prioritize window.currentWalletPublicKey (most reliable)
+                            if (window.currentWalletPublicKey) {
                                 walletPublicKey = window.currentWalletPublicKey;
+                                console.log('👛 Using currentWalletPublicKey:', walletPublicKey.toString().slice(0, 8) + '...');
+                            } else if (window.vibesApp && window.vibesApp.publicKey) {
+                                walletPublicKey = window.vibesApp.publicKey;
+                                console.log('👛 Using vibesApp.publicKey:', walletPublicKey.toString().slice(0, 8) + '...');
+                            } else if (window.solana && window.solana.publicKey) {
+                                walletPublicKey = window.solana.publicKey;
+                                console.log('👛 Using window.solana.publicKey:', walletPublicKey.toString().slice(0, 8) + '...');
                             }
                             
                             if (!walletPublicKey) {
@@ -3657,15 +3891,20 @@
                                 buyerData = {
                                     exists: false,
                                     stakedAmount: 0,
-                                    unstakedAmount: 0
+                                    unstakedAmount: 0,
+                                    accumulatedRewards: 0,
+                                    totalRewardsClaimed: 0,
+                                    lastStakeTs: 0,
+                                    lastUpdateTs: 0,
+                                    isStaking: false
                                 };
                             } else {
                                 // Create client with wallet
                                 const tempClient = new window.DirectContractClient(connection, { publicKey: walletPublicKey });
                                 
-                                // Get buyer state data for this wallet
+                                // Get buyer state data for this specific wallet
                                 buyerData = await tempClient.getBuyerStateData(walletPublicKey);
-                                console.log('✅ Buyer state data retrieved:', buyerData);
+                                console.log('✅ Buyer state data retrieved for wallet', walletPublicKey.toString().slice(0, 8) + '...:', buyerData);
                                 
                                 // Also get global presale state for APY
                                 try {
@@ -3678,6 +3917,17 @@
                         } catch (error) {
                             console.warn('⚠️ Could not fetch buyer staking data from contract:', error.message);
                             console.error(error);
+                            // Set zeros on error
+                            buyerData = {
+                                exists: false,
+                                stakedAmount: 0,
+                                unstakedAmount: 0,
+                                accumulatedRewards: 0,
+                                totalRewardsClaimed: 0,
+                                lastStakeTs: 0,
+                                lastUpdateTs: 0,
+                                isStaking: false
+                            };
                         }
                     } else if (stakingData) {
                         // Even when using stakingData, initialize connection and wallet for later use
@@ -3686,10 +3936,13 @@
                                 || 'https://devnet.helius-rpc.com/?api-key=10bdc822-0b46-4952-98fc-095c326565d7';
                             connection = new window.solanaWeb3.Connection(rpcUrl, 'confirmed');
                             
-                            if (window.solana && window.solana.publicKey) {
-                                walletPublicKey = window.solana.publicKey;
-                            } else if (window.currentWalletPublicKey) {
+                            // Get wallet reference - prioritize currentWalletPublicKey
+                            if (window.currentWalletPublicKey) {
                                 walletPublicKey = window.currentWalletPublicKey;
+                            } else if (window.vibesApp && window.vibesApp.publicKey) {
+                                walletPublicKey = window.vibesApp.publicKey;
+                            } else if (window.solana && window.solana.publicKey) {
+                                walletPublicKey = window.solana.publicKey;
                             }
                         } catch (error) {
                             console.warn('⚠️ Could not initialize connection for stakingData path:', error.message);
@@ -3934,6 +4187,7 @@
             // Load scripts in order
             const scripts = [
                 'src/js/config.js',
+                'src/js/notifications.js',
                 'src/js/solana-wallet-standard.js',
                 'src/js/idls.js', 
                 'src/js/direct-contract.js?v=1757960000',

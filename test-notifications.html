@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIBES Notification System - Test</title>
+    <style>
+        /* VIBES Design System - CSS Variables */
+        :root {
+            --primary-0: #798F1D;
+            --primary-1: #BCE70C;
+            --primary-2: #BCFFA4;
+            --primary-4: #0B0B12;
+            --primary-5: #28330A;
+            --bg-primary: #283D1F;
+            --bg-secondary: #28330A;
+            --bg-tertiary: #384925;
+            --bg-card: rgba(56, 73, 37, 0.7);
+            --bg-glass: rgba(40, 61, 31, 0.95);
+            --highlight-1: #FACD95;
+            --highlight-2: #F5D871;
+            --vibes-yellow: #C7F801;
+            --gradient-primary: linear-gradient(270deg, #C7F801 6.51%, #FACD95 63.52%);
+            --gradient-vertical: linear-gradient(180deg, #C7F801 0%, #FACD95 100%);
+            --font-heading: 'Lexend', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.25rem;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-glow: 0 0 20px rgba(199, 248, 1, 0.3);
+            --transition-fast: 150ms ease-in-out;
+            --transition-base: 250ms ease-in-out;
+            --transition-slow: 350ms ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: #FFFFFF;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .description {
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .test-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(199, 248, 1, 0.2);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-4);
+        }
+
+        .test-section h2 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-bottom: var(--space-4);
+            color: var(--vibes-yellow);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-3);
+        }
+
+        .test-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-heading);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            color: var(--bg-primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .btn-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .btn-transaction {
+            background: var(--gradient-primary);
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .test-button:active {
+            transform: translateY(0);
+        }
+
+        /* Notification System Styles */
+        .notification-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+            max-width: 400px;
+        }
+
+        .notification {
+            background: rgba(56, 73, 37, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                        0 0 20px rgba(199, 248, 1, 0.1);
+            border: 1px solid rgba(199, 248, 1, 0.2);
+            pointer-events: auto;
+            opacity: 0;
+            transform: translateX(400px);
+            transition: all var(--transition-base);
+            min-width: 320px;
+            max-width: 400px;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.hide {
+            opacity: 0;
+            transform: translateX(400px);
+        }
+
+        .notification-success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification-error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification-warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification-info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .notification-transaction {
+            border-left: 4px solid var(--vibes-yellow);
+        }
+
+        .notification-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-success .notification-icon {
+            color: #10b981;
+        }
+
+        .notification-error .notification-icon {
+            color: #ef4444;
+        }
+
+        .notification-warning .notification-icon {
+            color: #f59e0b;
+        }
+
+        .notification-info .notification-icon {
+            color: #3b82f6;
+        }
+
+        .notification-transaction .notification-icon {
+            color: var(--vibes-yellow);
+        }
+
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 14px;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .notification-action {
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: var(--gradient-primary);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-heading);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .notification-action:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .notification-close {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all var(--transition-fast);
+            padding: 0;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .notification-container {
+                left: 12px;
+                right: 12px;
+                top: 80px;
+                max-width: none;
+            }
+
+            .notification {
+                min-width: auto;
+                max-width: none;
+                padding: 14px;
+                transform: translateY(-100px);
+            }
+
+            .notification.show {
+                transform: translateY(0);
+            }
+
+            .notification.hide {
+                transform: translateY(-100px);
+            }
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💎 VIBES Notification System</h1>
+        <p class="description">
+            Test the different notification types and features of the VIBES notification system.
+            Click the buttons below to see the notifications in action!
+        </p>
+
+        <div class="test-section">
+            <h2>Basic Notifications</h2>
+            <div class="button-grid">
+                <button class="test-button btn-success" onclick="testSuccess()">✅ Success</button>
+                <button class="test-button btn-error" onclick="testError()">❌ Error</button>
+                <button class="test-button btn-warning" onclick="testWarning()">⚠️ Warning</button>
+                <button class="test-button btn-info" onclick="testInfo()">ℹ️ Info</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Advanced Features</h2>
+            <div class="button-grid">
+                <button class="test-button btn-transaction" onclick="testTransaction()">💎 Transaction</button>
+                <button class="test-button btn-info" onclick="testPersistent()">📌 Persistent</button>
+                <button class="test-button btn-success" onclick="testWithAction()">🎯 With Action</button>
+                <button class="test-button btn-warning" onclick="testMultiple()">📚 Multiple</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Real-world Examples</h2>
+            <div class="button-grid">
+                <button class="test-button btn-success" onclick="testPurchase()">💰 Purchase SOL</button>
+                <button class="test-button btn-success" onclick="testStaking()">🏦 Staking</button>
+                <button class="test-button btn-info" onclick="testWalletConnect()">👛 Wallet Connect</button>
+                <button class="test-button btn-error" onclick="testErrorExample()">⚠️ Error Example</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Code Example</h2>
+            <p style="margin-bottom: 1rem;">To use the notification system in your code:</p>
+            <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; overflow-x: auto;"><code>// Simple notification
+notifications.success('Operation completed!');
+
+// With custom options
+notifications.transaction(
+    'Successfully purchased VIBES!',
+    'signature123...',
+    { title: '🎉 Purchase Successful' }
+);</code></pre>
+        </div>
+    </div>
+
+    <!-- Load Notification System -->
+    <script src="src/js/config.js"></script>
+    <script src="src/js/notifications.js"></script>
+
+    <!-- Test Functions -->
+    <script>
+        // Wait for notification system to load
+        setTimeout(() => {
+            console.log('✅ Notification system loaded');
+        }, 500);
+
+        function testSuccess() {
+            notifications.success('This is a success notification! Everything went perfectly.');
+        }
+
+        function testError() {
+            notifications.error('This is an error notification! Something went wrong.');
+        }
+
+        function testWarning() {
+            notifications.warning('This is a warning notification! Please pay attention.');
+        }
+
+        function testInfo() {
+            notifications.info('This is an info notification! Just letting you know.');
+        }
+
+        function testTransaction() {
+            // Simulate a transaction signature
+            const mockSignature = '5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQwd';
+            notifications.transaction(
+                'Successfully purchased 100 VIBES tokens!',
+                mockSignature,
+                { title: '🎉 Purchase Successful' }
+            );
+        }
+
+        function testPersistent() {
+            notifications.info('This notification will not auto-dismiss. Click the X to close it.', {
+                duration: 0,
+                title: '📌 Persistent Notification'
+            });
+        }
+
+        function testWithAction() {
+            notifications.success('New version 2.0 is available!', {
+                title: '🚀 Update Available',
+                action: 'Learn More',
+                onAction: () => {
+                    alert('Action button clicked! This could redirect to a page or perform an action.');
+                }
+            });
+        }
+
+        function testMultiple() {
+            notifications.info('Loading step 1...', { title: 'Step 1' });
+            setTimeout(() => {
+                notifications.info('Loading step 2...', { title: 'Step 2' });
+            }, 500);
+            setTimeout(() => {
+                notifications.info('Loading step 3...', { title: 'Step 3' });
+            }, 1000);
+            setTimeout(() => {
+                notifications.success('All steps completed!', { title: '✅ Done' });
+            }, 1500);
+        }
+
+        function testPurchase() {
+            // Simulate a purchase flow
+            notifications.info('Processing purchase of 0.5 SOL...');
+            
+            setTimeout(() => {
+                const mockSignature = '2ZE7Rw9w1X6vqYz5JjnZLKUYK3vGJH9x4wYzN3jA7Fq8qL9Y3mN7oW2cS5pR8xA4tB6uC1dE7fG9hJ2kL4mN6oP';
+                notifications.transaction(
+                    'Successfully purchased VIBES with 0.5 SOL!',
+                    mockSignature,
+                    { title: '🎉 Purchase Successful' }
+                );
+            }, 2000);
+        }
+
+        function testStaking() {
+            notifications.info('Preparing staking transaction...');
+            
+            setTimeout(() => {
+                const mockSignature = '3XF8St0x2Y7wrZa6KkoAMLVZL4wHKI0y5xZaO4kB8Gr9rM0Z4nO8pX3dT6qS9yB5uC2eF8gH0iK3lM5nO7pQ9rS';
+                notifications.transaction(
+                    'Successfully staked 1000 VIBES tokens!',
+                    mockSignature,
+                    { title: '🏦 Staking Successful' }
+                );
+            }, 2000);
+        }
+
+        function testWalletConnect() {
+            notifications.info('Connecting to Phantom wallet...');
+            
+            setTimeout(() => {
+                notifications.success('Wallet connected: 4b3x...7k9p', {
+                    title: '👛 Wallet Connected'
+                });
+            }, 1500);
+        }
+
+        function testErrorExample() {
+            notifications.info('Attempting to process transaction...');
+            
+            setTimeout(() => {
+                notifications.error('Insufficient SOL balance. Please add funds to your wallet.', {
+                    title: '⚠️ Transaction Failed',
+                    duration: 10000 // Show for 10 seconds
+                });
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
+
