@@ -89,7 +89,7 @@ class VanillaWalletAdapter {
             wallets.push({
                 name: 'Trust Wallet',
                 provider: window.trustWallet,
-                icon: 'trust'
+                icon: 'trustwallet'
             });
         }
         
