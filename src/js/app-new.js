@@ -55,11 +55,11 @@ class VibesAdminApp {
             window.app = this;
             
             console.log('✅ VIBES Admin DApp initialized successfully');
-            this.showMessage('DApp initialized successfully', 'success');
+            // No notification needed for initialization
             
         } catch (error) {
             console.error('❌ Failed to initialize DApp:', error);
-            this.showMessage('Failed to initialize DApp: ' + error.message, 'error');
+            this.showMessage('Unable to start the application. Please refresh the page and try again.', 'error');
         }
     }
 
@@ -159,7 +159,10 @@ class VibesAdminApp {
         // Error event
         this.walletManager.on('error', (data) => {
             console.error('❌ Wallet error event:', data);
-            this.showMessage(`Wallet error: ${data.message}`, 'error');
+            // Only show critical wallet errors
+            if (data.message && !data.message.includes('disconnect')) {
+                this.showMessage(`Wallet error: ${data.message}. Please check your wallet and try again.`, 'error');
+            }
         });
         
         // Wallets detected event
@@ -247,7 +250,7 @@ class VibesAdminApp {
         const wallets = this.walletManager.getAvailableWallets();
         
         if (wallets.length === 0) {
-            this.showMessage('No Solana wallet detected. Please install Phantom, Solflare, or another Solana wallet and refresh the page.', 'warning');
+            this.showMessage('No Solana wallet detected. Please install a Solana wallet (Phantom, Solflare, etc.) and refresh the page.', 'warning');
             return;
         }
         
@@ -279,7 +282,7 @@ class VibesAdminApp {
     async connectWallet(walletName = null) {
         try {
             console.log('🔌 Connecting wallet...', walletName || 'auto');
-            this.showMessage('Connecting wallet...', 'info');
+            // No notification for connection progress
             
             // Update UI to show loading state
             this.updateConnectButtonState('connecting');
@@ -295,12 +298,16 @@ class VibesAdminApp {
             console.error('❌ Wallet connection failed:', error);
             
             // Show user-friendly error message
-            let errorMessage = 'Failed to connect wallet';
+            let errorMessage = 'Failed to connect wallet. ';
             
-            if (error.message.includes('User rejected')) {
-                errorMessage = 'Connection cancelled by user';
-            } else if (error.message.includes('not found') || error.message.includes('not detected')) {
-                errorMessage = error.message;
+            if (error.message.includes('User rejected') || error.message.includes('rejected')) {
+                errorMessage += 'Connection was cancelled. Please try again and approve the connection in your wallet.';
+            } else if (error.message.includes('not found') || error.message.includes('not detected') || error.message.includes('No wallet')) {
+                errorMessage += 'Wallet not detected. Please install Phantom, Solflare, or another Solana wallet.';
+            } else if (error.message.includes('timeout')) {
+                errorMessage += 'Connection timed out. Please try again.';
+            } else {
+                errorMessage += 'Please make sure your wallet is unlocked and try again.';
             }
             
             this.showMessage(errorMessage, 'error');
@@ -314,13 +321,13 @@ class VibesAdminApp {
     async disconnectWallet() {
         try {
             console.log('🔌 Disconnecting wallet...');
-            this.showMessage('Disconnecting wallet...', 'info');
+            // No notification for disconnection progress
             
             await this.walletManager.disconnect();
             
         } catch (error) {
             console.error('❌ Wallet disconnection failed:', error);
-            this.showMessage('Failed to disconnect wallet', 'error');
+            // No notification for disconnection errors - it's not critical
         }
     }
 
@@ -332,7 +339,7 @@ class VibesAdminApp {
         this.connected = true;
         
         console.log('✅ Wallet connected:', this.publicKey.toString());
-        this.showMessage(`Wallet connected: ${this.formatAddress(this.publicKey.toString())}`, 'success');
+        this.showMessage(`Wallet connected successfully`, 'success');
         
         // Initialize contract client
         if (typeof DirectContractClient !== 'undefined') {
@@ -387,7 +394,7 @@ class VibesAdminApp {
         this.userData = null;
         
         console.log('🔌 Wallet disconnected');
-        this.showMessage('Wallet disconnected', 'info');
+        // No notification for disconnect - it's intentional user action
         
         // Clear global wallet reference
         window.currentWalletPublicKey = null;
@@ -415,7 +422,7 @@ class VibesAdminApp {
         this.publicKey = data.publicKey;
         
         console.log('🔄 Account changed:', this.publicKey?.toString());
-        this.showMessage('Account changed', 'info');
+        this.showMessage('Wallet account changed', 'warning');
         
         // Update global wallet reference
         window.currentWalletPublicKey = this.publicKey;
@@ -515,7 +522,7 @@ class VibesAdminApp {
         
         try {
             console.log('📊 Loading user data...');
-            this.showMessage('Loading wallet data...', 'info');
+            // No notification for data loading
             
             // Load SOL balance
             const solBalance = await this.connection.getBalance(this.publicKey);
@@ -529,11 +536,11 @@ class VibesAdminApp {
             // Load presale data
             await this.loadPresaleData();
             
-            this.showMessage('Wallet data loaded successfully', 'success');
+            // No notification for successful data loading
             
         } catch (error) {
             console.error('❌ Failed to load user data:', error);
-            this.showMessage('Failed to load wallet data', 'error');
+            this.showMessage('Unable to load wallet data. Please refresh the page to try again.', 'error');
         }
     }
 
@@ -600,6 +607,7 @@ class VibesAdminApp {
             
         } catch (error) {
             console.error('❌ Failed to load presale data:', error);
+            // No notification for presale data load errors - not critical for user experience
             
             // Fallback to mock data if contract reading fails
             console.log('🔄 Using fallback data...');
@@ -1035,7 +1043,7 @@ class VibesAdminApp {
         
         try {
             console.log('🏦 Staking tokens:', amount, 'VIBES');
-            this.showMessage('Preparing staking transaction...', 'info');
+            // No notification for transaction preparation
             
             // Call the real contract method to opt into staking
             console.log('📡 Calling contract optIntoStaking...');
@@ -1107,7 +1115,7 @@ class VibesAdminApp {
         
         try {
             console.log('💰 Unstaking tokens:', amount);
-            this.showMessage('Unstaking tokens...', 'info');
+            // No notification for transaction processing
             
             // Here you would call the contract method to unstake tokens
             // For now, we'll simulate the action
@@ -1123,7 +1131,19 @@ class VibesAdminApp {
             
         } catch (error) {
             console.error('❌ Unstaking failed:', error);
-            this.showMessage('Unstaking failed. Please try again.', 'error');
+            
+            let errorMsg = 'Unstaking failed. ';
+            if (error.message?.includes('insufficient')) {
+                errorMsg += 'You don\'t have enough staked tokens.';
+            } else if (error.message?.includes('rejected') || error.message?.includes('User rejected')) {
+                errorMsg += 'Transaction was cancelled.';
+            } else if (error.message?.includes('timeout')) {
+                errorMsg += 'Transaction timed out. Please try again.';
+            } else {
+                errorMsg += 'Please check your wallet and try again.';
+            }
+            
+            this.showMessage(errorMsg, 'error');
         }
     }
 
@@ -1138,7 +1158,7 @@ class VibesAdminApp {
         
         try {
             console.log('🎁 Claiming rewards...');
-            this.showMessage('Claiming rewards...', 'info');
+            // No notification for transaction processing
             
             // Here you would call the contract method to claim rewards
             // For now, we'll simulate the action
@@ -1151,7 +1171,19 @@ class VibesAdminApp {
             
         } catch (error) {
             console.error('❌ Claiming rewards failed:', error);
-            this.showMessage('Claiming rewards failed. Please try again.', 'error');
+            
+            let errorMsg = 'Unable to claim rewards. ';
+            if (error.message?.includes('No rewards')) {
+                errorMsg += 'You don\'t have any rewards to claim yet.';
+            } else if (error.message?.includes('rejected') || error.message?.includes('User rejected')) {
+                errorMsg += 'Transaction was cancelled.';
+            } else if (error.message?.includes('timeout')) {
+                errorMsg += 'Transaction timed out. Please try again.';
+            } else {
+                errorMsg += 'Please check your wallet and try again.';
+            }
+            
+            this.showMessage(errorMsg, 'error');
         }
     }
 
@@ -1195,7 +1227,7 @@ class VibesAdminApp {
             
         } catch (error) {
             console.error('❌ Failed to load staking data:', error);
-            this.showMessage('Failed to load staking data', 'error');
+            // No notification for staking data load errors - not critical for user experience
         }
     }
 
@@ -1310,7 +1342,7 @@ class VibesAdminApp {
         
         try {
             console.log('🎁 Claiming vested tokens...');
-            this.showMessage('Claiming vested tokens...', 'info');
+            // No notification for transaction processing
             
             // Here you would call the contract method to claim vested tokens
             // For now, we'll simulate the action
@@ -1323,7 +1355,19 @@ class VibesAdminApp {
             
         } catch (error) {
             console.error('❌ Claiming vested tokens failed:', error);
-            this.showMessage('Claiming vested tokens failed. Please try again.', 'error');
+            
+            let errorMsg = 'Unable to claim vested tokens. ';
+            if (error.message?.includes('No tokens') || error.message?.includes('not vested')) {
+                errorMsg += 'You don\'t have any tokens available to claim yet. Check your vesting schedule.';
+            } else if (error.message?.includes('rejected') || error.message?.includes('User rejected')) {
+                errorMsg += 'Transaction was cancelled.';
+            } else if (error.message?.includes('timeout')) {
+                errorMsg += 'Transaction timed out. Please try again.';
+            } else {
+                errorMsg += 'Please check your wallet and try again.';
+            }
+            
+            this.showMessage(errorMsg, 'error');
         }
     }
 
@@ -1462,7 +1506,7 @@ class VibesAdminApp {
             
         } catch (error) {
             console.error('❌ Failed to load vesting data:', error);
-            this.showMessage('Failed to load vesting data', 'error');
+            // No notification for vesting data load errors - not critical for user experience
             
             // Show error state
             this.updateVestingDisplay({
@@ -1488,7 +1532,7 @@ class VibesAdminApp {
         }
         
         console.log('🔄 Refreshing data...');
-        this.showMessage('Refreshing data...', 'info');
+        // No notification for data refresh
         
         await this.loadUserData();
         await this.loadPresaleData();
@@ -1524,7 +1568,7 @@ class VibesAdminApp {
             }
             
             console.log('💰 Buying with SOL:', { amount, optIntoStaking });
-            this.showMessage(`Processing purchase of ${amount} SOL...`, 'info');
+            // No notification for transaction processing
             
             // Execute purchase
             const signature = await this.contractClient.buyWithSol(amount, optIntoStaking);
@@ -1552,7 +1596,21 @@ class VibesAdminApp {
             
         } catch (error) {
             console.error('❌ Purchase failed:', error);
-            this.showMessage(`Purchase failed: ${error.message}`, 'error');
+            
+            let errorMsg = 'Purchase failed. ';
+            if (error.message?.includes('insufficient') || error.message?.includes('balance')) {
+                errorMsg += 'Insufficient SOL balance. Please add more SOL to your wallet.';
+            } else if (error.message?.includes('rejected') || error.message?.includes('User rejected')) {
+                errorMsg += 'Transaction was cancelled.';
+            } else if (error.message?.includes('timeout')) {
+                errorMsg += 'Transaction timed out. Please try again.';
+            } else if (error.message?.includes('slippage')) {
+                errorMsg += 'Price changed too much. Please try again.';
+            } else {
+                errorMsg += 'Please check your wallet balance and try again.';
+            }
+            
+            this.showMessage(errorMsg, 'error');
         }
     }
 
@@ -1584,7 +1642,7 @@ class VibesAdminApp {
             }
             
             console.log('💵 Buying with USDC:', { amount, optIntoStaking });
-            this.showMessage(`Processing purchase of ${amount} USDC...`, 'info');
+            // No notification for transaction processing
             
             // Execute purchase
             const signature = await this.contractClient.buyWithUsdc(amount, optIntoStaking);
@@ -1612,7 +1670,21 @@ class VibesAdminApp {
             
         } catch (error) {
             console.error('❌ Purchase failed:', error);
-            this.showMessage(`Purchase failed: ${error.message}`, 'error');
+            
+            let errorMsg = 'Purchase failed. ';
+            if (error.message?.includes('insufficient') || error.message?.includes('balance')) {
+                errorMsg += 'Insufficient USDC balance. Please add more USDC to your wallet.';
+            } else if (error.message?.includes('rejected') || error.message?.includes('User rejected')) {
+                errorMsg += 'Transaction was cancelled.';
+            } else if (error.message?.includes('timeout')) {
+                errorMsg += 'Transaction timed out. Please try again.';
+            } else if (error.message?.includes('slippage')) {
+                errorMsg += 'Price changed too much. Please try again.';
+            } else {
+                errorMsg += 'Please check your wallet balance and try again.';
+            }
+            
+            this.showMessage(errorMsg, 'error');
         }
     }
 
@@ -1641,7 +1713,7 @@ class VibesAdminApp {
             }
             
             console.log('🏦 Opting into staking:', amount);
-            this.showMessage(`Opting into staking with ${amount} VIBES...`, 'info');
+            // No notification for transaction processing
             
             // Execute staking
             const signature = await this.contractClient.optIntoStaking(amount);
@@ -1667,7 +1739,21 @@ class VibesAdminApp {
             
         } catch (error) {
             console.error('❌ Staking failed:', error);
-            this.showMessage(`Staking failed: ${error.message}`, 'error');
+            
+            let errorMsg = 'Staking failed. ';
+            if (error.message?.includes('insufficient') || error.message?.includes('balance')) {
+                errorMsg += 'Insufficient VIBES balance. You need to purchase tokens first.';
+            } else if (error.message?.includes('rejected') || error.message?.includes('User rejected')) {
+                errorMsg += 'Transaction was cancelled.';
+            } else if (error.message?.includes('timeout')) {
+                errorMsg += 'Transaction timed out. Please try again.';
+            } else if (error.message?.includes('already staked')) {
+                errorMsg += 'These tokens are already staked.';
+            } else {
+                errorMsg += 'Please check your wallet and try again.';
+            }
+            
+            this.showMessage(errorMsg, 'error');
         }
     }
 
@@ -1681,8 +1767,11 @@ class VibesAdminApp {
 
     /**
      * Show message to user
+     * @param {string} message - Message to show
+     * @param {string} type - Type of message: 'success', 'error', 'warning', 'info'
+     * @param {boolean} showNotification - Whether to show visual notification (default: true for errors, warnings, success; false for info)
      */
-    showMessage(message, type = 'info') {
+    showMessage(message, type = 'info', showNotification = null) {
         const timestamp = new Date().toLocaleTimeString();
         const logMessage = `[${timestamp}] ${message}`;
         
@@ -1713,8 +1802,14 @@ class VibesAdminApp {
             genericLog.scrollTop = genericLog.scrollHeight;
         }
         
-        // Use new notification system if available
-        if (window.notifications) {
+        // Determine if notification should be shown
+        // By default: show errors, warnings, and success; hide info messages
+        if (showNotification === null) {
+            showNotification = (type !== 'info');
+        }
+        
+        // Use new notification system if available and enabled
+        if (window.notifications && showNotification) {
             // Map type to notification method
             switch (type) {
                 case 'success':

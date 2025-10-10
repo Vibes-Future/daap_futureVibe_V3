@@ -9,7 +9,7 @@ Implementation of the official VIBES logo in the DApp header, replacing the text
 - **File**: `FUTURE _VIBES_512x512.png`
 - **Original Size**: 512x512 pixels
 - **Format**: PNG with transparency
-- **Location**: Project root directory
+- **Location**: `src/images/` directory (organized assets folder)
 
 ### Display Specifications
 - **Desktop Size**: 48x48 pixels
@@ -160,6 +160,7 @@ Implementation of the official VIBES logo in the DApp header, replacing the text
 
 ### Current File
 - **Name**: `FUTURE _VIBES_512x512.png`
+- **Location**: `src/images/FUTURE _VIBES_512x512.png`
 - **Note**: Filename contains space - not ideal but functional
 - **Size**: Original 512x512, displayed at 48x48 (good resolution for retina displays)
 
@@ -167,6 +168,7 @@ Implementation of the official VIBES logo in the DApp header, replacing the text
 - Consider renaming to `future-vibes-512x512.png` (no spaces)
 - Current implementation works but space in filename may cause issues in some contexts
 - File size should be optimized for web (PNG compression)
+- ✅ **Updated**: All image assets now organized in `src/images/` directory (October 10, 2025)
 
 ## 🚀 Performance
 

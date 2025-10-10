@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         /* VIBES Design System - CSS Variables */
         :root {
@@ -1512,15 +1514,26 @@
         }
 
         .wallet-option-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
+            width: 64px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
             flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .wallet-option-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .wallet-option:hover .wallet-option-icon img {
+            transform: scale(1.1);
+            filter: drop-shadow(0 6px 16px rgba(199, 248, 1, 0.4));
         }
 
         .wallet-option-info {
@@ -1641,15 +1654,23 @@
         }
 
         .card-icon-stats {
-            width: 48px;
-            height: 48px;
-            background: var(--gradient-primary);
+            width: 56px;
+            height: 56px;
+            background: rgba(199, 248, 1, 0.1);
+            border: 2px solid rgba(199, 248, 1, 0.3);
             border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            box-shadow: 0 4px 16px rgba(199, 248, 1, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card-icon-stats:hover {
+            background: rgba(199, 248, 1, 0.15);
+            border-color: rgba(199, 248, 1, 0.5);
+            box-shadow: 0 6px 20px rgba(199, 248, 1, 0.3);
         }
 
         .card-title-stats {
@@ -2543,6 +2564,56 @@
             animation: notificationProgress 5s linear forwards;
             border-radius: 0 0 var(--radius-xl) var(--radius-xl);
         }
+
+        /* Lucide Icons Styling */
+        .lucide {
+            display: inline-block;
+            vertical-align: middle;
+            stroke-width: 2;
+        }
+
+        .icon-inline {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .icon-header {
+            width: 28px;
+            height: 28px;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        .icon-card {
+            width: 28px;
+            height: 28px;
+            color: #c7f801;
+            stroke-width: 2.5;
+        }
+
+        .card-icon-stats .lucide {
+            width: 28px;
+            height: 28px;
+            color: #c7f801;
+            stroke-width: 2.5;
+        }
+
+        h2 .lucide {
+            width: 32px;
+            height: 32px;
+            margin-right: 12px;
+            color: #c7f801;
+            vertical-align: middle;
+        }
+
+        h3 .lucide {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -2551,7 +2622,7 @@
         <div class="header-content">
             <!-- Logo -->
             <a href="https://futurevibes.io/" target="_blank" class="logo-container">
-                <img src="FUTURE _VIBES_512x512.png" alt="VIBES Logo" class="logo-image">
+                <img src="src/images/FUTURE _VIBES_512x512.png" alt="VIBES Logo" class="logo-image">
                 <div class="logo-text-nav">
                     <div class="logo-title-nav">VIBES</div>
                     <div class="logo-subtitle-nav">DeFi Ecosystem</div>
@@ -2572,10 +2643,7 @@
                 <div id="production-wallet-container">
                     <!-- Connect Button (shown when not connected) -->
                     <button id="wallet-connect-btn" class="wallet-connect-button">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="wallet-icon">
-                        <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <i data-lucide="wallet" style="width: 20px; height: 20px; margin-right: 8px;"></i>
                     <span>Connect Wallet</span>
                 </button>
 
@@ -2671,16 +2739,16 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-                <h1>💎 VIBES DeFi</h1>
+                <h1><i data-lucide="gem" class="icon-header"></i>VIBES DeFi</h1>
                 <p>FutureVibes combines crypto & charity – shaping the Future of DeFi with purpose, profit, and impact.</p>
-        </div>
+            </div>
 
             <!-- Dashboard Stats Grid -->
             <div id="dashboard" class="dashboard-grid">
                 <!-- Presale Stats Card -->
                 <div class="presale-stats-card">
                     <div class="card-header-stats">
-                        <div class="card-icon-stats">📊</div>
+                        <div class="card-icon-stats"><i data-lucide="bar-chart-3" class="icon-card"></i></div>
                 <div>
                             <div class="card-title-stats">Presale Stats</div>
                             <div class="card-subtitle-stats">Real-time presale metrics</div>
@@ -2720,7 +2788,7 @@
                 <!-- Price Calendar Card -->
                 <div class="price-calendar-card">
                     <div class="card-header-stats">
-                        <div class="card-icon-stats">⏰</div>
+                        <div class="card-icon-stats"><i data-lucide="clock" class="icon-card"></i></div>
                 <div>
                             <div class="card-title-stats">Price Calendar</div>
                             <div class="card-subtitle-stats">Time until next price increase</div>
@@ -2800,7 +2868,7 @@
 
         <!-- Purchase Section -->
             <div id="presale" class="section">
-            <h2>💰 Presale</h2>
+            <h2><i data-lucide="coins"></i>Presale</h2>
            
             
             <!-- Presale Information Cards -->
@@ -2828,13 +2896,15 @@
             
             
             <!-- Purchase Section Title -->
-            <h2 style="margin: 30px 0 20px 0;">👉 Purchase VIBES Tokens</h2>
+            <h2 style="margin: 30px 0 20px 0;"><i data-lucide="shopping-cart"></i>Purchase VIBES Tokens</h2>
             
             <div class="grid">
                 <!-- SOL Purchase -->
                     <div class="purchase-card">
                         <div class="purchase-header">
-                            <div class="purchase-icon">◎</div>
+                            <div class="purchase-icon">
+                                <img src="src/images/Logo Solana.png" alt="Solana Logo" style="width: 32px; height: 32px; object-fit: contain;">
+                            </div>
                             <div class="purchase-title">Buy with SOL</div>
                         </div>
                     <div class="form-group">
@@ -2856,17 +2926,20 @@
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="sol-staking">
-                            <label for="sol-staking">🏦 Opt into staking (40% APY)</label>
+                            <label for="sol-staking"><i data-lucide="landmark" class="icon-inline"></i>Opt into staking (40% APY)</label>
                     </div>
-                        <button id="buy-sol" class="btn btn-success" style="width: 100%; margin: 10px 0 0 0;">
-                            Buy with SOL ◎
+                        <button id="buy-sol" class="btn btn-success" style="width: 100%; margin: 10px 0 0 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <img src="src/images/Logo Solana.png" alt="SOL" style="width: 20px; height: 20px; object-fit: contain;">
+                            Buy with SOL
                         </button>
                 </div>
 
                 <!-- USDC Purchase -->
                     <div class="purchase-card">
                         <div class="purchase-header">
-                            <div class="purchase-icon">💵</div>
+                            <div class="purchase-icon">
+                                <img src="src/images/Logo USDC.png" alt="USDC Logo" style="width: 32px; height: 32px; object-fit: contain;">
+                            </div>
                             <div class="purchase-title">Buy with USDC</div>
                         </div>
                     <div class="form-group">
@@ -2886,10 +2959,11 @@
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="usdc-staking">
-                            <label for="usdc-staking">🏦 Opt into staking (40% APY)</label>
+                            <label for="usdc-staking"><i data-lucide="landmark" class="icon-inline"></i>Opt into staking (40% APY)</label>
                     </div>
-                        <button id="buy-usdc" class="btn btn-success" style="width: 100%; margin: 10px 0 0 0;">
-                            Buy with USDC 💵
+                        <button id="buy-usdc" class="btn btn-success" style="width: 100%; margin: 10px 0 0 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <img src="src/images/Logo USDC.png" alt="USDC" style="width: 20px; height: 20px; object-fit: contain;">
+                            Buy with USDC
                         </button>
                 </div>
             </div>
@@ -2897,7 +2971,7 @@
 
         <!-- Staking Section -->
         <div id="staking" class="section">
-            <h2>🏦 Staking Management</h2>
+            <h2><i data-lucide="landmark"></i>Staking Management</h2>
             
             <!-- Staking Overview Cards - Diseño según boceto -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
@@ -2940,7 +3014,7 @@
             <!-- Staking Actions Grid -->
             <div class="grid" style="margin-top: 30px;">
                 <div class="info-card">
-                    <h3>🏦 Stake Tokens</h3>
+                    <h3><i data-lucide="lock"></i>Stake Tokens</h3>
                     <div class="form-group">
                         <label for="stake-amount">Amount to Stake:</label>
                         <input type="number" id="stake-amount" step="0.01" min="0" placeholder="Enter amount to stake">
@@ -2950,7 +3024,7 @@
                 </div>
                 
                 <div class="info-card">
-                    <h3>📊 Staking Status</h3>
+                    <h3><i data-lucide="activity"></i>Staking Status</h3>
                     <p><strong>Status:</strong> <span id="staking-status" style="color: #c7f801;">Not Staking</span></p>
                     <p><strong>Staking Start:</strong> <span id="staking-start-date">-</span></p>
                     <p><strong>Last Update:</strong> <span id="last-update-date">-</span></p>
@@ -2961,7 +3035,7 @@
 
         <!-- Vesting Section -->
         <div id="vesting" class="section">
-            <h2>⏰ Vesting Management</h2>
+            <h2><i data-lucide="clock"></i>Vesting Management</h2>
             
             <!-- Vesting Overview Cards -->
             <div class="vesting-overview-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
@@ -2986,7 +3060,7 @@
             
             <div class="grid">
                 <div class="info-card">
-                    <h3>📊 Vesting Information</h3>
+                    <h3><i data-lucide="trending-up"></i>Vesting Information</h3>
                     <p><strong>Vesting Status:</strong> <span id="vesting-status" style="color: #ff6b6b;">Not Available</span></p>
                     <p><strong>Presale Status:</strong> <span id="presale-status" style="color: #c7f801;">Active</span></p>
                     <p><strong>Vesting Start:</strong> <span id="vesting-start-date">-</span></p>
@@ -3006,13 +3080,14 @@
             
             <!-- Tokenomics Table -->
             <div style="margin: 40px 0;">
-                <h3 style="margin-bottom: 20px; color: #c7f801; font-size: 1.5rem; font-weight: 600;">📊 Tokenomics Distribution</h3>
+                <h3 style="margin-bottom: 20px; color: #c7f801; font-size: 1.5rem; font-weight: 600;"><i data-lucide="pie-chart"></i> Tokenomics Distribution</h3>
                 <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(199, 248, 1, 0.1);">
                     <table style="width: 100%; border-collapse: collapse; background: linear-gradient(135deg, rgba(40, 61, 31, 0.8) 0%, rgba(56, 73, 37, 0.6) 100%); border: 2px solid rgba(199, 248, 1, 0.3);">
                         <thead>
                             <tr style="background: linear-gradient(135deg, rgba(199, 248, 1, 0.2) 0%, rgba(199, 248, 1, 0.1) 100%);">
                                 <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 0.95rem; color: #c7f801; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid rgba(199, 248, 1, 0.3);">Tokenomics</th>
                                 <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 0.95rem; color: #c7f801; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid rgba(199, 248, 1, 0.3);">Wallet</th>
+                                <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 0.95rem; color: #c7f801; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid rgba(199, 248, 1, 0.3);">Amount</th>
                                 <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 0.95rem; color: #c7f801; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid rgba(199, 248, 1, 0.3);">Unlock Date</th>
                                 <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 0.95rem; color: #c7f801; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid rgba(199, 248, 1, 0.3);">% Unlock</th>
                                 <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 0.95rem; color: #c7f801; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid rgba(199, 248, 1, 0.3);">% Unlock per Month</th>
@@ -3022,64 +3097,61 @@
                             <!-- Presale Row -->
                             <tr style="border-bottom: 1px solid rgba(199, 248, 1, 0.15); transition: background 0.3s ease;" onmouseover="this.style.background='rgba(199, 248, 1, 0.05)'" onmouseout="this.style.background='transparent'">
                                 <td style="padding: 16px 20px; font-weight: 600; color: #ffffff; font-size: 0.95rem;">Presale</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem; font-family: monospace;">6sLUNcaguF5hQsqhDGzHwpCTNfxWo1DR8KYQmV5ta2bs</td>
+                                <td style="padding: 16px 20px; color: #c7f801; font-size: 0.9rem; font-weight: 600;">40,000,000</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">11/15/26</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">40%</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">20%</td>
                             </tr>
                             
                             <!-- Staking Row -->
                             <tr style="border-bottom: 1px solid rgba(199, 248, 1, 0.15); transition: background 0.3s ease;" onmouseover="this.style.background='rgba(199, 248, 1, 0.05)'" onmouseout="this.style.background='transparent'">
                                 <td style="padding: 16px 20px; font-weight: 600; color: #ffffff; font-size: 0.95rem;">Staking</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem; font-family: monospace;">HbYXFqAuLcjGvH8qkWcZQR7AZbnc8ERjEp1Y3DNQJPnY</td>
+                                <td style="padding: 16px 20px; color: #c7f801; font-size: 0.9rem; font-weight: 600;">15,000,000</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">12/15/26</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">40%</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">20%</td>
                             </tr>
                             
                             <!-- Marketing Row -->
                             <tr style="border-bottom: 1px solid rgba(199, 248, 1, 0.15); transition: background 0.3s ease;" onmouseover="this.style.background='rgba(199, 248, 1, 0.05)'" onmouseout="this.style.background='transparent'">
                                 <td style="padding: 16px 20px; font-weight: 600; color: #ffffff; font-size: 0.95rem;">Marketing</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem; font-family: monospace;">7cZxM8Pa9nmvG6qRuue4XyjmsjTbsLwK4mW5iutwawfZ</td>
+                                <td style="padding: 16px 20px; color: #c7f801; font-size: 0.9rem; font-weight: 600;">5,000,000</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">12/31/26</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">100%</td>
                                 <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
                             </tr>
                             
                             <!-- Project Row -->
                             <tr style="border-bottom: 1px solid rgba(199, 248, 1, 0.15); transition: background 0.3s ease;" onmouseover="this.style.background='rgba(199, 248, 1, 0.05)'" onmouseout="this.style.background='transparent'">
                                 <td style="padding: 16px 20px; font-weight: 600; color: #ffffff; font-size: 0.95rem;">Project</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem; font-family: monospace;">29npkviXzAoE2UpqZsmufQpXWYdmErrsxCdNucaBHTZp</td>
+                                <td style="padding: 16px 20px; color: #c7f801; font-size: 0.9rem; font-weight: 600;">2,500,000</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">12/31/26</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">40%</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">20%</td>
                             </tr>
                             
                             <!-- Development Row -->
                             <tr style="border-bottom: 1px solid rgba(199, 248, 1, 0.15); transition: background 0.3s ease;" onmouseover="this.style.background='rgba(199, 248, 1, 0.05)'" onmouseout="this.style.background='transparent'">
                                 <td style="padding: 16px 20px; font-weight: 600; color: #ffffff; font-size: 0.95rem;">Development</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem; font-family: monospace;">E8z8PHMuVh3ziuu6daJL96qGMHE1HuyLKgYKTkzRDoq1</td>
+                                <td style="padding: 16px 20px; color: #c7f801; font-size: 0.9rem; font-weight: 600;">5,000,000</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">12/31/26</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">40%</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">20%</td>
                             </tr>
                             
                             <!-- Donation Row -->
                             <tr style="border-bottom: 1px solid rgba(199, 248, 1, 0.15); transition: background 0.3s ease;" onmouseover="this.style.background='rgba(199, 248, 1, 0.05)'" onmouseout="this.style.background='transparent'">
                                 <td style="padding: 16px 20px; font-weight: 600; color: #ffffff; font-size: 0.95rem;">Donation</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                            </tr>
-                            
-                            <!-- Liquidity Row -->
-                            <tr style="transition: background 0.3s ease;" onmouseover="this.style.background='rgba(199, 248, 1, 0.05)'" onmouseout="this.style.background='transparent'">
-                                <td style="padding: 16px 20px; font-weight: 600; color: #ffffff; font-size: 0.95rem;">Liquidity</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">-</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem; font-family: monospace;">4RjsTjaVmombQDSqVYeNnitcwJQ8uWWNEgZLyegXzKUe</td>
+                                <td style="padding: 16px 20px; color: #c7f801; font-size: 0.9rem; font-weight: 600;">5,000,000</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">10/10/27</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">40%</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">20%</td>
                             </tr>
                         </tbody>
                     </table>
@@ -3512,15 +3584,15 @@
                 const walletList = document.getElementById('wallet-selector-list');
                 let onSelectCallback = null;
 
-                // Wallet icons map
+                // Wallet icons map (local logos)
                 const walletIcons = {
-                    phantom: '👻',
-                    solflare: '🔥',
-                    trust: '🛡️',
-                    backpack: '🎒',
-                    coinbase: '🔵',
-                    brave: '🦁',
-                    wallet: '💼'
+                    phantom: 'src/images/phanton.png?v=2',
+                    solflare: 'src/images/solflare.jpeg?v=2',
+                    trust: 'src/images/trust-wallet.png?v=2',
+                    backpack: 'https://cdn.jsdelivr.net/gh/solana-labs/wallet-adapter@master/packages/wallets/icons/backpack.svg',
+                    coinbase: 'https://cdn.jsdelivr.net/gh/solana-labs/wallet-adapter@master/packages/wallets/icons/coinbase.svg',
+                    brave: 'https://cdn.jsdelivr.net/gh/solana-labs/wallet-adapter@master/packages/wallets/icons/brave.svg',
+                    wallet: 'src/images/phanton.png?v=2'
                 };
 
                 // Show wallet selector modal
@@ -3537,10 +3609,13 @@
                         option.className = 'wallet-option';
                         option.onclick = () => selectWallet(wallet);
                         
-                        const icon = walletIcons[wallet.icon] || '💼';
+                        const iconUrl = walletIcons[wallet.icon] || walletIcons.wallet;
                         
                         option.innerHTML = `
-                            <div class="wallet-option-icon">${icon}</div>
+                            <div class="wallet-option-icon">
+                                <img src="${iconUrl}" alt="${wallet.name}" 
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23c7f801%22 stroke-width=%222%22><rect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222%22/><path d=%22M3 10h18%22/></svg>';">
+                            </div>
                             <div class="wallet-option-info">
                                 <div class="wallet-option-name">${wallet.name}</div>
                                 <div class="wallet-option-status detected">✓ Detected</div>
@@ -4512,6 +4587,80 @@
             console.log('🚀 Initializing purchase calculators...');
             setupPurchaseCalculators();
             startPriceUpdates();
+        }
+    </script>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        // Function to initialize Lucide icons
+        function initializeLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✨ Lucide icons initialized');
+                return true;
+            } else {
+                console.warn('⚠️ Lucide library not loaded yet');
+                return false;
+            }
+        }
+
+        // Initialize icons when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                // Try to initialize immediately
+                if (!initializeLucideIcons()) {
+                    // If Lucide isn't loaded yet, wait and retry
+                    setTimeout(initializeLucideIcons, 100);
+                }
+            });
+        } else {
+            // DOM already loaded, initialize now
+            if (!initializeLucideIcons()) {
+                // If Lucide isn't loaded yet, wait and retry
+                setTimeout(initializeLucideIcons, 100);
+            }
+        }
+
+        // Re-initialize icons when content changes (for dynamic updates)
+        // This is useful when content is loaded asynchronously
+        window.refreshLucideIcons = function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        };
+
+        // Observer to re-initialize icons when new content is added
+        if (typeof MutationObserver !== 'undefined') {
+            const observer = new MutationObserver((mutations) => {
+                let shouldRefresh = false;
+                mutations.forEach((mutation) => {
+                    if (mutation.addedNodes.length > 0) {
+                        mutation.addedNodes.forEach((node) => {
+                            if (node.nodeType === 1) { // Element node
+                                // Check if the added node contains lucide icons
+                                if (node.querySelector && node.querySelector('[data-lucide]')) {
+                                    shouldRefresh = true;
+                                }
+                                if (node.hasAttribute && node.hasAttribute('data-lucide')) {
+                                    shouldRefresh = true;
+                                }
+                            }
+                        });
+                    }
+                });
+                if (shouldRefresh && typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            });
+
+            // Start observing after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+                console.log('👀 Lucide icon observer started');
+            }, 500);
         }
     </script>
 </body>
