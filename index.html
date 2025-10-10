@@ -7,7 +7,8 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>VIBES DeFi - Admin Dashboard</title>
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+    <link rel="icon" type="image/png" href="src/images/FUTURE _VIBES_512x512.png">
+    <link rel="apple-touch-icon" href="src/images/FUTURE _VIBES_512x512.png">
     <!-- Import VIBES Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -967,15 +968,22 @@
         .logo-image {
             width: 48px;
             height: 48px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(199, 248, 1, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(199, 248, 1, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             object-fit: cover;
         }
 
         .logo-container:hover .logo-image {
-            transform: scale(1.05);
-            box-shadow: 0 4px 16px rgba(199, 248, 1, 0.5);
+            transform: scale(1.08);
+            box-shadow: 
+                0 0 0 4px rgba(199, 248, 1, 0.15),
+                0 8px 24px rgba(199, 248, 1, 0.6),
+                0 0 40px rgba(199, 248, 1, 0.4);
+        }
+
+        .logo-container:active .logo-image {
+            transform: scale(1.02);
         }
 
         /* Navigation */
