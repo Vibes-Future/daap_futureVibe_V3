@@ -3586,13 +3586,13 @@
 
                 // Wallet icons map (local logos)
                 const walletIcons = {
-                    phantom: 'src/images/phanton.png?v=2',
-                    solflare: 'src/images/solflare.jpeg?v=2',
-                    trust: 'src/images/trust-wallet.png?v=2',
+                    phantom: 'src/images/phanton.png?v=4',
+                    solflare: 'src/images/solflare.jpeg?v=4',
+                    trust: 'src/images/trust-wallet.png?v=4',
                     backpack: 'https://cdn.jsdelivr.net/gh/solana-labs/wallet-adapter@master/packages/wallets/icons/backpack.svg',
                     coinbase: 'https://cdn.jsdelivr.net/gh/solana-labs/wallet-adapter@master/packages/wallets/icons/coinbase.svg',
                     brave: 'https://cdn.jsdelivr.net/gh/solana-labs/wallet-adapter@master/packages/wallets/icons/brave.svg',
-                    wallet: 'src/images/phanton.png?v=2'
+                    wallet: 'src/images/phanton.png?v=4'
                 };
 
                 // Show wallet selector modal
@@ -3611,10 +3611,12 @@
                         
                         const iconUrl = walletIcons[wallet.icon] || walletIcons.wallet;
                         
+                        // Debug log
+                        console.log(`🔍 Wallet: ${wallet.name}, Icon key: ${wallet.icon}, URL: ${iconUrl}`);
+                        
                         option.innerHTML = `
                             <div class="wallet-option-icon">
-                                <img src="${iconUrl}" alt="${wallet.name}" 
-                                     onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23c7f801%22 stroke-width=%222%22><rect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222%22/><path d=%22M3 10h18%22/></svg>';">
+                                <img src="${iconUrl}" alt="${wallet.name}">
                             </div>
                             <div class="wallet-option-info">
                                 <div class="wallet-option-name">${wallet.name}</div>

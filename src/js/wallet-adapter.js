@@ -71,7 +71,7 @@ class VanillaWalletAdapter {
             wallets.push({
                 name: 'Phantom',
                 provider: window.solana,
-                icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/phantom.svg'
+                icon: 'phantom'
             });
         }
         
@@ -80,7 +80,7 @@ class VanillaWalletAdapter {
             wallets.push({
                 name: 'Solflare',
                 provider: window.solflare,
-                icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/solflare.svg'
+                icon: 'solflare'
             });
         }
         
@@ -89,7 +89,7 @@ class VanillaWalletAdapter {
             wallets.push({
                 name: 'Trust Wallet',
                 provider: window.trustWallet,
-                icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/trust.svg'
+                icon: 'trust'
             });
         }
         
