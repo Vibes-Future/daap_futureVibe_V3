@@ -210,11 +210,11 @@ class DirectContractClient {
             new solanaWeb3.PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
         );
         
-        // Contract wallets' USDC ATAs - MAINNET WALLETS (from contract state, NOT config.json!)
+        // Contract wallets' USDC ATAs - MAINNET WALLETS (verified from contract at offset 197)
         // IMPORTANT: These MUST match what's in the deployed contract
-        const feeCollectorWallet = new solanaWeb3.PublicKey('vYAXJaPhEMAXkK7x5oBK56WJBBp1CaZMSAoHxn6o7PS');      // fee_collector_usdc from contract
-        const treasuryWallet = new solanaWeb3.PublicKey('55pFq53FfhNWpxivfhaN3EAy6d4uL2KDkbwaoZM565eY');         // treasury_usdc from contract
-        const secondaryWallet = new solanaWeb3.PublicKey('55pFq53FfhNWpxivfhaN3EAy6d4uL2KDkbwaoZM565eY');        // secondary_usdc from contract
+        const feeCollectorWallet = new solanaWeb3.PublicKey('J5HheDdCai2Hp6kU9MzJmCuttNFxDdWtYEWqtVpY2SbT');      // fee_collector_usdc (same as fee_collector_sol)
+        const treasuryWallet = new solanaWeb3.PublicKey('vYAXJaPhEMAXkK7x5oBK56WJBBp1CaZMSAoHxn6o7PS');         // treasury_usdc_wallet
+        const secondaryWallet = new solanaWeb3.PublicKey('55pFq53FfhNWpxivfhaN3EAy6d4uL2KDkbwaoZM565eY');        // secondary_usdc_wallet
         
         // Calculate their USDC ATAs
         const [feeCollectorUsdcAccount] = await solanaWeb3.PublicKey.findProgramAddress(

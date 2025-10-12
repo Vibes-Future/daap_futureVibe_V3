@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug USDC Error 6006</title>
+</head>
+<body>
+    <h1>Debug USDC Purchase Error 6006</h1>
+    <button onclick="debugUsdcError()">Run Debug</button>
+    <pre id="output"></pre>
+
+    <script src="https://unpkg.com/@solana/web3.js@1.91.0/lib/index.iife.min.js"></script>
+    <script>
+        async function debugUsdcError() {
+            const output = document.getElementById('output');
+            output.textContent = 'Running debug...\n\n';
+            
+            const RPC = 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c';
+            const PRESALE_STATE = 'EoDCTycvkJV4UXm54KYiF1DuCMSHyXYPftGUVr3qJxPp';
+            
+            const connection = new solanaWeb3.Connection(RPC, 'confirmed');
+            const presaleStatePubkey = new solanaWeb3.PublicKey(PRESALE_STATE);
+            
+            // Read contract state
+            const accountInfo = await connection.getAccountInfo(presaleStatePubkey);
+            const data = accountInfo.data;
+            
+            output.textContent += '📊 WALLETS EN EL CONTRATO (offset correcto)\\n';
+            output.textContent += '━'.repeat(80) + '\\n\\n';
+            
+            // Correct offset for business wallets (verified from previous successful script)
+            let offset = 8 + 32 + 32 + 32 + 1 + 32 + 32 + 1 + 8 + 8 + 8 + 1 + 2; // = 169
+            
+            const feeCollectorSol = new solanaWeb3.PublicKey(data.slice(offset, offset + 32));
+            output.textContent += `Fee Collector SOL: ${feeCollectorSol.toBase58()}\\n`;
+            offset += 32;
+            
+            const treasurySol = new solanaWeb3.PublicKey(data.slice(offset, offset + 32));
+            output.textContent += `Treasury SOL:      ${treasurySol.toBase58()}\\n`;
+            offset += 32;
+            
+            const secondarySol = new solanaWeb3.PublicKey(data.slice(offset, offset + 32));
+            output.textContent += `Secondary SOL:     ${secondarySol.toBase58()}\\n`;
+            offset += 32;
+            
+            const feeCollectorUsdc = new solanaWeb3.PublicKey(data.slice(offset, offset + 32));
+            output.textContent += `Fee Collector USDC: ${feeCollectorUsdc.toBase58()}\\n`;
+            offset += 32;
+            
+            const treasuryUsdc = new solanaWeb3.PublicKey(data.slice(offset, offset + 32));
+            output.textContent += `Treasury USDC:      ${treasuryUsdc.toBase58()}\\n`;
+            offset += 32;
+            
+            const secondaryUsdc = new solanaWeb3.PublicKey(data.slice(offset, offset + 32));
+            output.textContent += `Secondary USDC:     ${secondaryUsdc.toBase58()}\\n`;
+            
+            output.textContent += '\\n';
+            output.textContent += '━'.repeat(80) + '\\n';
+            output.textContent += '🔍 VERIFICANDO ATAs PARA ESTAS WALLETS\\n';
+            output.textContent += '━'.repeat(80) + '\\n\\n';
+            
+            const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
+            const TOKEN_PROGRAM = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
+            const ATA_PROGRAM = 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL';
+            
+            const wallets = [
+                { name: 'Fee Collector', wallet: feeCollectorUsdc },
+                { name: 'Treasury', wallet: treasuryUsdc },
+                { name: 'Secondary', wallet: secondaryUsdc }
+            ];
+            
+            for (const {name, wallet} of wallets) {
+                const [ata] = await solanaWeb3.PublicKey.findProgramAddress(
+                    [
+                        wallet.toBytes(),
+                        new solanaWeb3.PublicKey(TOKEN_PROGRAM).toBytes(),
+                        new solanaWeb3.PublicKey(USDC_MINT).toBytes(),
+                    ],
+                    new solanaWeb3.PublicKey(ATA_PROGRAM)
+                );
+                
+                const ataInfo = await connection.getAccountInfo(ata);
+                output.textContent += `${name} USDC:\\n`;
+                output.textContent += `  Wallet: ${wallet.toBase58()}\\n`;
+                output.textContent += `  ATA:    ${ata.toBase58()}\\n`;
+                output.textContent += `  Existe: ${ataInfo ? '✅' : '❌ NO'}\\n`;
+                
+                if (ataInfo) {
+                    const owner = new solanaWeb3.PublicKey(ataInfo.data.slice(32, 64));
+                    output.textContent += `  Owner:  ${owner.toBase58()}\\n`;
+                    output.textContent += `  Match:  ${owner.toBase58() === wallet.toBase58() ? '✅' : '❌'}\\n`;
+                }
+                output.textContent += '\\n';
+            }
+            
+            output.textContent += '✅ Debug complete';
+        }
+    </script>
+</body>
+</html>
+
