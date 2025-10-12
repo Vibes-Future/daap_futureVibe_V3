@@ -255,6 +255,104 @@ const PRESALE_V3_IDL = {
       }
     }
   ],
+  "events": [
+    {
+      "name": "PurchaseEventV3",
+      "fields": [
+        { "name": "buyer", "type": "publicKey", "index": false },
+        { "name": "paymentToken", "type": "string", "index": false },
+        { "name": "paymentAmount", "type": "u64", "index": false },
+        { "name": "feeAmount", "type": "u64", "index": false },
+        { "name": "netAmount", "type": "u64", "index": false },
+        { "name": "treasuryAmount", "type": "u64", "index": false },
+        { "name": "secondaryAmount", "type": "u64", "index": false },
+        { "name": "vibesPurchased", "type": "u64", "index": false },
+        { "name": "stakingChoice", "type": "bool", "index": false },
+        { "name": "priceTierUsd", "type": "f64", "index": false },
+        { "name": "timestamp", "type": "i64", "index": false }
+      ]
+    },
+    {
+      "name": "RewardsClaimedEventV3",
+      "fields": [
+        { "name": "buyer", "type": "publicKey", "index": false },
+        { "name": "totalRewards", "type": "u64", "index": false },
+        { "name": "userRewards", "type": "u64", "index": false },
+        { "name": "charityDonation", "type": "u64", "index": false },
+        { "name": "charityWallet", "type": "publicKey", "index": false },
+        { "name": "timestamp", "type": "i64", "index": false }
+      ]
+    },
+    {
+      "name": "TokensClaimedEventV3",
+      "fields": [
+        { "name": "buyer", "type": "publicKey", "index": false },
+        { "name": "principalAmount", "type": "u64", "index": false },
+        { "name": "rewardsAmount", "type": "u64", "index": false },
+        { "name": "totalClaimed", "type": "u64", "index": false },
+        { "name": "claimMethod", "type": "string", "index": false },
+        { "name": "timestamp", "type": "i64", "index": false }
+      ]
+    },
+    {
+      "name": "PresaleInitializedEventV3",
+      "fields": [
+        { "name": "authority", "type": "publicKey", "index": false },
+        { "name": "startTs", "type": "i64", "index": false },
+        { "name": "endTs", "type": "i64", "index": false },
+        { "name": "hardCapTotal", "type": "u64", "index": false },
+        { "name": "feeRateBps", "type": "u16", "index": false },
+        { "name": "stakingApyBps", "type": "u64", "index": false },
+        { "name": "charityRateBps", "type": "u16", "index": false },
+        { "name": "optionalStaking", "type": "bool", "index": false },
+        { "name": "priceTiers", "type": "u8", "index": false },
+        { "name": "treasurySol", "type": "publicKey", "index": false },
+        { "name": "treasuryUsdc", "type": "publicKey", "index": false },
+        { "name": "secondarySol", "type": "publicKey", "index": false },
+        { "name": "secondaryUsdc", "type": "publicKey", "index": false },
+        { "name": "feeCollectorSol", "type": "publicKey", "index": false },
+        { "name": "feeCollectorUsdc", "type": "publicKey", "index": false },
+        { "name": "charityWallet", "type": "publicKey", "index": false },
+        { "name": "timestamp", "type": "i64", "index": false }
+      ]
+    },
+    {
+      "name": "StakingOptInEvent",
+      "fields": [
+        { "name": "buyer", "type": "publicKey", "index": false },
+        { "name": "amountStaked", "type": "u64", "index": false },
+        { "name": "totalStaked", "type": "u64", "index": false },
+        { "name": "totalUnstaked", "type": "u64", "index": false },
+        { "name": "pendingRewardsAdded", "type": "u64", "index": false },
+        { "name": "timestamp", "type": "i64", "index": false }
+      ]
+    },
+    {
+      "name": "StakingOptOutEvent",
+      "fields": [
+        { "name": "buyer", "type": "publicKey", "index": false },
+        { "name": "amountUnstaked", "type": "u64", "index": false },
+        { "name": "totalStaked", "type": "u64", "index": false },
+        { "name": "totalUnstaked", "type": "u64", "index": false },
+        { "name": "pendingRewardsPreserved", "type": "u64", "index": false },
+        { "name": "stillStaking", "type": "bool", "index": false },
+        { "name": "timestamp", "type": "i64", "index": false }
+      ]
+    },
+    {
+      "name": "TransferToVestingEventV3",
+      "fields": [
+        { "name": "buyer", "type": "publicKey", "index": false },
+        { "name": "principalAmount", "type": "u64", "index": false },
+        { "name": "rewardsAmount", "type": "u64", "index": false },
+        { "name": "totalVestingAmount", "type": "u64", "index": false },
+        { "name": "vestingVault", "type": "publicKey", "index": false },
+        { "name": "unlockTimestamp", "type": "i64", "index": false },
+        { "name": "lockPeriodMonths", "type": "u8", "index": false },
+        { "name": "stakingBonusApplied", "type": "bool", "index": false }
+      ]
+    }
+  ],
   "errors": [
     { "code": 6000, "name": "PresaleNotActive", "msg": "Presale is not currently active" },
     { "code": 6001, "name": "PresaleNotStarted", "msg": "Presale has not started yet" },
@@ -291,10 +389,11 @@ const PRESALE_V3_IDL = {
     { "code": 6032, "name": "PriceScheduleTooLong", "msg": "Price schedule too long" },
     { "code": 6033, "name": "InvalidTimeRange", "msg": "Invalid time range" },
     { "code": 6034, "name": "StartTimeInPast", "msg": "Start time in the past" },
-    { "code": 6035, "name": "EndTimeBeforeStart", "msg": "End time before start time" }
+    { "code": 6035, "name": "EndTimeBeforeStart", "msg": "End time before start time" },
+    { "code": 6036, "name": "InvalidPurchaseLimit", "msg": "Invalid purchase limit" }
   ],
   "metadata": {
-    "address": "62kSXjshfq3FF4Ny4qvmkhaYjSagYR18njWwDh6sFi9N"
+    "address": "HNPuLPxycypT4YtD5vMZPdcrr53MLKAajYrQwNTv4ujH"
   }
 };
 

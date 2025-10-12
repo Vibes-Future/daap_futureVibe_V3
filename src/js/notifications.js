@@ -271,7 +271,7 @@ class NotificationSystem {
      * Helper method for transaction notifications with link
      */
     transaction(message, signature, options = {}) {
-        const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=${NETWORK_CONFIG.CLUSTER === 'mainnet-beta' ? 'mainnet' : 'devnet'}`;
+        const explorerUrl = `https://explorer.solana.com/tx/${signature}${NETWORK_CONFIG.NETWORK === 'mainnet-beta' ? '' : '?cluster=devnet'}`;
         
         return this.show(message, 'transaction', 0, {
             ...options,

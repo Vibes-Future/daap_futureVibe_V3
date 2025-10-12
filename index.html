@@ -3046,10 +3046,9 @@
             <div class="grid">
                 <div class="info-card">
                     <h3><i data-lucide="trending-up"></i>Vesting Information</h3>
-                    <p><strong>Vesting Status:</strong> <span id="vesting-status" style="color: #ff6b6b;">Not Available</span></p>
+                    <p><strong>Vesting Status:</strong> <span id="vesting-status" style="color: #ff6b6b;">Pending Transfer</span></p>
                     <p><strong>Presale Status:</strong> <span id="presale-status" style="color: #c7f801;">Active</span></p>
-                    <p><strong>Vesting Start:</strong> <span id="vesting-start-date">-</span></p>
-                    <p><strong>Last Claim:</strong> <span id="last-claim-date">-</span></p>
+                    <p><strong>Vesting Start:</strong> <span style="color: #c7f801;">Oct 12, 2026</span></p>
                 </div>
                 
                 <div class="info-card" id="vesting-claim-card" style="opacity: 0.5; pointer-events: none;">
@@ -3682,22 +3681,105 @@
         <!-- Dashboard Stats & Price Calendar Script -->
         <script>
             // Price Calendar Countdown Timer
-            function updateCountdown() {
-                // Calculate next price increase time (example: 7 days from now)
-                // In production, this should come from contract data
-                const now = new Date().getTime();
-                const nextPriceIncrease = new Date(now + (7 * 24 * 60 * 60 * 1000)).getTime(); // 7 days from now
+            // Global variables for countdown
+            let globalNextPriceTimestamp = null;
+            let countdownTimerInterval = null;
+            
+            async function updateCountdown() {
+                // Clear any existing interval
+                if (countdownTimerInterval) {
+                    clearInterval(countdownTimerInterval);
+                    countdownTimerInterval = null;
+                }
+                
+                // Fetch next price increase time from contract
+                try {
+                    if (!globalNextPriceTimestamp) {
+                        console.log('⏱️ Fetching price schedule from contract for countdown...');
+                        
+                        // Check if libraries are loaded
+                        if (!window.solanaWeb3 || !window.DirectContractClient) {
+                            console.warn('⚠️ Solana libraries not loaded yet, retrying in 1 second...');
+                            setTimeout(() => updateCountdown(), 1000);
+                            return;
+                        }
+                        
+                        const rpcUrl = (window.NETWORK_CONFIG && window.NETWORK_CONFIG.RPC_URL) 
+                            || 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c';
+                        
+                        const connection = new window.solanaWeb3.Connection(rpcUrl, 'confirmed');
+                        const tempClient = new window.DirectContractClient(connection, {});
+                        
+                        const contractData = await tempClient.getPresaleStateFromContract();
+                        
+                        // Find next tier based on current time
+                        const nowSeconds = Math.floor(Date.now() / 1000);
+                        let nextTierTimestamp = null;
+                        
+                        for (let i = 0; i < contractData.priceTiers.length; i++) {
+                            if (contractData.priceTiers[i].startTs > nowSeconds) {
+                                nextTierTimestamp = contractData.priceTiers[i].startTs;
+                                console.log(`⏱️ Next tier: Tier ${i + 1} at ${new Date(nextTierTimestamp * 1000).toISOString()}`);
+                                console.log(`⏱️ Price will change from $${contractData.priceTiers[i-1]?.priceUsd.toFixed(4)} to $${contractData.priceTiers[i].priceUsd.toFixed(4)}`);
+                                break;
+                            }
+                        }
+                        
+                        if (nextTierTimestamp) {
+                            globalNextPriceTimestamp = nextTierTimestamp * 1000; // Convert to milliseconds
+                            console.log('✅ Countdown synced with contract:', new Date(globalNextPriceTimestamp).toISOString());
+                        } else {
+                            // No more tiers, presale is ending or ended
+                            console.log('⚠️ No more price tiers scheduled');
+                            globalNextPriceTimestamp = contractData.endTs * 1000;
+                        }
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching price schedule for countdown:', error);
+                    console.error('Stack:', error.stack);
+                    // Fallback: calculate next tier (assumes monthly 10% increase)
+                    const nowSeconds = Math.floor(Date.now() / 1000);
+                    const presaleStart = 1760302140; // From contract: 2025-10-12T20:49:00.000Z
+                    const monthsElapsed = Math.floor((nowSeconds - presaleStart) / (30 * 24 * 60 * 60));
+                    const nextTierStart = presaleStart + ((monthsElapsed + 1) * 30 * 24 * 60 * 60);
+                    globalNextPriceTimestamp = nextTierStart * 1000;
+                    console.log('⚠️ Using fallback calculation for countdown:', new Date(globalNextPriceTimestamp).toISOString());
+                }
                 
                 function updateTimer() {
-                    const currentTime = new Date().getTime();
-                    const distance = nextPriceIncrease - currentTime;
-                    
-                    if (distance < 0) {
-                        // Countdown finished
+                    if (!globalNextPriceTimestamp) {
+                        // Still loading, show zeros
                         document.getElementById('countdown-days').textContent = '00';
                         document.getElementById('countdown-hours').textContent = '00';
                         document.getElementById('countdown-minutes').textContent = '00';
                         document.getElementById('countdown-seconds').textContent = '00';
+                        return;
+                    }
+                    
+                    const currentTime = new Date().getTime();
+                    const distance = globalNextPriceTimestamp - currentTime;
+                    
+                    if (distance < 0) {
+                        // Price tier has changed! Need to refresh everything
+                        console.log('🔄 Price tier changed! Refreshing data from contract...');
+                        
+                        document.getElementById('countdown-days').textContent = '00';
+                        document.getElementById('countdown-hours').textContent = '00';
+                        document.getElementById('countdown-minutes').textContent = '00';
+                        document.getElementById('countdown-seconds').textContent = '00';
+                        
+                        // Reset timestamp and refetch countdown
+                        globalNextPriceTimestamp = null;
+                        setTimeout(() => updateCountdown(), 2000);
+                        
+                        // IMPORTANT: Also refresh dashboard stats to update prices
+                        if (window.updateDashboardStats) {
+                            console.log('📊 Updating dashboard with new tier prices...');
+                            updateDashboardStats().catch(err => 
+                                console.error('Error refreshing dashboard after tier change:', err)
+                            );
+                        }
+                        
                         return;
                     }
                     
@@ -3716,7 +3798,8 @@
                 
                 // Update immediately and then every second
                 updateTimer();
-                setInterval(updateTimer, 1000);
+                countdownTimerInterval = setInterval(updateTimer, 1000);
+                console.log('✅ Countdown timer started');
             }
 
             // Update Dashboard Stats from contract data
@@ -3748,23 +3831,36 @@
                     
                     if (contractData) {
                         // Use real contract data
-                        solRaised = contractData.raisedSol / 1e9; // Convert from lamports
-                        usdcRaised = contractData.raisedUsdc / 1e6; // Convert from microUSDC
-                        tokensSold = contractData.totalVibesSold / 1e9; // Convert from lamports
+                        const solDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.SOL_DECIMALS) || 9;
+                        const usdcDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.USDC_DECIMALS) || 6;
+                        const vibesDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.VIBES_DECIMALS) || 6;
+                        solRaised = contractData.raisedSol / Math.pow(10, solDecimals); // Convert from lamports
+                        usdcRaised = contractData.raisedUsdc / Math.pow(10, usdcDecimals); // Convert from smallest units
+                        tokensSold = contractData.totalVibesSold / Math.pow(10, vibesDecimals); // Convert from smallest units
                         totalBuyers = contractData.totalBuyers || 0; // Total buyers from blockchain
                         
                         // Calculate current price and tier from contract data
                         const now = Math.floor(Date.now() / 1000);
                         currentPrice = contractData.priceTiers[0].priceUsd;
                         currentPriceTier = 1; // Default to tier 1
+                        let currentTierIndex = 0;
+                        
                         for (let i = contractData.priceTiers.length - 1; i >= 0; i--) {
                             if (now >= contractData.priceTiers[i].startTs) {
                                 currentPrice = contractData.priceTiers[i].priceUsd;
                                 currentPriceTier = i + 1; // Tier index (1-based)
+                                currentTierIndex = i;
                                 break;
                             }
                         }
-                        nextPrice = currentPrice * 1.10;
+                        
+                        // Get actual next price from schedule, or calculate if at last tier
+                        if (currentTierIndex + 1 < contractData.priceTiers.length) {
+                            nextPrice = contractData.priceTiers[currentTierIndex + 1].priceUsd;
+                        } else {
+                            // At last tier, show 10% increase as estimate
+                            nextPrice = currentPrice * 1.10;
+                        }
                         
                         console.log('📊 Using contract data:', {
                             solRaised,
@@ -3892,15 +3988,21 @@
             // Initialize countdown on page load
             document.addEventListener('DOMContentLoaded', async function() {
                 console.log('🚀 Initializing dashboard features...');
-                updateCountdown();
                 
-                // Wait for libraries to load before fetching contract data
+                // Wait for libraries to load before initializing everything
                 setTimeout(async () => {
+                    console.log('📚 Libraries loaded, starting initialization...');
+                    
+                    // Start countdown (it will fetch data internally)
+                    await updateCountdown();
+                    
                     // Fetch real data from contract (no hardcoded values)
                     await Promise.all([
                         updateDashboardStats(),
                         updateStakingStats()
                     ]);
+                    
+                    console.log('✅ All dashboard features initialized');
                 }, 2000); // Wait 2 seconds for libraries to load
             });
 
@@ -4016,9 +4118,10 @@
                     let totalStaked, totalUnstaked;
                     
                     if (buyerData) {
-                        // Show WALLET-SPECIFIC data (converted from lamports to VIBES)
-                        totalStaked = buyerData.stakedAmount / 1e9;
-                        totalUnstaked = buyerData.unstakedAmount / 1e9;
+                        // Show WALLET-SPECIFIC data (converted from smallest units to VIBES)
+                        const vibesDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.VIBES_DECIMALS) || 6; // Mainnet uses 6
+                        totalStaked = buyerData.stakedAmount / Math.pow(10, vibesDecimals);
+                        totalUnstaked = buyerData.unstakedAmount / Math.pow(10, vibesDecimals);
                         
                         console.log('👤 Using wallet-specific staking data:', {
                             wallet: buyerData.exists ? 'Found' : 'Not found',
@@ -4089,7 +4192,8 @@
                         // Get global presale state for total pool
                         const tempClient = new window.DirectContractClient(connection, {});
                         const presaleState = await tempClient.getPresaleStateFromContract();
-                        const totalPoolStaked = presaleState.totalStakedOptional / 1e9;
+                        const vibesDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.VIBES_DECIMALS) || 6;
+                        const totalPoolStaked = presaleState.totalStakedOptional / Math.pow(10, vibesDecimals);
                         
                         // Calculate share percentage
                         let sharePercent = 0;
@@ -4123,7 +4227,8 @@
                                 // Calculate pending rewards using the staking formula
                                 const tempClient = new window.DirectContractClient(connection, { publicKey: walletPublicKey });
                                 const pendingRewardsLamports = await tempClient.calculatePendingRewards(walletPublicKey);
-                                const pendingRewards = pendingRewardsLamports / 1e9;
+                                const vibesDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.VIBES_DECIMALS) || 6;
+                                const pendingRewards = pendingRewardsLamports / Math.pow(10, vibesDecimals);
                                 
                                 const formattedRewards = pendingRewards.toLocaleString('en-US', { 
                                     minimumFractionDigits: 0, 
@@ -4135,7 +4240,8 @@
                                 console.warn('⚠️ Could not calculate pending rewards:', error.message);
                                 // Fallback to accumulated rewards from buyerData
                                 if (buyerData && buyerData.accumulatedRewards !== undefined) {
-                                    const pendingRewards = buyerData.accumulatedRewards / 1e9;
+                                    const vibesDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.VIBES_DECIMALS) || 6;
+                                    const pendingRewards = buyerData.accumulatedRewards / Math.pow(10, vibesDecimals);
                                     const formattedRewards = pendingRewards.toLocaleString('en-US', { 
                                         minimumFractionDigits: 0, 
                                         maximumFractionDigits: 0 
@@ -4153,7 +4259,7 @@
                         }
                     }
                     
-                    // Update Staking Status
+                    // Update Staking Status (from contract - real data)
                     if (stakingElements.stakingStatus && buyerData) {
                         if (buyerData.isStaking && totalStaked > 0) {
                             stakingElements.stakingStatus.textContent = 'Staking';
@@ -4165,34 +4271,39 @@
                         console.log('📊 Updated staking status:', buyerData.isStaking ? 'Staking' : 'Not Staking');
                     }
                     
-                    // Update Staking Start Date
+                    // Update Staking Start Date (from contract - real timestamp)
                     if (stakingElements.stakingStartDate && buyerData && buyerData.lastStakeTs > 0) {
                         const startDate = new Date(buyerData.lastStakeTs * 1000);
                         stakingElements.stakingStartDate.textContent = startDate.toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
-                            day: 'numeric'
-                        });
-                        console.log('📅 Updated staking start date:', startDate.toISOString());
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) + ' UTC';
+                        console.log('📅 Updated staking start date (real from contract):', startDate.toISOString());
                     }
                     
-                    // Update Last Update Date
+                    // Update Last Update Date (from contract - real timestamp)
                     if (stakingElements.lastUpdateDate && buyerData && buyerData.lastUpdateTs > 0) {
                         const updateDate = new Date(buyerData.lastUpdateTs * 1000);
                         stakingElements.lastUpdateDate.textContent = updateDate.toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
-                            day: 'numeric'
-                        });
-                        console.log('🔄 Updated last update date:', updateDate.toISOString());
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) + ' UTC';
+                        console.log('🔄 Updated last update date (real from contract):', updateDate.toISOString());
                     }
                     
-                    // Update Total Rewards Claimed
+                    // Update Total Rewards Claimed (MUST be from contract - NEVER hardcoded!)
                     if (stakingElements.totalRewardsClaimed && buyerData) {
-                        const rewardsClaimed = buyerData.totalRewardsClaimed / 1e9;
+                        const vibesDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.VIBES_DECIMALS) || 6;
+                        const rewardsClaimed = buyerData.totalRewardsClaimed / Math.pow(10, vibesDecimals);
                         stakingElements.totalRewardsClaimed.textContent = 
                             rewardsClaimed.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                        console.log('✅ Updated total rewards claimed:', rewardsClaimed, 'VIBES');
+                        console.log('✅ Updated total rewards claimed (real from contract):', rewardsClaimed, 'VIBES');
                     }
                     
                     console.log('✅ Staking stats updated successfully with wallet-specific data');
@@ -4247,8 +4358,9 @@
         waitForLibraries().then(() => {
             console.log('🚀 Loading DApp scripts...');
             
-            // Load scripts in order
+            // Load scripts in order (secure-logger first for security)
             const scripts = [
+                'src/js/secure-logger.js',  // SECURITY: Load first to prevent logging of sensitive data
                 'src/js/config.js',
                 'src/js/notifications.js',
                 'src/js/solana-wallet-standard.js',

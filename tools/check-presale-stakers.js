@@ -77,10 +77,12 @@ async function checkPresaleStakers() {
           // Read unstakedAmount (8 bytes)
           const unstakedAmount = data.readBigUInt64LE(offset);
           
-          // Convert to VIBES (9 decimals)
-          const totalVibes = Number(totalPurchased) / 1e9;
-          const stakedVibes = Number(stakedAmount) / 1e9;
-          const unstakedVibes = Number(unstakedAmount) / 1e9;
+          // Convert to VIBES (6 decimals for MAINNET, 9 for DEVNET)
+          // NOTE: Update this if switching networks!
+          const VIBES_DECIMALS = 6; // Mainnet = 6, Devnet = 9
+          const totalVibes = Number(totalPurchased) / Math.pow(10, VIBES_DECIMALS);
+          const stakedVibes = Number(stakedAmount) / Math.pow(10, VIBES_DECIMALS);
+          const unstakedVibes = Number(unstakedAmount) / Math.pow(10, VIBES_DECIMALS);
           
           console.log(`\n━━━━ Cuenta #${i + 1} (BuyerState) ━━━━`);
           console.log(`  📍 Address: ${account.pubkey.toBase58()}`);

@@ -25,6 +25,10 @@ class VibesAdminApp {
         };
         this.userData = null;
         
+        // Intervals
+        this.daysLeftInterval = null; // For updating days left counter
+        this.presaleEndTs = null; // Store presale end timestamp
+        
         // Initialize app
         this.init();
     }
@@ -104,7 +108,8 @@ class VibesAdminApp {
                 'confirmed'
             );
             
-            console.log('✅ Solana connection initialized:', NETWORK_CONFIG.RPC_URL);
+            // SECURITY: Do not log RPC URL as it contains API key
+            console.log('✅ Solana connection initialized to', NETWORK_CONFIG.NETWORK);
         } catch (error) {
             console.error('❌ Failed to initialize connection:', error);
             throw error;
@@ -582,6 +587,9 @@ class VibesAdminApp {
             const now = Math.floor(Date.now() / 1000);
             const daysLeft = Math.max(0, Math.ceil((presaleData.endTs - now) / (24 * 60 * 60)));
             
+            // Store endTs for periodic updates
+            this.presaleEndTs = presaleData.endTs;
+            
             // Convert APY from basis points to percentage
             const stakingAPY = presaleData.stakingApyBps / 100;
             
@@ -597,13 +605,19 @@ class VibesAdminApp {
                 raisedSol: raisedSol,
                 raisedUsdc: raisedUsdc,
                 totalVibesSold: presaleData.totalVibesSold,
-                isActive: now >= presaleData.startTs && now <= presaleData.endTs && !presaleData.isFinalized
+                isActive: now >= presaleData.startTs && now <= presaleData.endTs && !presaleData.isFinalized,
+                startTs: presaleData.startTs,
+                endTs: presaleData.endTs
             };
             
             // Update the presale info cards
             this.updatePresaleInfoCards(presaleInfo);
             
+            // Start periodic days counter update
+            this.startDaysLeftCounter();
+            
             console.log('✅ Presale data loaded successfully:', presaleInfo);
+            console.log(`📅 Presale ends: ${new Date(presaleData.endTs * 1000).toISOString()} (${daysLeft} days remaining)`);
             
         } catch (error) {
             console.error('❌ Failed to load presale data:', error);
@@ -749,7 +763,7 @@ class VibesAdminApp {
             // transferredToVesting (1) + finalVestingAmount (8) + purchaseCount (4) = 143
             const BUYER_STATE_SIZE = 143;
             
-            console.log('🔍 Fetching BuyerState accounts using Helius optimized RPC...');
+            console.log('🔍 Fetching BuyerState accounts from RPC...');
             
             // Use Helius optimized getProgramAccounts with dataSize filter
             // This is faster than memcmp and more reliable
@@ -769,7 +783,7 @@ class VibesAdminApp {
             });
             
             const buyerCount = accounts.length;
-            console.log(`✅ Found ${buyerCount} total buyers (via Helius RPC)`);
+            console.log(`✅ Found ${buyerCount} total buyers`);
             
             return buyerCount;
             
@@ -876,6 +890,44 @@ class VibesAdminApp {
     }
 
     /**
+     * Start periodic update for days left counter
+     */
+    startDaysLeftCounter() {
+        // Clear any existing interval
+        if (this.daysLeftInterval) {
+            clearInterval(this.daysLeftInterval);
+        }
+        
+        // Update function
+        const updateDaysLeft = () => {
+            if (!this.presaleEndTs) return;
+            
+            const now = Math.floor(Date.now() / 1000);
+            const daysLeft = Math.max(0, Math.ceil((this.presaleEndTs - now) / (24 * 60 * 60)));
+            
+            const daysLeftEl = document.getElementById('days-left');
+            if (daysLeftEl) {
+                daysLeftEl.textContent = daysLeft;
+                
+                // Log if it's close to ending
+                if (daysLeft <= 7 && daysLeft > 0) {
+                    console.log(`⚠️ Presale ending soon: ${daysLeft} days remaining`);
+                } else if (daysLeft === 0) {
+                    console.log('🏁 Presale has ended');
+                }
+            }
+        };
+        
+        // Update immediately
+        updateDaysLeft();
+        
+        // Update every hour (3600000 ms)
+        this.daysLeftInterval = setInterval(updateDaysLeft, 3600000);
+        
+        console.log('✅ Days left counter started (updates every hour)');
+    }
+
+    /**
      * Update dashboard stats (Total Raised USD, Total Buyers, etc.)
      */
     async updateDashboardStats(data) {
@@ -929,7 +981,7 @@ class VibesAdminApp {
             // Update Tokens Sold
             const statsTokensSoldEl = document.getElementById('stats-tokens-sold');
             if (statsTokensSoldEl && data.totalVibesSold) {
-                const tokensSold = data.totalVibesSold / 1e9; // Convert from lamports
+                const tokensSold = data.totalVibesSold / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS); // Convert from smallest unit
                 statsTokensSoldEl.textContent = `${tokensSold.toLocaleString(undefined, {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 2
@@ -1274,15 +1326,10 @@ class VibesAdminApp {
             presaleStatusEl.style.color = vestingData.presaleActive ? '#c7f801' : '#ff6b6b';
         }
         
-        const startDateEl = document.getElementById('vesting-start-date');
-        if (startDateEl) {
-            startDateEl.textContent = vestingData.vestingStart || '-';
-        }
+        // Vesting Start is now hardcoded as "Oct 12, 2026" in HTML
+        // No need to update it dynamically
         
-        const lastClaimEl = document.getElementById('last-claim-date');
-        if (lastClaimEl) {
-            lastClaimEl.textContent = vestingData.lastClaim || '-';
-        }
+        // Last Claim field removed from UI
         
         // Update claimable amount with $VIBES suffix
         const claimableEl = document.getElementById('claimable-amount');
@@ -1425,13 +1472,13 @@ class VibesAdminApp {
             
             console.log('📊 Buyer state:', {
                 transferredToVesting: buyerState.transferredToVesting,
-                finalVestingAmount: (buyerState.finalVestingAmount / 1e9).toFixed(2) + ' VIBES'
+                finalVestingAmount: (buyerState.finalVestingAmount / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS)).toFixed(2) + ' VIBES'
             });
             
             // If not transferred to vesting yet, show buyer's purchased tokens as potential vesting
             if (!buyerState.transferredToVesting) {
                 // Show total purchased tokens as "pending vesting"
-                const totalPurchased = buyerState.totalPurchasedVibes / 1e9;
+                const totalPurchased = buyerState.totalPurchasedVibes / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
                 
                 this.updateVestingDisplay({
                     totalVesting: totalPurchased.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
@@ -1454,9 +1501,9 @@ class VibesAdminApp {
             if (!vestingSchedule || !vestingSchedule.exists) {
                 console.log('📭 No vesting schedule found - user has not created vesting yet');
                 this.updateVestingDisplay({
-                    totalVesting: (buyerState.finalVestingAmount / 1e9).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                    totalVesting: (buyerState.finalVestingAmount / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                     released: '0.00',
-                    remaining: (buyerState.finalVestingAmount / 1e9).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                    remaining: (buyerState.finalVestingAmount / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                     status: 'Not Created',
                     presaleActive: presaleActive,
                     vestingStart: '-',
@@ -1467,10 +1514,10 @@ class VibesAdminApp {
             }
             
             // Parse and format vesting data
-            const totalVesting = vestingSchedule.total / 1e9;
-            const released = vestingSchedule.released / 1e9;
-            const remaining = vestingSchedule.remaining / 1e9;
-            const claimable = vestingSchedule.claimable / 1e9;
+            const totalVesting = vestingSchedule.total / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
+            const released = vestingSchedule.released / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
+            const remaining = vestingSchedule.remaining / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
+            const claimable = vestingSchedule.claimable / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             
             // Determine vesting status
             let status = 'Active';

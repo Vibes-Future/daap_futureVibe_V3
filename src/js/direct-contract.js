@@ -32,8 +32,8 @@ class DirectContractClient {
         const buffer = new ArrayBuffer(16); // 8 bytes for u64 + 1 byte for bool + padding
         const view = new DataView(buffer);
         
-        // Write sol amount as u64 (little endian)
-        const lamports = BigInt(Math.floor(solAmount * Math.pow(10, 9)));
+        // Write sol amount as u64 (little endian) using TOKEN_CONFIG
+        const lamports = BigInt(Math.floor(solAmount * Math.pow(10, TOKEN_CONFIG.SOL_DECIMALS)));
         view.setBigUint64(0, lamports, true); // true = little endian
         
         // Write opt_into_staking as bool
@@ -48,8 +48,8 @@ class DirectContractClient {
         const buffer = new ArrayBuffer(16); // 8 bytes for u64 + 1 byte for bool + padding
         const view = new DataView(buffer);
         
-        // Write USDC amount as u64 (little endian) - USDC has 6 decimals
-        const usdcLamports = BigInt(Math.floor(usdcAmount * Math.pow(10, 6)));
+        // Write USDC amount as u64 (little endian) using TOKEN_CONFIG
+        const usdcLamports = BigInt(Math.floor(usdcAmount * Math.pow(10, TOKEN_CONFIG.USDC_DECIMALS)));
         view.setBigUint64(0, usdcLamports, true); // true = little endian
         
         // Write opt_into_staking as bool
@@ -75,7 +75,7 @@ class DirectContractClient {
         instructionData.set(discriminator, 0);
         instructionData.set(argsData, discriminator.length);
         
-        // Get required accounts from IDL - UPDATED FOR NEW DEPLOYMENT
+        // Get required accounts from IDL - MAINNET DEPLOYMENT
         const presaleState = new solanaWeb3.PublicKey('EoDCTycvkJV4UXm54KYiF1DuCMSHyXYPftGUVr3qJxPp');
         const buyerState = await this.getBuyerStateAddress(this.wallet.publicKey);
         
@@ -101,9 +101,9 @@ class DirectContractClient {
                 { pubkey: presaleState, isSigner: false, isWritable: true },                    // presaleState
                 { pubkey: buyerState, isSigner: false, isWritable: true },                      // buyerState  
                 { pubkey: this.wallet.publicKey, isSigner: true, isWritable: true },           // buyer
-                { pubkey: new solanaWeb3.PublicKey('6xW2ZYh16AhRR3teKAWK8v1BDkUTDyTPBEqvLyhPpSos'), isSigner: false, isWritable: true }, // feeCollectorSol
-                { pubkey: new solanaWeb3.PublicKey('5zKuHDrHFsaB6WbGGxjwRAtX2dP6Sze7qUWX9vyNq1AR'), isSigner: false, isWritable: true }, // treasurySol
-                { pubkey: new solanaWeb3.PublicKey('9JqWNcKYQCTGNM2aRdNAPk3hXfFBVUZHNdr668C9DcSn'), isSigner: false, isWritable: true }, // secondarySol
+                { pubkey: new solanaWeb3.PublicKey('J5HheDdCai2Hp6kU9MzJmCuttNFxDdWtYEWqtVpY2SbT'), isSigner: false, isWritable: true }, // feeCollectorSol (Mainnet)
+                { pubkey: new solanaWeb3.PublicKey('vYAXJaPhEMAXkK7x5oBK56WJBBp1CaZMSAoHxn6o7PS'), isSigner: false, isWritable: true }, // treasurySol (Mainnet)
+                { pubkey: new solanaWeb3.PublicKey('55pFq53FfhNWpxivfhaN3EAy6d4uL2KDkbwaoZM565eY'), isSigner: false, isWritable: true }, // secondarySol (Mainnet)
                 { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }  // systemProgram
             ],
             data: instructionData
@@ -115,12 +115,12 @@ class DirectContractClient {
 
     // Encode arguments for optIntoStaking instruction
     encodeOptIntoStakingArgs(amount) {
-        // optIntoStaking takes one u64 argument: amount (in VIBES with 9 decimals)
+        // optIntoStaking takes one u64 argument: amount (in VIBES smallest units)
         const buffer = new ArrayBuffer(8); // u64 = 8 bytes
         const view = new DataView(buffer);
         
-        // Convert VIBES amount to lamports (9 decimals)
-        const lamports = BigInt(Math.floor(amount * Math.pow(10, 9)));
+        // Convert VIBES amount to smallest units using TOKEN_CONFIG decimals
+        const lamports = BigInt(Math.floor(amount * Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS)));
         view.setBigUint64(0, lamports, true); // true = little endian
         
         return new Uint8Array(buffer);
@@ -210,10 +210,11 @@ class DirectContractClient {
             new solanaWeb3.PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
         );
         
-        // Contract wallets' USDC ATAs
-        const feeCollectorWallet = new solanaWeb3.PublicKey('6bHam5U8Z5Qnrky86HMQfCGaWX7ie5hdyvKpJzAAjGHj');
-        const treasuryWallet = new solanaWeb3.PublicKey('Fypp3b43LduLMPWoTEaBimTbgdMzgSs2iYbcSXs9jf5R');
-        const secondaryWallet = new solanaWeb3.PublicKey('3549ZVcu7jL55NNMyZgRAFYBJr5PUB2LVtcsD79G8KKX');
+        // Contract wallets' USDC ATAs - MAINNET WALLETS (from contract state, NOT config.json!)
+        // IMPORTANT: These MUST match what's in the deployed contract
+        const feeCollectorWallet = new solanaWeb3.PublicKey('vYAXJaPhEMAXkK7x5oBK56WJBBp1CaZMSAoHxn6o7PS');      // fee_collector_usdc from contract
+        const treasuryWallet = new solanaWeb3.PublicKey('55pFq53FfhNWpxivfhaN3EAy6d4uL2KDkbwaoZM565eY');         // treasury_usdc from contract
+        const secondaryWallet = new solanaWeb3.PublicKey('55pFq53FfhNWpxivfhaN3EAy6d4uL2KDkbwaoZM565eY');        // secondary_usdc from contract
         
         // Calculate their USDC ATAs
         const [feeCollectorUsdcAccount] = await solanaWeb3.PublicKey.findProgramAddress(
@@ -279,7 +280,7 @@ class DirectContractClient {
         const encoder = new TextEncoder();
         const [pda] = await solanaWeb3.PublicKey.findProgramAddress(
             [
-                encoder.encode('buyer_v3'),  // CORRECT: Contract uses "buyer_v3", not "buyer_state"
+                encoder.encode('buyer_state'),  // MAINNET: Contract uses "buyer_state" (devnet uses "buyer_v3")
                 buyerPublicKey.toBytes()
             ],
             new solanaWeb3.PublicKey(this.programIds.presale)
@@ -453,7 +454,7 @@ class DirectContractClient {
                 console.log('📍 Buyer state does not exist yet (normal for first purchase)');
             }
             
-            // Check USDC account
+            // Check USDC account and balance
             try {
                 const usdcInfo = await this.connection.getAccountInfo(buyerUsdcAccount);
                 console.log('📍 Buyer USDC account exists:', !!usdcInfo);
@@ -463,13 +464,23 @@ class DirectContractClient {
                     try {
                         const balance = await this.connection.getTokenAccountBalance(buyerUsdcAccount);
                         console.log('💰 USDC balance:', balance.value.uiAmount, 'USDC');
+                        
+                        if (balance.value.uiAmount === null || balance.value.uiAmount < amount) {
+                            throw new Error(`Insufficient USDC balance. You have ${balance.value.uiAmount || 0} USDC but trying to spend ${amount} USDC`);
+                        }
                     } catch (balError) {
+                        if (balError.message.includes('Insufficient USDC')) {
+                            throw balError;
+                        }
                         console.log('⚠️ Could not get USDC balance:', balError.message);
                     }
                 } else {
-                    console.log('⚠️ USDC account does not exist - may need to create ATA first');
+                    throw new Error('USDC token account not found. Please initialize your USDC account first by receiving some USDC.');
                 }
             } catch (error) {
+                if (error.message.includes('Insufficient USDC') || error.message.includes('not found')) {
+                    throw error;
+                }
                 console.log('⚠️ Error checking USDC account:', error.message);
             }
             
@@ -847,11 +858,11 @@ class DirectContractClient {
             
             console.log('✅ Presale state parsed successfully');
             console.log('📊 Stats from contract:', {
-                raisedSol: raisedSol / 1e9,
-                raisedUsdc: raisedUsdc / 1e6,
-                totalVibesSold: totalVibesSold / 1e9,
-                totalStaked: totalStakedOptional / 1e9,
-                totalUnstaked: totalUnstaked / 1e9,
+                raisedSol: raisedSol / Math.pow(10, TOKEN_CONFIG.SOL_DECIMALS),
+                raisedUsdc: raisedUsdc / Math.pow(10, TOKEN_CONFIG.USDC_DECIMALS),
+                totalVibesSold: totalVibesSold / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS),
+                totalStaked: totalStakedOptional / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS),
+                totalUnstaked: totalUnstaked / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS),
                 stakingApyBps: stakingApyBps,
                 priceScheduleLength: priceTiers.length
             });
@@ -1099,21 +1110,21 @@ class DirectContractClient {
             // Read totalPurchasedVibes (u64)
             const totalPurchasedVibes = Number(view.getBigUint64(offset, true));
             offset += 8;
-            const totalPurchasedVibesUI = totalPurchasedVibes / 1e9;
+            const totalPurchasedVibesUI = totalPurchasedVibes / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             console.log('📊 Total Purchased VIBES (raw):', totalPurchasedVibes);
             console.log('📊 Total Purchased VIBES (UI):', totalPurchasedVibesUI);
             
             // Read solContributed (u64)
             const solContributed = Number(view.getBigUint64(offset, true));
             offset += 8;
-            const solContributedUI = solContributed / 1e9;
+            const solContributedUI = solContributed / Math.pow(10, TOKEN_CONFIG.SOL_DECIMALS);
             console.log('◎ SOL Contributed (raw):', solContributed);
             console.log('◎ SOL Contributed (UI):', solContributedUI);
             
             // Read usdcContributed (u64)
             const usdcContributed = Number(view.getBigUint64(offset, true));
             offset += 8;
-            const usdcContributedUI = usdcContributed / 1e6;
+            const usdcContributedUI = usdcContributed / Math.pow(10, TOKEN_CONFIG.USDC_DECIMALS);
             console.log('💵 USDC Contributed (raw):', usdcContributed);
             console.log('💵 USDC Contributed (UI):', usdcContributedUI);
             
@@ -1125,20 +1136,20 @@ class DirectContractClient {
             // Read stakedAmount (u64) - THIS IS THE KEY VALUE
             const stakedAmount = Number(view.getBigUint64(offset, true));
             offset += 8;
-            const stakedAmountUI = stakedAmount / 1e9;
+            const stakedAmountUI = stakedAmount / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             console.log('🔒 Staked Amount (raw lamports):', stakedAmount);
             console.log('🔒 Staked Amount (UI VIBES):', stakedAmountUI);
             
             // Read unstakedAmount (u64) - THIS IS THE KEY VALUE
             const unstakedAmount = Number(view.getBigUint64(offset, true));
             offset += 8;
-            const unstakedAmountUI = unstakedAmount / 1e9;
+            const unstakedAmountUI = unstakedAmount / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             console.log('🔓 Unstaked Amount (raw lamports):', unstakedAmount);
             console.log('🔓 Unstaked Amount (UI VIBES):', unstakedAmountUI);
             
             // Validation check
             const totalAmount = stakedAmount + unstakedAmount;
-            console.log('🔍 Validation: staked + unstaked =', totalAmount / 1e9, 'VIBES');
+            console.log('🔍 Validation: staked + unstaked =', totalAmount / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS), 'VIBES');
             console.log('🔍 Should equal totalPurchased =', totalPurchasedVibesUI, 'VIBES');
             
             if (Math.abs(totalAmount - totalPurchasedVibes) > 1000) { // Allow 1000 lamports tolerance
@@ -1154,14 +1165,14 @@ class DirectContractClient {
             // Read accumulatedRewards (u64)
             const accumulatedRewards = Number(view.getBigUint64(offset, true));
             offset += 8;
-            const accumulatedRewardsUI = accumulatedRewards / 1e9;
+            const accumulatedRewardsUI = accumulatedRewards / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             console.log('🎁 Accumulated Rewards (raw):', accumulatedRewards);
             console.log('🎁 Accumulated Rewards (UI):', accumulatedRewardsUI);
             
             // Read totalRewardsClaimed (u64)
             const totalRewardsClaimed = Number(view.getBigUint64(offset, true));
             offset += 8;
-            const totalRewardsClaimedUI = totalRewardsClaimed / 1e9;
+            const totalRewardsClaimedUI = totalRewardsClaimed / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             console.log('✅ Total Rewards Claimed (raw):', totalRewardsClaimed);
             console.log('✅ Total Rewards Claimed (UI):', totalRewardsClaimedUI);
             
@@ -1187,7 +1198,7 @@ class DirectContractClient {
             // Read finalVestingAmount (u64)
             const finalVestingAmount = Number(view.getBigUint64(offset, true));
             offset += 8;
-            console.log('🎁 Final Vesting Amount:', finalVestingAmount / 1e9);
+            console.log('🎁 Final Vesting Amount:', finalVestingAmount / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS));
             
             // Read purchaseCount (u32)
             const purchaseCount = view.getUint32(offset, true);
@@ -1313,13 +1324,13 @@ class DirectContractClient {
                 
                 console.log('  - Seconds per year:', secondsPerYear);
                 console.log('  - Time-based rewards (lamports):', timeBasedRewards.toFixed(0));
-                console.log('  - Time-based rewards (VIBES):', (timeBasedRewards / 1e9).toFixed(9));
+                console.log('  - Time-based rewards (VIBES):', (timeBasedRewards / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS)).toFixed(9));
                 
                 // Add time-based rewards to accumulated rewards
                 pendingRewards = BigInt(Math.floor(timeBasedRewards)) + accumulatedRewards;
             }
             
-            const pendingRewardsUI = Number(pendingRewards) / 1e9; // Convert to VIBES
+            const pendingRewardsUI = Number(pendingRewards) / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS); // Convert to VIBES
             
             console.log('✅ Total pending rewards:', pendingRewardsUI.toFixed(9), 'VIBES');
             
@@ -1425,14 +1436,14 @@ class DirectContractClient {
             // Read total (u64)
             const total = Number(view.getBigUint64(offset, true));
             offset += 8;
-            const totalUI = total / 1e9;
+            const totalUI = total / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             console.log('📊 Total Vesting (raw):', total);
             console.log('📊 Total Vesting (UI):', totalUI);
             
             // Read released (u64)
             const released = Number(view.getBigUint64(offset, true));
             offset += 8;
-            const releasedUI = released / 1e9;
+            const releasedUI = released / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             console.log('✅ Released (raw):', released);
             console.log('✅ Released (UI):', releasedUI);
             
@@ -1476,11 +1487,11 @@ class DirectContractClient {
             
             // Calculate remaining and claimable amounts
             const remaining = total - released;
-            const remainingUI = remaining / 1e9;
+            const remainingUI = remaining / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             
             // Calculate claimable based on current time and vesting schedule
             const claimable = this.calculateVestingClaimable(total, released, listingTs, cliff1, cliff2, cliff3, isCancelled);
-            const claimableUI = claimable / 1e9;
+            const claimableUI = claimable / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS);
             
             console.log('📊 Remaining (raw):', remaining);
             console.log('📊 Remaining (UI):', remainingUI);
@@ -1568,9 +1579,9 @@ class DirectContractClient {
             cliff1: new Date(cliff1 * 1000).toISOString(),
             cliff2: new Date(cliff2 * 1000).toISOString(),
             cliff3: new Date(cliff3 * 1000).toISOString(),
-            vestedAmount: vestedAmount / 1e9,
-            released: released / 1e9,
-            claimable: claimable / 1e9
+            vestedAmount: vestedAmount / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS),
+            released: released / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS),
+            claimable: claimable / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS)
         });
         
         return claimable;

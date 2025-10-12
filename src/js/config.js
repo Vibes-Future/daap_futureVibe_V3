@@ -1,7 +1,7 @@
 // Configuration for VIBES DeFi Basic DApp
 // Smart Contract Configuration
 
-// Program IDs (from frontend_data.json - updated deployment)
+// Program IDs (Mainnet Deployment - October 12, 2025)
 const PROGRAM_IDS = {
     PRESALE_V3: 'HNPuLPxycypT4YtD5vMZPdcrr53MLKAajYrQwNTv4ujH',
     STAKING: '3ZaKegZktvjwt4SreDvitLECG47UnPdd4EFzNAnyHDaW',
@@ -10,25 +10,25 @@ const PROGRAM_IDS = {
 
 // Network Configuration
 const NETWORK_CONFIG = {
-    // Using Helius RPC for devnet (where our contracts are deployed)
-    RPC_URL: 'https://devnet.helius-rpc.com/?api-key=10bdc822-0b46-4952-98fc-095c326565d7',
-    // Fallback also to Helius for best performance
-    FALLBACK_RPC: 'https://devnet.helius-rpc.com/?api-key=10bdc822-0b46-4952-98fc-095c326565d7',
-    // Mainnet RPC (for future use)
+    // Using Helius RPC for mainnet (private API key)
+    RPC_URL: 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c',
+    // Fallback to Helius mainnet for best performance
+    FALLBACK_RPC: 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c',
+    // Public mainnet RPC (backup)
     MAINNET_RPC: 'https://api.mainnet-beta.solana.com',
-    // Current network (devnet where our contracts are deployed)
-    NETWORK: 'devnet'
+    // Current network (mainnet-beta)
+    NETWORK: 'mainnet-beta'
 };
 
-// Token Configuration (from contract analysis)
+// Token Configuration (Mainnet tokens)
 const TOKEN_CONFIG = {
-    // USDC mint address - STANDARD DEVNET USDC
-    USDC_MINT: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU',
-    // VIBES token mint from contract data
-    VIBES_MINT: 'C4SeJZr8wJ6BrNUJP52vGZf6QMunWFRgx6kbkb56j3vW',
+    // USDC mint address - OFFICIAL MAINNET USDC (Circle)
+    USDC_MINT: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    // VIBES token mint (Mainnet)
+    VIBES_MINT: 'G5n3KqfKZB4qeJAQA3k5dKbj7X264oCjV1vXMnBpwL43',
     // Token decimals
     USDC_DECIMALS: 6,
-    VIBES_DECIMALS: 9,
+    VIBES_DECIMALS: 6,
     SOL_DECIMALS: 9
 };
 
@@ -119,7 +119,8 @@ if (typeof window !== 'undefined') {
     
     console.log('✅ Configuration loaded successfully');
     console.log('📊 Network:', NETWORK_CONFIG.NETWORK);
-    console.log('🔗 RPC URL:', NETWORK_CONFIG.RPC_URL);
+    // SECURITY: Do not log RPC URL as it contains API key
+    console.log('🔗 RPC Endpoint:', NETWORK_CONFIG.RPC_URL.split('?')[0] + '?api-key=[REDACTED]');
 }
 
 // Export configuration for Node.js (if needed)
