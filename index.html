@@ -2998,14 +2998,15 @@
             
             <!-- Staking Actions Grid -->
             <div class="grid" style="margin-top: 30px;">
-                <div class="info-card">
+                <div class="info-card" style="opacity: 0.5; pointer-events: none; position: relative;">
                     <h3><i data-lucide="lock"></i>Stake Tokens</h3>
                     <div class="form-group">
                         <label for="stake-amount">Amount to Stake:</label>
-                        <input type="number" id="stake-amount" step="0.01" min="0" placeholder="Enter amount to stake">
+                        <input type="number" id="stake-amount" step="0.01" min="0" placeholder="Enter amount to stake" disabled style="cursor: not-allowed;">
                     </div>
-                    <button id="stake-tokens" class="btn btn-success" style="width: 100%; margin-bottom: 10px;">Stake VIBES</button>
+                    <button id="stake-tokens" class="btn btn-success" style="width: 100%; margin-bottom: 10px; cursor: not-allowed;" disabled>Stake VIBES</button>
                     <p style="color: #a0a0a0; font-size: 0.9rem; text-align: center;">Stake your VIBES tokens to earn rewards</p>
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 100, 100, 0.8); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">INACTIVE</div>
                 </div>
                 
                 <div class="info-card">
