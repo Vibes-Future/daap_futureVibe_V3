@@ -94,7 +94,7 @@ class DirectContractClient {
         }
         
         // Create instruction following the REAL IDL account structure (ONLY 7 accounts!)
-        const instruction = {
+        const instruction = new solanaWeb3.TransactionInstruction({
             programId: new solanaWeb3.PublicKey(this.programIds.presale),
             keys: [
                 // From REAL IDL: buyWithSolV3 accounts in exact order (7 accounts only)
@@ -107,7 +107,7 @@ class DirectContractClient {
                 { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }  // systemProgram
             ],
             data: instructionData
-        };
+        });
         
         console.log('✅ Instruction created with', instruction.keys.length, 'accounts');
         return instruction;
@@ -161,7 +161,7 @@ class DirectContractClient {
         }
         
         // Create instruction following the IDL structure for optIntoStaking
-        const instruction = {
+        const instruction = new solanaWeb3.TransactionInstruction({
             programId: new solanaWeb3.PublicKey(this.programIds.presale),
             keys: [
                 // From IDL: optIntoStaking accounts (3 accounts)
@@ -170,7 +170,7 @@ class DirectContractClient {
                 { pubkey: this.wallet.publicKey, isSigner: true, isWritable: false } // buyer
             ],
             data: instructionData
-        };
+        });
         
         console.log('✅ OptIntoStaking instruction created with', instruction.keys.length, 'accounts');
         return instruction;
@@ -254,7 +254,7 @@ class DirectContractClient {
         console.log('  - Wallet:', this.wallet.publicKey.toBase58());
         
         // Create instruction following the IDL account structure (9 accounts)
-        const instruction = {
+        const instruction = new solanaWeb3.TransactionInstruction({
             programId: new solanaWeb3.PublicKey(this.programIds.presale),
             keys: [
                 // From IDL: buyWithUsdcV3 accounts in exact order
@@ -269,7 +269,7 @@ class DirectContractClient {
                 { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }  // systemProgram
             ],
             data: instructionData
-        };
+        });
         
         console.log('✅ USDC Instruction created with', instruction.keys.length, 'accounts');
         return instruction;
@@ -1250,21 +1250,33 @@ class DirectContractClient {
             const buyerPubkey = walletPublicKey || this.wallet.publicKey;
             
             if (!buyerPubkey) {
-                console.warn('⚠️ No wallet connected');
+                console.warn('⚠️ [CALC-REWARDS] No wallet connected');
                 return 0;
             }
 
-            console.log('💰 Calculating pending rewards for wallet...');
+            console.log('💰 [CALC-REWARDS] Calculating pending rewards for wallet:', buyerPubkey.toString());
 
             // Get buyer state
+            console.log('🔍 [CALC-REWARDS] Fetching buyer state data...');
             const buyerData = await this.getBuyerStateData(buyerPubkey);
-            if (!buyerData || !buyerData.exists || buyerData.stakedAmount === 0) {
-                console.log('📭 No staked amount, no rewards');
+            console.log('🔍 [CALC-REWARDS] Buyer data received:', buyerData);
+            
+            if (!buyerData || !buyerData.exists) {
+                console.log('📭 [CALC-REWARDS] Buyer state does not exist, returning 0');
                 return 0;
             }
+            
+            if (buyerData.stakedAmount === 0) {
+                console.log('📭 [CALC-REWARDS] No staked amount, returning 0');
+                return 0;
+            }
+            
+            console.log('✅ [CALC-REWARDS] Buyer has', buyerData.stakedAmount, 'lamports staked');
 
             // Get presale state for accRewardPerToken and APY
+            console.log('🔍 [CALC-REWARDS] Fetching presale state...');
             const presaleState = await this.getPresaleStateFromContract();
+            console.log('🔍 [CALC-REWARDS] Presale state received:', presaleState);
             
             // Calculate pending rewards using the standard staking formula:
             // pending = (stakedAmount * accRewardPerToken / PRECISION) - rewardDebt + accumulatedRewards
@@ -1297,37 +1309,53 @@ class DirectContractClient {
                 pendingRewards = 0n;
             }
             
-            // If accRewardPerToken is 0, calculate rewards based on time elapsed
-            // This happens when the contract hasn't been updated yet
-            if (accRewardPerToken === 0n && buyerData.lastStakeTs > 0) {
-                console.log('⚠️ AccRewardPerToken is 0, calculating time-based rewards...');
+            console.log('🔍 [CALC-REWARDS] Pending rewards from standard formula:', pendingRewards.toString(), 'lamports');
+            
+            // If the standard calculation gives 0 or very low rewards, use time-based calculation
+            // This happens when accRewardPerToken is 0 or hasn't been updated by the contract
+            console.log('🔍 [CALC-REWARDS] Checking if time-based calculation needed...');
+            console.log('🔍 [CALC-REWARDS] accRewardPerToken:', accRewardPerToken.toString());
+            console.log('🔍 [CALC-REWARDS] lastStakeTs:', buyerData.lastStakeTs);
+            console.log('🔍 [CALC-REWARDS] pendingRewards:', pendingRewards.toString());
+            
+            // Use time-based calculation if:
+            // 1. accRewardPerToken is 0, OR
+            // 2. Pending rewards are 0 and user has been staking
+            const shouldUseTimeBased = (accRewardPerToken === 0n || pendingRewards === 0n) && buyerData.lastStakeTs > 0;
+            console.log('🔍 [CALC-REWARDS] Should use time-based calculation:', shouldUseTimeBased);
+            
+            if (shouldUseTimeBased) {
+                console.log('⏰ [CALC-REWARDS] Using time-based calculation (standard formula gave 0)...');
                 
                 // Get current timestamp
                 const nowSeconds = Math.floor(Date.now() / 1000);
                 const lastUpdateTs = buyerData.lastUpdateTs || buyerData.lastStakeTs;
                 const timeElapsedSeconds = nowSeconds - lastUpdateTs;
                 
-                console.log('  - Last update:', new Date(lastUpdateTs * 1000).toISOString());
-                console.log('  - Now:', new Date(nowSeconds * 1000).toISOString());
-                console.log('  - Time elapsed:', timeElapsedSeconds, 'seconds');
+                console.log('  📅 Last update:', new Date(lastUpdateTs * 1000).toISOString());
+                console.log('  📅 Now:', new Date(nowSeconds * 1000).toISOString());
+                console.log('  ⏱️  Time elapsed:', timeElapsedSeconds, 'seconds', '(' + (timeElapsedSeconds / 86400).toFixed(2) + ' days)');
                 
                 // APY from presale state (in basis points: 4000 = 40%)
                 const apyBps = presaleState.stakingApyBps || 4000; // Default 40%
                 const apyDecimal = apyBps / 10000; // Convert to decimal (0.40)
                 
-                console.log('  - APY (BPS):', apyBps);
-                console.log('  - APY (decimal):', apyDecimal);
+                console.log('  📊 APY (BPS):', apyBps);
+                console.log('  📊 APY (decimal):', apyDecimal);
                 
                 // Calculate rewards: stakedAmount * APY * (timeElapsed / secondsPerYear)
                 const secondsPerYear = 365.25 * 24 * 60 * 60; // 31,557,600 seconds
                 const timeBasedRewards = (Number(stakedAmount) * apyDecimal * timeElapsedSeconds) / secondsPerYear;
                 
-                console.log('  - Seconds per year:', secondsPerYear);
-                console.log('  - Time-based rewards (lamports):', timeBasedRewards.toFixed(0));
-                console.log('  - Time-based rewards (VIBES):', (timeBasedRewards / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS)).toFixed(9));
+                console.log('  📊 Seconds per year:', secondsPerYear);
+                console.log('  💰 Time-based rewards (lamports):', timeBasedRewards.toFixed(0));
+                console.log('  💰 Time-based rewards (VIBES):', (timeBasedRewards / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS)).toFixed(9));
                 
                 // Add time-based rewards to accumulated rewards
                 pendingRewards = BigInt(Math.floor(timeBasedRewards)) + accumulatedRewards;
+                console.log('  ✅ Final pending rewards after time-based calc:', pendingRewards.toString(), 'lamports');
+            } else {
+                console.log('✅ [CALC-REWARDS] Using standard formula (contract has valid accRewardPerToken:', accRewardPerToken.toString(), ')');
             }
             
             const pendingRewardsUI = Number(pendingRewards) / Math.pow(10, TOKEN_CONFIG.VIBES_DECIMALS); // Convert to VIBES

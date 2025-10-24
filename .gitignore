@@ -55,3 +55,33 @@ verify-contract-*.js
 fix-*.js
 temp-*.js
 debug-*.js
+
+# ===================================
+# CRITICAL SECURITY - Wallet Protection
+# ===================================
+
+# Wallet files and directories (NEVER commit private keys)
+wallets/
+*keypair*
+*.key
+*.seed
+*.private
+*wallet*.json
+
+# Allow specific wallet-related documentation
+!wallets/README.md
+!wallets/.gitkeep
+
+# ===================================
+# CRITICAL SECURITY - API Keys and Secrets
+# ===================================
+
+# Configuration files that may contain secrets
+config.local.js
+config.production.js
+*secret*
+*private*
+
+# Backup of configuration files
+*.config.backup
+config.*.bak

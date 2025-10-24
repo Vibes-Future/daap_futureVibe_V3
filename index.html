@@ -13,8 +13,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide Icons - Local version (no CDN dependency) -->
+    <script src="src/vendor/lucide.min.js"></script>
     <style>
         /* VIBES Design System - CSS Variables */
         :root {
@@ -3010,11 +3010,37 @@
                 </div>
                 
                 <div class="info-card">
-                    <h3><i data-lucide="activity"></i>Staking Status</h3>
-                    <p><strong>Status:</strong> <span id="staking-status" style="color: #c7f801;">Not Staking</span></p>
-                    <p><strong>Staking Start:</strong> <span id="staking-start-date">-</span></p>
-                    <p><strong>Last Update:</strong> <span id="last-update-date">-</span></p>
-                    <p><strong>Total Rewards Claimed:</strong> <span id="total-rewards-claimed">0</span> VIBES</p>
+                    <h3><i data-lucide="calendar"></i>Vesting & Rewards Schedule</h3>
+                    
+                    <!-- Vesting & Rewards Schedule -->
+                    <div style="margin-top: 0;">
+                        <!-- Vesting Start -->
+                        <div style="background: rgba(199, 248, 1, 0.1); border-left: 3px solid #c7f801; padding: 12px; margin-bottom: 12px; border-radius: 6px;">
+                            <div style="color: #c7f801; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px;">📅 Vesting Start: Oct 12, 2026</div>
+                            <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; line-height: 1.5;">
+                                <strong style="color: #c7f801;">40%</strong> unlock immediately<br>
+                                <span style="color: rgba(255, 255, 255, 0.7);">Claim your first tokens on vesting start</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Monthly Unlocks -->
+                        <div style="background: rgba(250, 205, 149, 0.1); border-left: 3px solid #FACD95; padding: 12px; margin-bottom: 12px; border-radius: 6px;">
+                            <div style="color: #FACD95; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px;">📆 Monthly Unlocks</div>
+                            <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; line-height: 1.5;">
+                                <strong style="color: #FACD95;">20%</strong> per month for 3 months<br>
+                                <span style="color: rgba(255, 255, 255, 0.7);">Nov, Dec 2026 & Jan 2027</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Staking Rewards -->
+                        <div style="background: rgba(78, 204, 163, 0.1); border-left: 3px solid #4ecca3; padding: 12px; border-radius: 6px;">
+                            <div style="color: #4ecca3; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px;">🎁 Staking Rewards: Jan 12, 2027</div>
+                            <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; line-height: 1.5;">
+                                <strong style="color: #4ecca3;">40% APY</strong> rewards claimable<br>
+                                <span style="color: rgba(255, 255, 255, 0.7);">3 months after vesting starts</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3132,9 +3158,9 @@
                             <!-- Donation Row -->
                             <tr style="border-bottom: 1px solid rgba(199, 248, 1, 0.15); transition: background 0.3s ease;" onmouseover="this.style.background='rgba(199, 248, 1, 0.05)'" onmouseout="this.style.background='transparent'">
                                 <td style="padding: 16px 20px; font-weight: 600; color: #ffffff; font-size: 0.95rem;">Donation</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem; font-family: monospace;">4RjsTjaVmombQDSqVYeNnitcwJQ8uWWNEgZLyegXzKUe</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem; font-family: monospace;">DYVmSWi2t1oBKSZRqsThBLEpuxrTshLQ98ySKQsgbbhh</td>
                                 <td style="padding: 16px 20px; color: #c7f801; font-size: 0.9rem; font-weight: 600;">5,000,000</td>
-                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">10/10/27</td>
+                                <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">04/01/27</td>
                                 <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">40%</td>
                                 <td style="padding: 16px 20px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">20%</td>
                             </tr>
@@ -4225,11 +4251,22 @@
                     if (stakingElements.pendingRewards) {
                         if (walletPublicKey && connection) {
                             try {
+                                console.log('🔍 [REWARDS] Starting pending rewards calculation...');
+                                console.log('🔍 [REWARDS] Wallet:', walletPublicKey.toString());
+                                console.log('🔍 [REWARDS] Connection:', connection ? 'Connected' : 'Not connected');
+                                
                                 // Calculate pending rewards using the staking formula
                                 const tempClient = new window.DirectContractClient(connection, { publicKey: walletPublicKey });
+                                console.log('🔍 [REWARDS] DirectContractClient created successfully');
+                                
                                 const pendingRewardsLamports = await tempClient.calculatePendingRewards(walletPublicKey);
+                                console.log('🔍 [REWARDS] Raw pending rewards (lamports):', pendingRewardsLamports);
+                                
                                 const vibesDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.VIBES_DECIMALS) || 6;
+                                console.log('🔍 [REWARDS] Using decimals:', vibesDecimals);
+                                
                                 const pendingRewards = pendingRewardsLamports / Math.pow(10, vibesDecimals);
+                                console.log('🔍 [REWARDS] Converted pending rewards (VIBES):', pendingRewards);
                                 
                                 const formattedRewards = pendingRewards.toLocaleString('en-US', { 
                                     minimumFractionDigits: 0, 
@@ -4238,7 +4275,8 @@
                                 stakingElements.pendingRewards.textContent = formattedRewards + ' $VIBES';
                                 console.log('🎁 Updated pending rewards (calculated) to:', pendingRewards, 'VIBES');
                             } catch (error) {
-                                console.warn('⚠️ Could not calculate pending rewards:', error.message);
+                                console.error('❌ [REWARDS] Failed to calculate pending rewards:', error);
+                                console.error('❌ [REWARDS] Error stack:', error.stack);
                                 // Fallback to accumulated rewards from buyerData
                                 if (buyerData && buyerData.accumulatedRewards !== undefined) {
                                     const vibesDecimals = (window.TOKEN_CONFIG && window.TOKEN_CONFIG.VIBES_DECIMALS) || 6;
@@ -4248,9 +4286,10 @@
                                         maximumFractionDigits: 0 
                                     });
                                     stakingElements.pendingRewards.textContent = formattedRewards + ' $VIBES';
-                                    console.log('🎁 Updated pending rewards (accumulated) to:', pendingRewards, 'VIBES');
+                                    console.log('🎁 Updated pending rewards (accumulated fallback) to:', pendingRewards, 'VIBES');
                                 } else {
                                     stakingElements.pendingRewards.textContent = '0 $VIBES';
+                                    console.log('⚠️ No accumulated rewards available, showing 0');
                                 }
                             }
                         } else {
@@ -4693,40 +4732,64 @@
 
     <!-- Initialize Lucide Icons -->
     <script>
-        // Function to initialize Lucide icons
+        // Function to initialize Lucide icons with better error handling
         function initializeLucideIcons() {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-                console.log('✨ Lucide icons initialized');
-                return true;
-            } else {
-                console.warn('⚠️ Lucide library not loaded yet');
+            try {
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                    console.log('✨ Lucide icons initialized successfully');
+                    return true;
+                } else if (typeof lucide !== 'undefined') {
+                    console.warn('⚠️ Lucide loaded but createIcons method not found');
+                    console.log('Available lucide methods:', Object.keys(lucide));
+                    return false;
+                } else {
+                    console.warn('⚠️ Lucide library not loaded yet');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Error initializing Lucide icons:', error);
                 return false;
+            }
+        }
+
+        // Retry initialization with exponential backoff
+        function tryInitializeLucide(attempt = 0, maxAttempts = 5) {
+            if (initializeLucideIcons()) {
+                return; // Success!
+            }
+            
+            if (attempt < maxAttempts) {
+                const delay = Math.min(100 * Math.pow(2, attempt), 1000); // Max 1 second
+                setTimeout(() => tryInitializeLucide(attempt + 1, maxAttempts), delay);
+            } else {
+                console.error('❌ Failed to initialize Lucide icons after', maxAttempts, 'attempts');
+                console.warn('💡 Using fallback: hiding icon elements');
+                // Fallback: hide icon elements gracefully
+                document.querySelectorAll('[data-lucide]').forEach(el => {
+                    el.style.display = 'none';
+                });
             }
         }
 
         // Initialize icons when DOM is ready
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                // Try to initialize immediately
-                if (!initializeLucideIcons()) {
-                    // If Lucide isn't loaded yet, wait and retry
-                    setTimeout(initializeLucideIcons, 100);
-                }
-            });
+            document.addEventListener('DOMContentLoaded', () => tryInitializeLucide());
         } else {
             // DOM already loaded, initialize now
-            if (!initializeLucideIcons()) {
-                // If Lucide isn't loaded yet, wait and retry
-                setTimeout(initializeLucideIcons, 100);
-            }
+            tryInitializeLucide();
         }
 
         // Re-initialize icons when content changes (for dynamic updates)
         // This is useful when content is loaded asynchronously
         window.refreshLucideIcons = function() {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+            try {
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                    console.log('🔄 Lucide icons refreshed');
+                }
+            } catch (error) {
+                console.error('❌ Error refreshing Lucide icons:', error);
             }
         };
 

@@ -132,63 +132,106 @@ class SolanaWalletManager {
      */
     detectWallets() {
         this.availableWallets = [];
+        
+        // Track detected wallet types to avoid duplicates
+        const detectedTypes = new Set();
 
-        // Phantom Wallet
-        if (window.solana?.isPhantom) {
+        // Phantom Wallet - Check first to prioritize it
+        if (window.solana?.isPhantom && !detectedTypes.has('phantom')) {
             this.availableWallets.push({
                 name: 'Phantom',
                 adapter: window.solana,
                 icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/phantom.svg',
                 installed: true
             });
+            detectedTypes.add('phantom');
             console.log('✅ Phantom wallet detected');
         }
 
-        // Solflare Wallet
-        if (window.solflare?.isSolflare) {
-            this.availableWallets.push({
-                name: 'Solflare',
-                adapter: window.solflare,
-                icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/solflare.svg',
-                installed: true
-            });
-            console.log('✅ Solflare wallet detected');
-        }
-
-        // Trust Wallet
-        if (window.trustwallet?.solana) {
+        // Trust Wallet - Multiple detection methods
+        // Method 1: window.trustwallet.solana (most common)
+        if (window.trustwallet?.solana && !detectedTypes.has('trust')) {
             this.availableWallets.push({
                 name: 'Trust Wallet',
                 adapter: window.trustwallet.solana,
                 icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/trust.svg',
                 installed: true
             });
-            console.log('✅ Trust Wallet detected');
+            detectedTypes.add('trust');
+            console.log('✅ Trust Wallet detected (trustwallet.solana)');
+        }
+        // Method 2: window.solana with isTrust flag
+        else if (window.solana?.isTrust && !detectedTypes.has('trust') && !detectedTypes.has('phantom')) {
+            this.availableWallets.push({
+                name: 'Trust Wallet',
+                adapter: window.solana,
+                icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/trust.svg',
+                installed: true
+            });
+            detectedTypes.add('trust');
+            console.log('✅ Trust Wallet detected (solana.isTrust)');
+        }
+        // Method 3: window.solana with isTrustWallet flag
+        else if (window.solana?.isTrustWallet && !detectedTypes.has('trust') && !detectedTypes.has('phantom')) {
+            this.availableWallets.push({
+                name: 'Trust Wallet',
+                adapter: window.solana,
+                icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/trust.svg',
+                installed: true
+            });
+            detectedTypes.add('trust');
+            console.log('✅ Trust Wallet detected (solana.isTrustWallet)');
+        }
+
+        // Solflare Wallet
+        if (window.solflare?.isSolflare && !detectedTypes.has('solflare')) {
+            this.availableWallets.push({
+                name: 'Solflare',
+                adapter: window.solflare,
+                icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/solflare.svg',
+                installed: true
+            });
+            detectedTypes.add('solflare');
+            console.log('✅ Solflare wallet detected');
         }
 
         // Coinbase Wallet
-        if (window.coinbaseSolana) {
+        if (window.coinbaseSolana && !detectedTypes.has('coinbase')) {
             this.availableWallets.push({
                 name: 'Coinbase Wallet',
                 adapter: window.coinbaseSolana,
                 icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/coinbase.svg',
                 installed: true
             });
+            detectedTypes.add('coinbase');
             console.log('✅ Coinbase Wallet detected');
         }
 
         // Backpack Wallet
-        if (window.backpack?.isBackpack) {
+        if (window.backpack?.isBackpack && !detectedTypes.has('backpack')) {
             this.availableWallets.push({
                 name: 'Backpack',
                 adapter: window.backpack,
                 icon: 'https://raw.githubusercontent.com/solana-labs/wallet-adapter/master/packages/wallets/icons/backpack.svg',
                 installed: true
             });
+            detectedTypes.add('backpack');
             console.log('✅ Backpack wallet detected');
         }
 
         console.log(`📊 Total wallets detected: ${this.availableWallets.length}`, this.availableWallets);
+        
+        // Debug: Log all window.solana properties to help detect Trust Wallet
+        if (window.solana && this.availableWallets.length > 0) {
+            const solanaProps = Object.keys(window.solana).filter(key => 
+                key.toLowerCase().includes('trust') || 
+                key.toLowerCase().includes('is') ||
+                key.toLowerCase().includes('name')
+            );
+            if (solanaProps.length > 0) {
+                console.log('🔍 window.solana detection properties:', solanaProps);
+            }
+        }
 
         // Emit wallet detection event
         this.emit('walletsDetected', this.availableWallets);
@@ -247,14 +290,40 @@ class SolanaWalletManager {
             console.log(`🔌 Connecting to ${selectedWallet.name}...`);
 
             // Connect to wallet
-            const response = await selectedWallet.adapter.connect();
-            
-            console.log('📦 Connection response:', response);
+            let response;
+            try {
+                // Try to connect - different wallets return different types
+                response = await selectedWallet.adapter.connect();
+                console.log('📦 Connection response:', response);
+            } catch (connectError) {
+                // If connect() fails, check if wallet is already connected
+                if (selectedWallet.adapter.publicKey && selectedWallet.adapter.isConnected) {
+                    console.log('📍 Wallet was already connected');
+                    response = { publicKey: selectedWallet.adapter.publicKey };
+                } else {
+                    throw connectError;
+                }
+            }
 
-            // Get public key
-            this.publicKey = response.publicKey || selectedWallet.adapter.publicKey;
+            // Get public key - try multiple methods
+            this.publicKey = null;
+            
+            // Method 1: From response
+            if (response?.publicKey) {
+                this.publicKey = response.publicKey;
+            }
+            // Method 2: From adapter directly
+            else if (selectedWallet.adapter.publicKey) {
+                this.publicKey = selectedWallet.adapter.publicKey;
+            }
+            // Method 3: Check if response IS the publicKey
+            else if (response && typeof response.toBase58 === 'function') {
+                this.publicKey = response;
+            }
             
             if (!this.publicKey) {
+                console.error('❌ Could not get public key. Response:', response);
+                console.error('❌ Adapter publicKey:', selectedWallet.adapter.publicKey);
                 throw new Error('Failed to get public key from wallet');
             }
 

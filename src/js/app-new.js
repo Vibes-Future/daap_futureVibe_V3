@@ -375,10 +375,7 @@ class VibesAdminApp {
         // Load presale data
         await this.loadPresaleData();
         
-        // Load staking data
-        await this.loadStakingData();
-        
-        // Update staking stats with wallet-specific data
+        // Update staking stats with wallet-specific data (reads from contract)
         if (typeof window.updateStakingStats === 'function') {
             await window.updateStakingStats();
         }
@@ -796,38 +793,57 @@ class VibesAdminApp {
     }
 
     /**
-     * Fetch SOL price from multiple oracles with fallback
+     * Fetch SOL price from multiple oracles with fallback and caching
      */
     async getSolPrice() {
+        // Check cache first (cache for 5 minutes)
+        const CACHE_KEY = 'vibes_sol_price';
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+        
+        try {
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                const { price, timestamp } = JSON.parse(cached);
+                const age = Date.now() - timestamp;
+                
+                if (age < CACHE_DURATION) {
+                    console.log(`💰 Using cached SOL price: $${price} (${Math.floor(age / 1000)}s old)`);
+                    return price;
+                }
+            }
+        } catch (error) {
+            // Ignore cache errors
+        }
+        
         // Multiple price oracles with fallback
         const oracles = [
-            {
-                name: 'CoinGecko',
-                url: 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd',
-                parser: (data) => data.solana?.usd
-            },
-            {
-                name: 'CoinCap',
-                url: 'https://api.coincap.io/v2/assets/solana',
-                parser: (data) => parseFloat(data.data?.priceUsd)
-            },
             {
                 name: 'Binance',
                 url: 'https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT',
                 parser: (data) => parseFloat(data.price)
+            },
+            {
+                name: 'CoinGecko',
+                url: 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd',
+                parser: (data) => data.solana?.usd
             }
         ];
         
         // Try each oracle in sequence
         for (const oracle of oracles) {
             try {
-                console.log(`🔍 Trying ${oracle.name} API...`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+                
                 const response = await fetch(oracle.url, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json'
-                    }
+                    },
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -836,20 +852,47 @@ class VibesAdminApp {
                 const data = await response.json();
                 const price = oracle.parser(data);
                 
-                if (price && price > 0) {
+                if (price && price > 0 && price < 10000) { // Sanity check
                     console.log(`💰 SOL Price from ${oracle.name}: $${price}`);
+                    
+                    // Cache the price
+                    try {
+                        localStorage.setItem(CACHE_KEY, JSON.stringify({
+                            price,
+                            timestamp: Date.now()
+                        }));
+                    } catch (error) {
+                        // Ignore cache save errors
+                    }
+                    
                     return price;
                 } else {
-                    throw new Error(`Invalid price data from ${oracle.name}`);
+                    throw new Error(`Invalid price: ${price}`);
                 }
             } catch (error) {
-                console.warn(`⚠️ ${oracle.name} failed: ${error.message}`);
-                continue; // Try next oracle
+                // Silently continue to next oracle (don't spam console)
+                if (error.name !== 'AbortError') {
+                    // Only log non-timeout errors in debug mode
+                }
+                continue;
             }
         }
         
-        // All oracles failed, use fallback
-        console.warn(`⚠️ All price oracles failed. Using fallback price $150`);
+        // All oracles failed, try to use last cached price (even if expired)
+        try {
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                const { price, timestamp } = JSON.parse(cached);
+                const ageMinutes = Math.floor((Date.now() - timestamp) / 60000);
+                console.log(`💰 Using expired cached SOL price: $${price} (${ageMinutes} min old)`);
+                return price;
+            }
+        } catch (error) {
+            // Ignore
+        }
+        
+        // Ultimate fallback
+        console.log(`💰 Using fallback SOL price estimate: $150`);
         return 150;
     }
 
@@ -1129,8 +1172,6 @@ class VibesAdminApp {
                 console.log('✅ Staking stats refreshed successfully');
             } else {
                 console.warn('⚠️ updateStakingStats function not available');
-                // Fallback: call loadStakingData
-                this.loadStakingData();
             }
             
         } catch (error) {
@@ -1178,8 +1219,10 @@ class VibesAdminApp {
             // Clear the input
             document.getElementById('unstake-amount').value = '';
             
-            // Update staking display
-            this.loadStakingData();
+            // Update staking stats from contract
+            if (typeof window.updateStakingStats === 'function') {
+                await window.updateStakingStats();
+            }
             
         } catch (error) {
             console.error('❌ Unstaking failed:', error);
@@ -1218,8 +1261,10 @@ class VibesAdminApp {
             
             this.showMessage('Successfully claimed rewards!', 'success');
             
-            // Update staking display
-            this.loadStakingData();
+            // Update staking stats from contract
+            if (typeof window.updateStakingStats === 'function') {
+                await window.updateStakingStats();
+            }
             
         } catch (error) {
             console.error('❌ Claiming rewards failed:', error);
@@ -1583,7 +1628,12 @@ class VibesAdminApp {
         
         await this.loadUserData();
         await this.loadPresaleData();
-        await this.loadStakingData();
+        
+        // Update staking stats from contract
+        if (typeof window.updateStakingStats === 'function') {
+            await window.updateStakingStats();
+        }
+        
         await this.loadVestingData();
     }
 

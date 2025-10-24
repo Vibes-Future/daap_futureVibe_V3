@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trust Wallet Detection Debug</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1a1a2e;
+            color: #c7f801;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #c7f801;
+            border-bottom: 2px solid #c7f801;
+            padding-bottom: 10px;
+        }
+        .section {
+            background: #16213e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #0f3460;
+        }
+        .section h2 {
+            color: #FACD95;
+            margin-top: 0;
+        }
+        .detected {
+            color: #4ecca3;
+            font-weight: bold;
+        }
+        .not-detected {
+            color: #ff6b6b;
+        }
+        .info {
+            color: #95a5a6;
+        }
+        pre {
+            background: #0f0f1e;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            color: #c7f801;
+        }
+        button {
+            background: #c7f801;
+            color: #1a1a2e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+        button:hover {
+            background: #a8d801;
+        }
+        .property {
+            margin: 5px 0;
+            padding: 5px;
+            background: #0f0f1e;
+            border-left: 3px solid #c7f801;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Trust Wallet Detection Debugger</h1>
+    
+    <div class="section">
+        <h2>Instructions</h2>
+        <p>1. Open this page with Trust Wallet browser (in-app browser)</p>
+        <p>2. Check the detection results below</p>
+        <p>3. Share the console output with the developer if Trust Wallet is not detected</p>
+        <button onclick="runDetection()">🔄 Re-run Detection</button>
+        <button onclick="copyResults()">📋 Copy Results</button>
+    </div>
+
+    <div class="section">
+        <h2>Wallet Detection Results</h2>
+        <div id="detection-results"></div>
+    </div>
+
+    <div class="section">
+        <h2>window.solana Properties</h2>
+        <div id="solana-properties"></div>
+    </div>
+
+    <div class="section">
+        <h2>window.trustwallet Properties</h2>
+        <div id="trustwallet-properties"></div>
+    </div>
+
+    <div class="section">
+        <h2>All Window Properties (related to wallets)</h2>
+        <div id="all-properties"></div>
+    </div>
+
+    <div class="section">
+        <h2>Console Output</h2>
+        <pre id="console-output"></pre>
+    </div>
+
+    <script>
+        let consoleLog = '';
+
+        // Override console.log to capture output
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleLog += args.map(arg => {
+                if (typeof arg === 'object') {
+                    try {
+                        return JSON.stringify(arg, null, 2);
+                    } catch (e) {
+                        return String(arg);
+                    }
+                }
+                return String(arg);
+            }).join(' ') + '\n';
+            document.getElementById('console-output').textContent = consoleLog;
+        };
+
+        function log(message, type = 'info') {
+            const prefix = {
+                'success': '✅',
+                'error': '❌',
+                'warning': '⚠️',
+                'info': '📍'
+            }[type] || '📍';
+            console.log(`${prefix} ${message}`);
+        }
+
+        function displayProperty(name, value, parent) {
+            const div = document.createElement('div');
+            div.className = 'property';
+            
+            let displayValue = 'undefined';
+            let status = 'not-detected';
+            
+            if (value !== undefined && value !== null) {
+                if (typeof value === 'object') {
+                    displayValue = JSON.stringify(value, null, 2);
+                } else if (typeof value === 'function') {
+                    displayValue = '[Function]';
+                } else {
+                    displayValue = String(value);
+                }
+                status = 'detected';
+            }
+            
+            div.innerHTML = `<span class="${status}">${name}:</span> <span class="info">${displayValue}</span>`;
+            parent.appendChild(div);
+        }
+
+        function runDetection() {
+            consoleLog = '';
+            log('=== WALLET DETECTION DEBUG ===', 'info');
+            log('Starting wallet detection...', 'info');
+
+            // Detection Results
+            const detectionDiv = document.getElementById('detection-results');
+            detectionDiv.innerHTML = '';
+
+            // Check Phantom
+            if (window.solana?.isPhantom) {
+                displayProperty('Phantom', '✅ DETECTED', detectionDiv);
+                log('Phantom wallet detected', 'success');
+            } else {
+                displayProperty('Phantom', '❌ NOT DETECTED', detectionDiv);
+                log('Phantom wallet not detected', 'error');
+            }
+
+            // Check Trust Wallet - Multiple methods
+            let trustDetected = false;
+            
+            if (window.trustwallet?.solana) {
+                displayProperty('Trust Wallet (trustwallet.solana)', '✅ DETECTED', detectionDiv);
+                log('Trust Wallet detected via window.trustwallet.solana', 'success');
+                trustDetected = true;
+            }
+            
+            if (window.solana?.isTrust) {
+                displayProperty('Trust Wallet (solana.isTrust)', '✅ DETECTED', detectionDiv);
+                log('Trust Wallet detected via window.solana.isTrust', 'success');
+                trustDetected = true;
+            }
+            
+            if (window.solana?.isTrustWallet) {
+                displayProperty('Trust Wallet (solana.isTrustWallet)', '✅ DETECTED', detectionDiv);
+                log('Trust Wallet detected via window.solana.isTrustWallet', 'success');
+                trustDetected = true;
+            }
+            
+            if (!trustDetected) {
+                displayProperty('Trust Wallet', '❌ NOT DETECTED', detectionDiv);
+                log('Trust Wallet not detected by any method', 'error');
+            }
+
+            // Check Solflare
+            if (window.solflare?.isSolflare) {
+                displayProperty('Solflare', '✅ DETECTED', detectionDiv);
+                log('Solflare wallet detected', 'success');
+            } else {
+                displayProperty('Solflare', '❌ NOT DETECTED', detectionDiv);
+                log('Solflare wallet not detected', 'error');
+            }
+
+            // window.solana Properties
+            const solanaDiv = document.getElementById('solana-properties');
+            solanaDiv.innerHTML = '';
+            
+            if (window.solana) {
+                log('Analyzing window.solana properties...', 'info');
+                const solanaKeys = Object.keys(window.solana).filter(key => 
+                    key.toLowerCase().includes('trust') || 
+                    key.toLowerCase().includes('is') ||
+                    key.toLowerCase().includes('name') ||
+                    key === 'publicKey'
+                );
+                
+                if (solanaKeys.length > 0) {
+                    solanaKeys.forEach(key => {
+                        try {
+                            const value = window.solana[key];
+                            displayProperty(key, value, solanaDiv);
+                            log(`window.solana.${key} = ${value}`, 'info');
+                        } catch (e) {
+                            displayProperty(key, '[Error reading property]', solanaDiv);
+                        }
+                    });
+                } else {
+                    solanaDiv.innerHTML = '<p class="not-detected">No relevant properties found</p>';
+                }
+            } else {
+                solanaDiv.innerHTML = '<p class="not-detected">window.solana is undefined</p>';
+                log('window.solana is undefined', 'warning');
+            }
+
+            // window.trustwallet Properties
+            const trustwalletDiv = document.getElementById('trustwallet-properties');
+            trustwalletDiv.innerHTML = '';
+            
+            if (window.trustwallet) {
+                log('Analyzing window.trustwallet properties...', 'info');
+                const trustKeys = Object.keys(window.trustwallet);
+                
+                if (trustKeys.length > 0) {
+                    trustKeys.forEach(key => {
+                        try {
+                            const value = window.trustwallet[key];
+                            if (key === 'solana' && value) {
+                                displayProperty(key, '✅ [Solana Adapter Object]', trustwalletDiv);
+                                log(`window.trustwallet.${key} exists`, 'success');
+                            } else {
+                                displayProperty(key, value, trustwalletDiv);
+                                log(`window.trustwallet.${key} = ${value}`, 'info');
+                            }
+                        } catch (e) {
+                            displayProperty(key, '[Error reading property]', trustwalletDiv);
+                        }
+                    });
+                } else {
+                    trustwalletDiv.innerHTML = '<p class="info">window.trustwallet exists but has no enumerable properties</p>';
+                }
+            } else {
+                trustwalletDiv.innerHTML = '<p class="not-detected">window.trustwallet is undefined</p>';
+                log('window.trustwallet is undefined', 'warning');
+            }
+
+            // All wallet-related window properties
+            const allPropsDiv = document.getElementById('all-properties');
+            allPropsDiv.innerHTML = '';
+            
+            log('Scanning all window properties for wallet-related objects...', 'info');
+            const windowKeys = Object.keys(window).filter(key => 
+                key.toLowerCase().includes('wallet') ||
+                key.toLowerCase().includes('solana') ||
+                key.toLowerCase().includes('phantom') ||
+                key.toLowerCase().includes('trust') ||
+                key.toLowerCase().includes('solflare') ||
+                key.toLowerCase().includes('backpack') ||
+                key.toLowerCase().includes('coinbase')
+            );
+            
+            if (windowKeys.length > 0) {
+                windowKeys.forEach(key => {
+                    try {
+                        const value = window[key];
+                        const type = typeof value;
+                        displayProperty(key, `[${type}]`, allPropsDiv);
+                        log(`window.${key} = [${type}]`, 'info');
+                    } catch (e) {
+                        displayProperty(key, '[Error]', allPropsDiv);
+                    }
+                });
+            } else {
+                allPropsDiv.innerHTML = '<p class="not-detected">No wallet-related properties found</p>';
+                log('No wallet-related properties found in window object', 'warning');
+            }
+
+            log('=== DETECTION COMPLETE ===', 'info');
+        }
+
+        function copyResults() {
+            const text = document.getElementById('console-output').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Results copied to clipboard!');
+            }).catch(err => {
+                alert('❌ Failed to copy: ' + err);
+            });
+        }
+
+        // Run detection on page load
+        window.addEventListener('load', () => {
+            setTimeout(runDetection, 500);
+        });
+
+        // Also run immediately
+        runDetection();
+    </script>
+</body>
+</html>
+

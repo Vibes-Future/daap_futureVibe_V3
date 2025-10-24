@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wallet Detection Test</title>
+</head>
+<body>
+    <h1>Trust Wallet Detection Test</h1>
+    <pre id="output"></pre>
+    <script>
+        const output = document.getElementById('output');
+        let results = 'Wallet Detection Results:\n\n';
+        
+        // Check all possible Trust Wallet injections
+        results += 'window.trustwallet: ' + (typeof window.trustwallet) + '\n';
+        results += 'window.trustwallet?.solana: ' + (typeof window.trustwallet?.solana) + '\n';
+        results += 'window.trustwallet?.isTrust: ' + (window.trustwallet?.isTrust) + '\n';
+        results += 'window.trustWallet: ' + (typeof window.trustWallet) + '\n';
+        results += 'window.solana?.isTrust: ' + (window.solana?.isTrust) + '\n';
+        results += 'window.solana?.isTrustWallet: ' + (window.solana?.isTrustWallet) + '\n';
+        results += '\nPhantom:\n';
+        results += 'window.solana?.isPhantom: ' + (window.solana?.isPhantom) + '\n';
+        results += '\nSolflare:\n';
+        results += 'window.solflare?.isSolflare: ' + (window.solflare?.isSolflare) + '\n';
+        results += '\nAll window.solana properties:\n';
+        if (window.solana) {
+            for (let key in window.solana) {
+                if (key.toLowerCase().includes('trust') || key.toLowerCase().includes('is')) {
+                    results += `  ${key}: ${window.solana[key]}\n`;
+                }
+            }
+        }
+        
+        output.textContent = results;
+        console.log(results);
+    </script>
+</body>
+</html>
