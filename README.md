@@ -241,28 +241,82 @@ app.connectWallet('Phantom')
 
 ## 🚀 Deployment
 
-### Production Build
+### Quick Deployment to Production Server
+
+**One-command deployment:**
 
 ```bash
-# Validate configuration
-npm run validate
-
-# Build for production
-npm run build
-
-# Deploy (configure your hosting)
-npm run deploy
+./scripts/deploy-to-server.sh deploy
 ```
 
-### Production Checklist
+This script will:
+1. ✅ Verify you're on `main` branch
+2. ✅ Push latest changes to GitHub
+3. ✅ Connect to production server
+4. ✅ Clone updated repository
+5. ✅ Copy files to production
+6. ✅ Restart HTTP service
+7. ✅ Verify deployment success
 
-- [ ] Update RPC endpoints for mainnet
-- [ ] Update contract addresses for mainnet
-- [ ] Configure SSL/TLS certificates
-- [ ] Set up monitoring and alerts
-- [ ] Enable CDN for static assets
-- [ ] Test all wallet providers
-- [ ] Review security settings
+**Other useful commands:**
+
+```bash
+# View server status
+./scripts/deploy-to-server.sh status
+
+# View real-time logs
+./scripts/deploy-to-server.sh logs
+
+# Rollback to previous commit
+./scripts/deploy-to-server.sh rollback <commit-hash>
+
+# View help
+./scripts/deploy-to-server.sh help
+```
+
+### Manual Deployment
+
+For detailed manual deployment instructions, see:
+
+📖 **[docs/SERVER_DEPLOYMENT_GUIDE.md](docs/SERVER_DEPLOYMENT_GUIDE.md)**
+
+This guide includes:
+- Complete step-by-step process
+- Server architecture
+- Troubleshooting tips
+- Rollback procedures
+- Checklist for each deployment
+
+### Production Environment
+
+- **Server:** server17225.za-internet.net
+- **URL:** https://app.futurevibes.io
+- **Port:** 3001 (http-server)
+- **Directory:** `/var/www/clients/client0/web8/web/`
+- **Web Server:** Apache (proxy to localhost:3001)
+
+### Pre-Deployment Checklist
+
+- [ ] Test all features locally
+- [ ] Verify wallet connections work
+- [ ] Check no console errors (F12)
+- [ ] Run security audit: `./scripts/verify_security.sh`
+- [ ] Commit and push all changes to GitHub
+- [ ] Review last commit: `git log --oneline -5`
+- [ ] Deploy during off-peak hours if possible
+
+### Post-Deployment Verification
+
+After deployment, verify:
+
+- [ ] Visit https://app.futurevibes.io
+- [ ] Clear browser cache (Ctrl+F5)
+- [ ] Connect wallet successfully
+- [ ] Verify rewards display correctly (not 0)
+- [ ] Check Lucide icons load
+- [ ] No errors in console (F12)
+- [ ] Test buy functionality
+- [ ] Check staking section displays correctly
 
 ---
 
