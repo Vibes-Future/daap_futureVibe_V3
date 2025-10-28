@@ -228,6 +228,8 @@ app.connectWallet('Phantom')
 
 ## 📚 Documentation
 
+### Development Guides
+
 | Document | Description |
 |----------|-------------|
 | [Quick Start Guide](docs/QUICK_START_GUIDE.md) | Get started in 5 minutes |
@@ -236,6 +238,14 @@ app.connectWallet('Phantom')
 | [Wallet Connection Solution](docs/WALLET_CONNECTION_SOLUTION.md) | Technical implementation details |
 | [Auto-Reconnect Feature](docs/AUTO_RECONNECT_FEATURE.md) | How auto-reconnect works |
 | [Implementation Progress](docs/IMPLEMENTATION_PROGRESS.md) | Development history |
+
+### Server & Deployment
+
+| Document | Description |
+|----------|-------------|
+| [Server Deployment Guide](docs/SERVER_DEPLOYMENT_GUIDE.md) | Complete production deployment guide |
+| [⚡ Quick Fix: 503 Error](docs/SERVICE_503_QUICKFIX.md) | 30-second fix for service down 🆕 |
+| [Emergency Service Recovery](docs/EMERGENCY_SERVICE_RECOVERY.md) | Full emergency recovery procedure 🆕 |
 
 ---
 

@@ -283,50 +283,23 @@ sudo git log --oneline -5
 
 ## 🆘 Troubleshooting
 
-### Problema 1: Servicio vibes-dapp no arranca
+### Problema 1: Puerto 3001 ya está en uso
 
-**Síntoma:** Error al verificar status del servicio
-
-**Solución:**
-```bash
-# 1. Ver estado detallado y logs
-sudo systemctl status vibes-dapp
-sudo journalctl -u vibes-dapp -n 100
-
-# 2. Verificar que el script existe
-ls -la ~/start-http-server.sh
-
-# 3. Probar el script manualmente
-~/start-http-server.sh
-# (Presiona Ctrl+C si arranca bien)
-
-# 4. Reiniciar el servicio
-sudo systemctl restart vibes-dapp
-
-# 5. Ver qué proceso usa el puerto (si está ocupado)
-sudo lsof -i :3001
-```
-
-### Problema 2: Puerto 3001 ocupado por proceso zombie
-
-**Síntoma:** Error "address already in use"
+**Síntoma:** Error al reiniciar http-server
 
 **Solución:**
 ```bash
-# 1. Ver qué proceso usa el puerto
+# Ver qué proceso usa el puerto
 sudo lsof -i :3001
 
-# 2. Matar todos los procesos en puerto 3001
-sudo pkill -9 -f "http-server.*3001"
+# Matar proceso específico
+sudo kill -9 <PID>
 
-# 3. Reiniciar el servicio
-sudo systemctl restart vibes-dapp
-
-# 4. Verificar
-sudo systemctl status vibes-dapp
+# O matar todos los http-server en 3001
+sudo pkill -f "http-server.*3001"
 ```
 
-### Problema 3: Sitio muestra versión vieja
+### Problema 2: Sitio muestra versión vieja
 
 **Síntoma:** Los cambios no se ven en el navegador
 
@@ -340,32 +313,29 @@ sudo ls -lh /var/www/clients/client0/web8/web/index.html
 # 3. Verificar última modificación en la respuesta HTTP
 curl -I http://localhost:3001/ | grep -i "last-modified"
 
-# 4. Reiniciar servicio (sin caché)
-sudo systemctl restart vibes-dapp
+# 4. Reiniciar http-server
+sudo pkill -f "http-server.*3001"
+cd /var/www/clients/client0/web8/web/
+sudo nohup npx http-server . -p 3001 -c-1 --cors > /tmp/http-server-3001.log 2>&1 &
 ```
 
-### Problema 4: Error 503 Service Unavailable
+### Problema 3: 502 Bad Gateway
 
-**Síntoma:** Apache muestra error 503
-
-**Causa:** El servicio vibes-dapp no está corriendo
+**Síntoma:** Apache muestra error 502
 
 **Solución:**
 ```bash
 # 1. Verificar que http-server está corriendo
-sudo systemctl status vibes-dapp
 ps aux | grep http-server | grep 3001
 
-# 2. Si no está corriendo, iniciarlo
-sudo systemctl start vibes-dapp
+# 2. Si no está corriendo, reiniciar
+cd /var/www/clients/client0/web8/web/
+sudo nohup npx http-server . -p 3001 -c-1 --cors > /tmp/http-server-3001.log 2>&1 &
 
 # 3. Ver logs de Apache
 sudo tail -f /var/log/ispconfig/httpd/app.futurevibes.io/error.log
 
-# 4. Ver logs del servicio
-sudo journalctl -u vibes-dapp -f
-
-# 5. Reiniciar Apache si es necesario (rara vez)
+# 4. Reiniciar Apache si es necesario
 sudo systemctl restart apache2
 ```
 
@@ -454,12 +424,13 @@ git checkout <COMMIT_ANTERIOR>
 # 2. Copiar archivos
 sudo rsync -av --delete --exclude='.git' --exclude='node_modules' --exclude='.env' ~/daap_rollback/ /var/www/clients/client0/web8/web/
 
-# 3. Reiniciar servicio
-sudo systemctl restart vibes-dapp
+# 3. Reiniciar
+sudo pkill -f "http-server.*3001"
+cd /var/www/clients/client0/web8/web/
+sudo nohup npx http-server . -p 3001 -c-1 --cors > /tmp/http-server-3001.log 2>&1 &
 
 # 4. Verificar
 sleep 3
-sudo systemctl status vibes-dapp
 curl -I http://localhost:3001/
 
 # 5. Limpiar
@@ -478,94 +449,12 @@ Si hay problemas graves:
 
 ---
 
-## ⚙️ Configuración del Servicio Systemd
-
-### Archivos del Servicio
-
-El DApp corre como servicio systemd para mayor estabilidad y auto-recuperación.
-
-**Archivo de Servicio:** `/etc/systemd/system/vibes-dapp.service`
-
-```ini
-[Unit]
-Description=VIBES DApp HTTP Server (Port 3001)
-After=network.target
-
-[Service]
-Type=simple
-User=ftadmin
-Group=ftadmin
-ExecStart=/hom/ftadmin/start-http-server.sh
-Restart=always
-RestartSec=10
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=vibes-dapp
-
-[Install]
-WantedBy=multi-user.target
-```
-
-**Script de Inicio:** `/hom/ftadmin/start-http-server.sh`
-
-```bash
-#!/bin/bash
-
-# Load NVM (note: /hom/ not /home/ - specific to this server)
-export NVM_DIR="/hom/ftadmin/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-# Change to app directory
-cd /var/www/clients/client0/web8/web
-
-# Start http-server
-exec npx http-server . -p 3001 -c-1 --cors
-```
-
-### Características del Servicio
-
-- ✅ **Auto-start:** Se inicia automáticamente al reiniciar el servidor
-- ✅ **Auto-restart:** Se reinicia automáticamente si falla (cada 10 segundos)
-- ✅ **Logs centralizados:** Logs disponibles con `journalctl`
-- ✅ **No depende de SSH:** Funciona independientemente de sesiones SSH
-- ✅ **Usuario específico:** Corre como `ftadmin` (no como root)
-
-### Re-crear el Servicio (si es necesario)
-
-Si necesitas re-crear el servicio desde cero:
-
-```bash
-# 1. Detener y deshabilitar servicio actual
-sudo systemctl stop vibes-dapp
-sudo systemctl disable vibes-dapp
-
-# 2. Crear script de inicio
-nano ~/start-http-server.sh
-# (pegar contenido del script mostrado arriba)
-chmod +x ~/start-http-server.sh
-
-# 3. Crear archivo de servicio
-sudo nano /etc/systemd/system/vibes-dapp.service
-# (pegar contenido del servicio mostrado arriba)
-
-# 4. Habilitar y arrancar
-sudo systemctl daemon-reload
-sudo systemctl enable vibes-dapp
-sudo systemctl start vibes-dapp
-
-# 5. Verificar
-sudo systemctl status vibes-dapp
-```
-
----
-
 ## 📚 Recursos Adicionales
 
 - **Repositorio GitHub:** https://github.com/Vibes-Future/daap_futureVibe_V3
 - **Documentación del Proyecto:** `/docs/` en el repo
 - **Apache Docs:** https://httpd.apache.org/docs/2.4/
 - **http-server Docs:** https://www.npmjs.com/package/http-server
-- **Systemd Docs:** https://www.freedesktop.org/software/systemd/man/systemd.service.html
 
 ---
 
