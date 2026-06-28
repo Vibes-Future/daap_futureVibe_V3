@@ -12,8 +12,8 @@ Se han encontrado **API keys expuestas** en múltiples archivos del frontend. Es
 ## 🚨 PROBLEMAS ENCONTRADOS
 
 ### 1. API Keys de Helius Hardcodeadas
-- **Mainnet:** `e4246c12-6fa3-40ff-b319-c96c9e1e9c9c` (4 veces en index.html)
-- **Devnet:** `10bdc822-0b46-4952-98fc-095c326565d7` (3 veces en index.html)
+- **Mainnet:** `[REDACTED_OLD_MAINNET_KEY]` (4 veces en index.html)
+- **Devnet:** `[REDACTED_OLD_DEVNET_KEY]` (3 veces en index.html)
 - **Total:** 17+ instancias en archivos de aplicación y documentación
 
 ### 2. Archivos Críticos Afectados
@@ -42,8 +42,8 @@ Se han encontrado **API keys expuestas** en múltiples archivos del frontend. Es
 # 1. Ve a: https://dashboard.helius.xyz
 # 2. Inicia sesión
 # 3. Revoca estas API keys INMEDIATAMENTE:
-#    - e4246c12-6fa3-40ff-b319-c96c9e1e9c9c (Mainnet)
-#    - 10bdc822-0b46-4952-98fc-095c326565d7 (Devnet)
+#    - [REDACTED_OLD_MAINNET_KEY] (Mainnet)
+#    - [REDACTED_OLD_DEVNET_KEY] (Devnet)
 # 4. Genera nuevas API keys
 # 5. Guarda las nuevas keys en un lugar seguro
 ```
@@ -79,8 +79,8 @@ git check-ignore .env
 ```javascript
 // ❌ ANTES (ELIMINAR ESTO):
 const CONFIG = {
-    RPC_URL: 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c',
-    FALLBACK_RPC: 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c',
+    RPC_URL: 'https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_MAINNET_API_KEY',
+    FALLBACK_RPC: 'https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_MAINNET_API_KEY',
     // ...
 };
 
@@ -133,7 +133,7 @@ Buscar y reemplazar las siguientes líneas:
 ```javascript
 // ANTES:
 const rpcUrl = window.CONFIG?.RPC_URL 
-    || 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c';
+    || 'https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_MAINNET_API_KEY';
 
 // DESPUÉS:
 const rpcUrl = window.CONFIG?.RPC_URL 
@@ -143,7 +143,7 @@ const rpcUrl = window.CONFIG?.RPC_URL
 **Línea ~3818:**
 ```javascript
 // ANTES:
-|| 'https://devnet.helius-rpc.com/?api-key=10bdc822-0b46-4952-98fc-095c326565d7';
+|| 'https://devnet.helius-rpc.com/?api-key=YOUR_HELIUS_DEVNET_API_KEY';
 
 // DESPUÉS:
 || 'https://api.devnet.solana.com';
@@ -152,7 +152,7 @@ const rpcUrl = window.CONFIG?.RPC_URL
 **Línea ~4039:**
 ```javascript
 // ANTES:
-|| 'https://devnet.helius-rpc.com/?api-key=10bdc822-0b46-4952-98fc-095c326565d7';
+|| 'https://devnet.helius-rpc.com/?api-key=YOUR_HELIUS_DEVNET_API_KEY';
 
 // DESPUÉS:
 || 'https://api.devnet.solana.com';
@@ -161,7 +161,7 @@ const rpcUrl = window.CONFIG?.RPC_URL
 **Línea ~4102:**
 ```javascript
 // ANTES:
-|| 'https://devnet.helius-rpc.com/?api-key=10bdc822-0b46-4952-98fc-095c326565d7';
+|| 'https://devnet.helius-rpc.com/?api-key=YOUR_HELIUS_DEVNET_API_KEY';
 
 // DESPUÉS:
 || 'https://api.devnet.solana.com';
@@ -173,7 +173,7 @@ const rpcUrl = window.CONFIG?.RPC_URL
 
 ```javascript
 // ANTES:
-const MAINNET_RPC = process.env.RPC_URL || 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c';
+const MAINNET_RPC = process.env.RPC_URL || 'https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_MAINNET_API_KEY';
 
 // DESPUÉS:
 const MAINNET_RPC = process.env.RPC_URL || 'https://api.mainnet-beta.solana.com';
@@ -184,7 +184,7 @@ const MAINNET_RPC = process.env.RPC_URL || 'https://api.mainnet-beta.solana.com'
 **Opción A: Actualizar el archivo**
 ```javascript
 // Línea 17 - ANTES:
-const RPC = 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c';
+const RPC = 'https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_MAINNET_API_KEY';
 
 // DESPUÉS:
 const RPC = 'https://api.mainnet-beta.solana.com';
@@ -207,11 +207,11 @@ rm debug-usdc-error.html
 
 **En cada archivo, reemplazar:**
 ```
-e4246c12-6fa3-40ff-b319-c96c9e1e9c9c
+[REDACTED_OLD_MAINNET_KEY]
 ↓
 YOUR_API_KEY_HERE
 
-10bdc822-0b46-4952-98fc-095c326565d7
+[REDACTED_OLD_DEVNET_KEY]
 ↓
 YOUR_API_KEY_HERE
 ```

@@ -14,7 +14,8 @@
             const output = document.getElementById('output');
             output.textContent = 'Running debug...\n\n';
             
-            const RPC = 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c';
+            // SECURITY: use public RPC fallback in shared debug files.
+            const RPC = 'https://api.mainnet-beta.solana.com';
             const PRESALE_STATE = 'EoDCTycvkJV4UXm54KYiF1DuCMSHyXYPftGUVr3qJxPp';
             
             const connection = new solanaWeb3.Connection(RPC, 'confirmed');

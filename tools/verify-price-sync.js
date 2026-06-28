@@ -8,7 +8,7 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
 
 // Mainnet configuration
-const MAINNET_RPC = process.env.RPC_URL || 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c';
+const MAINNET_RPC = process.env.RPC_URL || 'https://api.mainnet-beta.solana.com';
 const PRESALE_STATE_PDA = 'EoDCTycvkJV4UXm54KYiF1DuCMSHyXYPftGUVr3qJxPp';
 
 async function verifyPriceSync() {
@@ -66,7 +66,7 @@ async function verifyPriceSync() {
     console.log('');
     
     const tiers = [];
-    for (let i = 0; i < Math.min(scheduleLength, 12); i++) {
+    for (let i = 0; i < scheduleLength; i++) {
       const tierStartTs = Number(view.getBigInt64(offset, true));
       offset += 8;
       const priceUsd = view.getFloat64(offset, true);
@@ -128,7 +128,7 @@ async function verifyPriceSync() {
         console.log('📍 Price Calendar Card:');
         console.log(`   Current Price: $${currentTier.priceUsd.toFixed(4)}`);
         console.log(`   Next Price: $${nextTier.priceUsd.toFixed(4)}`);
-        console.log(`   Price Increase: +10%`);
+        console.log(`   Price Increase: +${((nextTier.priceUsd / currentTier.priceUsd - 1) * 100).toFixed(2)}%`);
         console.log('');
         console.log('⏱️  Countdown Timer:');
         console.log(`   Days: ${String(days).padStart(2, '0')}`);
@@ -146,10 +146,10 @@ async function verifyPriceSync() {
         console.log('');
         
         const checks = [
-          { name: 'Price schedule existe', pass: tiers.length === 12 },
+          { name: 'Price schedule exists', pass: tiers.length >= 1 },
           { name: 'Tier actual identificado', pass: currentTier !== null },
           { name: 'Próximo tier identificado', pass: nextTier !== null },
-          { name: 'Incremento es 10%', pass: Math.abs((nextTier.priceUsd / currentTier.priceUsd - 1.10)) < 0.001 },
+          { name: 'Incremento calculable', pass: nextTier.priceUsd > currentTier.priceUsd },
           { name: 'Timestamp futuro', pass: nextTier.tierStartTs > now },
           { name: 'Countdown > 0', pass: timeUntilNext > 0 },
           { name: 'Dentro de presale', pass: now >= startTs && now < endTs }

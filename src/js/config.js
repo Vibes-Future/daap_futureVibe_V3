@@ -9,15 +9,24 @@ const PROGRAM_IDS = {
 };
 
 // Network Configuration
+// Runtime env can be injected by hosting layer via window.__VIBES_ENV__
+const RUNTIME_ENV = (typeof window !== 'undefined' && window.__VIBES_ENV__) || {};
 const NETWORK_CONFIG = {
-    // Using Helius RPC for mainnet (private API key)
-    RPC_URL: 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c',
-    // Fallback to Helius mainnet for best performance
-    FALLBACK_RPC: 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c',
+    // Never hardcode private RPC keys in source code.
+    RPC_URL: RUNTIME_ENV.RPC_URL || 'https://api.mainnet-beta.solana.com',
+    FALLBACK_RPC: RUNTIME_ENV.FALLBACK_RPC || 'https://api.mainnet-beta.solana.com',
     // Public mainnet RPC (backup)
     MAINNET_RPC: 'https://api.mainnet-beta.solana.com',
     // Current network (mainnet-beta)
     NETWORK: 'mainnet-beta'
+};
+
+// Relaunch Growth Deal timeline constants
+const RELAUNCH_CONFIG = {
+    START_TS: 1793491200, // Nov 1, 2026 00:00:00 UTC (matches on-chain start_ts)
+    END_TS: 1846022400,   // Jul 1, 2028 00:00:00 UTC (matches on-chain end_ts)
+    INITIAL_PRICE_USD: 0.03,
+    FINAL_PRICE_USD: 0.12
 };
 
 // Token Configuration (Mainnet tokens)
@@ -87,8 +96,8 @@ const ERROR_MESSAGES = {
     TRANSACTION_FAILED: 'Transaction failed. Please try again',
     NETWORK_ERROR: 'Network error. Please check your connection',
     INVALID_AMOUNT: 'Please enter a valid amount',
-    PRESALE_NOT_ACTIVE: 'Presale is not currently active',
-    PRESALE_ENDED: 'Presale has ended',
+    PRESALE_NOT_ACTIVE: 'Relaunch $VIBES Growth Deal is not currently active',
+    PRESALE_ENDED: 'Relaunch $VIBES Growth Deal has ended',
     WALLET_LIMIT_EXCEEDED: 'Purchase would exceed wallet limit',
     INVALID_WALLET: 'Invalid wallet connection'
 };
@@ -111,6 +120,7 @@ if (typeof window !== 'undefined') {
     window.NETWORK_CONFIG = NETWORK_CONFIG;
     window.TOKEN_CONFIG = TOKEN_CONFIG;
     window.PRESALE_CONFIG = PRESALE_CONFIG;
+    window.RELAUNCH_CONFIG = RELAUNCH_CONFIG;
     window.DAPP_LIMITS = DAPP_LIMITS;
     window.WALLET_CONFIG = WALLET_CONFIG;
     window.UI_CONFIG = UI_CONFIG;
@@ -120,7 +130,7 @@ if (typeof window !== 'undefined') {
     console.log('✅ Configuration loaded successfully');
     console.log('📊 Network:', NETWORK_CONFIG.NETWORK);
     // SECURITY: Do not log RPC URL as it contains API key
-    console.log('🔗 RPC Endpoint:', NETWORK_CONFIG.RPC_URL.split('?')[0] + '?api-key=[REDACTED]');
+    console.log('🔗 RPC Endpoint:', NETWORK_CONFIG.RPC_URL.split('?')[0] + ' [REDACTED]');
 }
 
 // Export configuration for Node.js (if needed)
@@ -130,6 +140,7 @@ if (typeof module !== 'undefined' && module.exports) {
         NETWORK_CONFIG,
         TOKEN_CONFIG,
         PRESALE_CONFIG,
+        RELAUNCH_CONFIG,
         DAPP_LIMITS,
         WALLET_CONFIG,
         UI_CONFIG,

@@ -157,13 +157,26 @@ const PRESALE_V3_IDL = {
     },
     {
       "name": "updatePriceSchedule",
-      "docs": ["Update price schedule (admin only)"],
+      "docs": ["Update price schedule (admin only). Reallocs the account to fit up to 20 tiers; authority funds extra rent."],
+      "accounts": [
+        { "name": "presaleState", "isMut": true, "isSigner": false },
+        { "name": "authority", "isMut": true, "isSigner": true },
+        { "name": "systemProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [
+        { "name": "newPriceSchedule", "type": { "vec": { "defined": "PriceTier" } } }
+      ]
+    },
+    {
+      "name": "updateTimeWindow",
+      "docs": ["Update presale start/end timestamps (admin only). Enforces the relaunch lock on-chain."],
       "accounts": [
         { "name": "presaleState", "isMut": true, "isSigner": false },
         { "name": "authority", "isMut": false, "isSigner": true }
       ],
       "args": [
-        { "name": "newPriceSchedule", "type": { "vec": { "defined": "PriceTier" } } }
+        { "name": "startTs", "type": "i64" },
+        { "name": "endTs", "type": "i64" }
       ]
     }
   ],

@@ -5,8 +5,8 @@
 ### 1️⃣ REVOCAR API KEYS (5 minutos)
 ```
 □ Ir a https://dashboard.helius.xyz
-□ Revocar: e4246c12-6fa3-40ff-b319-c96c9e1e9c9c
-□ Revocar: 10bdc822-0b46-4952-98fc-095c326565d7
+□ Revocar: [OLD_MAINNET_KEY]
+□ Revocar: [OLD_DEVNET_KEY]
 □ Generar nuevas API keys
 ```
 

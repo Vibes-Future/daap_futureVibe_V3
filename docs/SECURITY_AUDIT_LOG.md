@@ -71,7 +71,7 @@ console.log('🔗 RPC Endpoint:', NETWORK_CONFIG.RPC_URL.split('?')[0] + '?api-k
 
 **Resultado:**
 ```
-ANTES: 🔗 RPC URL: https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c
+ANTES: 🔗 RPC URL: https://mainnet.helius-rpc.com/?api-key=[REDACTED_OLD_MAINNET_KEY]
 AHORA: 🔗 RPC Endpoint: https://mainnet.helius-rpc.com/?api-key=[REDACTED]
 ```
 
@@ -163,8 +163,8 @@ const scripts = [
 
 ```javascript
 // En la consola del navegador:
-🔗 RPC URL: https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c
-✅ Solana connection initialized: https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c
+🔗 RPC URL: https://mainnet.helius-rpc.com/?api-key=[REDACTED_OLD_MAINNET_KEY]
+✅ Solana connection initialized: https://mainnet.helius-rpc.com/?api-key=[REDACTED_OLD_MAINNET_KEY]
 🔍 Fetching BuyerState accounts using Helius optimized RPC...
 ✅ Found 157 total buyers (via Helius RPC)
 ```

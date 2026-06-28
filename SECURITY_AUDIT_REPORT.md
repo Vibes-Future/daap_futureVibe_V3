@@ -18,8 +18,8 @@ Se han identificado **vulnerabilidades críticas de seguridad** en el frontend D
 **Impacto:** Acceso no autorizado a servicios RPC, abuso financiero
 
 #### API Keys Expuestas:
-- **Mainnet Key:** `e4246c12-6fa3-40ff-b319-c96c9e1e9c9c` (4 instancias en index.html, múltiples en docs)
-- **Devnet Key:** `10bdc822-0b46-4952-98fc-095c326565d7` (3 instancias en index.html, múltiples en docs)
+- **Mainnet Key:** `[REDACTED_OLD_MAINNET_KEY]` (4 instancias en index.html, múltiples en docs)
+- **Devnet Key:** `[REDACTED_OLD_DEVNET_KEY]` (3 instancias en index.html, múltiples en docs)
 
 #### Archivos Críticos Afectados:
 
@@ -92,8 +92,8 @@ docs/HELIUS_OPTIMIZATION.md      (líneas 206, 207)
 ```bash
 # 1. Ir a https://dashboard.helius.xyz
 # 2. Revocar inmediatamente:
-#    - e4246c12-6fa3-40ff-b319-c96c9e1e9c9c
-#    - 10bdc822-0b46-4952-98fc-095c326565d7
+#    - [REDACTED_OLD_MAINNET_KEY]
+#    - [REDACTED_OLD_DEVNET_KEY]
 # 3. Generar nuevas API keys
 ```
 
@@ -125,8 +125,8 @@ Actualizar para usar variables de entorno o un loader de configuración seguro:
 ```javascript
 // ❌ ANTES (INSEGURO - NO USAR):
 const CONFIG = {
-    RPC_URL: 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c',
-    FALLBACK_RPC: 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c',
+    RPC_URL: 'https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_MAINNET_API_KEY',
+    FALLBACK_RPC: 'https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_MAINNET_API_KEY',
 };
 
 // ✅ DESPUÉS (SEGURO - USAR ESTO):
@@ -156,7 +156,7 @@ Buscar y reemplazar todas las instancias de API keys hardcodeadas:
 // Línea ~3709 - REEMPLAZAR:
 // ❌ ANTES:
 const rpcUrl = window.CONFIG?.RPC_URL 
-    || 'https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c';
+    || 'https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_MAINNET_API_KEY';
 
 // ✅ DESPUÉS:
 const rpcUrl = window.CONFIG?.RPC_URL 
@@ -171,7 +171,7 @@ const rpcUrl = window.CONFIG?.RPC_URL
 ```bash
 # Buscar y reemplazar en todos los archivos de docs:
 cd docs/
-grep -r "e4246c12-6fa3-40ff-b319-c96c9e1e9c9c" . | cut -d: -f1 | sort -u
+grep -r "YOUR_OLD_MAINNET_KEY" . | cut -d: -f1 | sort -u
 
 # Para cada archivo, reemplazar con:
 # https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY_HERE

@@ -203,8 +203,8 @@ const solPrice = result.toNumber();
 ```javascript
 const NETWORK_CONFIG = {
     // Helius RPC optimizado para devnet
-    RPC_URL: 'https://devnet.helius-rpc.com/?api-key=10bdc822-0b46-4952-98fc-095c326565d7',
-    FALLBACK_RPC: 'https://devnet.helius-rpc.com/?api-key=10bdc822-0b46-4952-98fc-095c326565d7',
+    RPC_URL: 'https://devnet.helius-rpc.com/?api-key=YOUR_HELIUS_DEVNET_API_KEY',
+    FALLBACK_RPC: 'https://devnet.helius-rpc.com/?api-key=YOUR_HELIUS_DEVNET_API_KEY',
     NETWORK: 'devnet'
 };
 ```

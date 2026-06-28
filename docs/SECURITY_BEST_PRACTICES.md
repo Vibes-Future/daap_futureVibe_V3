@@ -198,7 +198,7 @@ const connection = new Connection(NETWORK_CONFIG.RPC_URL);
 console.log('Public wallet:', publicKey.toBase58());
 
 // ❌ INCORRECTO:
-// Using API key: e4246c12-6fa3-40ff-b319-c96c9e1e9c9c
+// Using API key: [REDACTED_OLD_MAINNET_KEY]
 ```
 
 ### Testing:

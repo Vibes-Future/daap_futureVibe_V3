@@ -28,6 +28,7 @@ class VibesAdminApp {
         // Intervals
         this.daysLeftInterval = null; // For updating days left counter
         this.presaleEndTs = null; // Store presale end timestamp
+        this.relaunchStartTs = (window.RELAUNCH_CONFIG && window.RELAUNCH_CONFIG.START_TS) || 1793491200;
         
         // Initialize app
         this.init();
@@ -242,8 +243,60 @@ class VibesAdminApp {
         
         // Load presale data on page load (even without wallet connection)
         this.loadPresaleData();
+        this.updateRelaunchPurchaseState();
         
         console.log('✅ UI event listeners setup complete');
+    }
+
+    /**
+     * Returns true while the relaunch window is still closed.
+     */
+    isRelaunchLocked() {
+        const now = Math.floor(Date.now() / 1000);
+        return now < this.relaunchStartTs;
+    }
+
+    /**
+     * Disable all purchase controls before relaunch starts.
+     */
+    updateRelaunchPurchaseState() {
+        const isLocked = this.isRelaunchLocked();
+        const lockMessage = 'Relaunch starts Nov 1, 2026';
+
+        const controlIds = ['sol-amount', 'usdc-amount', 'sol-staking', 'usdc-staking'];
+        controlIds.forEach((id) => {
+            const control = document.getElementById(id);
+            if (!control) return;
+            control.disabled = isLocked;
+            if (isLocked) {
+                control.title = lockMessage;
+            } else {
+                control.removeAttribute('title');
+            }
+        });
+
+        const buttonConfig = [
+            { id: 'buy-sol', activeLabel: 'Join the Relaunch Deal' },
+            { id: 'buy-usdc', activeLabel: 'Join the Relaunch Deal' }
+        ];
+
+        buttonConfig.forEach(({ id, activeLabel }) => {
+            const button = document.getElementById(id);
+            if (!button) return;
+
+            button.disabled = isLocked;
+            if (isLocked) {
+                button.textContent = lockMessage;
+                button.style.opacity = '0.6';
+                button.style.cursor = 'not-allowed';
+                button.title = lockMessage;
+            } else {
+                button.textContent = activeLabel;
+                button.style.opacity = '';
+                button.style.cursor = '';
+                button.removeAttribute('title');
+            }
+        });
     }
 
     /**
@@ -556,8 +609,8 @@ class VibesAdminApp {
             if (!this.connection) {
                 console.warn('⚠️ No connection available, using fallback data');
                 this.updatePresaleInfoCards({
-                    startingPrice: 0.0598,
-                    currentPrice: 0.0598,
+                    startingPrice: 0.03,
+                    currentPrice: 0.03,
                     daysLeft: 45,
                     stakingAPY: 40
                 });
@@ -595,7 +648,7 @@ class VibesAdminApp {
             const raisedUsdc = presaleData.raisedUsdc / 1000000; // USDC has 6 decimals
             
             const presaleInfo = {
-                startingPrice: presaleData.priceSchedule[0]?.priceUsd || 0.0598,
+                startingPrice: presaleData.priceSchedule[0]?.priceUsd || 0.03,
                 currentPrice: currentPrice,
                 daysLeft: daysLeft,
                 stakingAPY: stakingAPY,
@@ -609,6 +662,7 @@ class VibesAdminApp {
             
             // Update the presale info cards
             this.updatePresaleInfoCards(presaleInfo);
+            this.updateRelaunchPurchaseState();
             
             // Start periodic days counter update
             this.startDaysLeftCounter();
@@ -623,11 +677,12 @@ class VibesAdminApp {
             // Fallback to mock data if contract reading fails
             console.log('🔄 Using fallback data...');
             this.updatePresaleInfoCards({
-                startingPrice: 0.0598,
-                currentPrice: 0.0598,
+                startingPrice: 0.03,
+                currentPrice: 0.03,
                 daysLeft: 45,
                 stakingAPY: 40
             });
+            this.updateRelaunchPurchaseState();
         }
     }
 
@@ -723,7 +778,7 @@ class VibesAdminApp {
      */
     calculateCurrentPrice(priceSchedule) {
         if (!priceSchedule || priceSchedule.length === 0) {
-            return 0.0598; // Default price
+            return 0.03; // Relaunch default price
         }
         
         const now = Math.floor(Date.now() / 1000);
@@ -1367,11 +1422,16 @@ class VibesAdminApp {
         
         const presaleStatusEl = document.getElementById('presale-status');
         if (presaleStatusEl) {
-            presaleStatusEl.textContent = vestingData.presaleActive ? 'Active' : 'Ended';
-            presaleStatusEl.style.color = vestingData.presaleActive ? '#c7f801' : '#ff6b6b';
+            if (this.isRelaunchLocked()) {
+                presaleStatusEl.textContent = 'Paused until Nov 1, 2026';
+                presaleStatusEl.style.color = '#FACD95';
+            } else {
+                presaleStatusEl.textContent = vestingData.presaleActive ? 'Live' : 'Ended';
+                presaleStatusEl.style.color = vestingData.presaleActive ? '#c7f801' : '#ff6b6b';
+            }
         }
         
-        // Vesting Start is now hardcoded as "Oct 12, 2026" in HTML
+        // Vesting start is intentionally displayed as Jul 1, 2028 in the HTML copy.
         // No need to update it dynamically
         
         // Last Claim field removed from UI
@@ -1404,7 +1464,7 @@ class VibesAdminApp {
             claimCard.style.opacity = '0.5';
             claimCard.style.pointerEvents = 'none';
             claimBtn.disabled = true;
-            claimBtn.textContent = 'Claim VIBES (Presale Active)';
+            claimBtn.textContent = 'Claim VIBES (Growth Deal Active)';
             claimBtn.style.backgroundColor = '#666';
         } else if (claimable <= 0) {
             // Presale ended but no claimable tokens
@@ -1645,6 +1705,11 @@ class VibesAdminApp {
             this.showMessage('Please connect your wallet first', 'warning');
             return;
         }
+
+        if (this.isRelaunchLocked()) {
+            this.showMessage('Relaunch $VIBES Growth Deal starts on Nov 1, 2026 (UTC).', 'warning');
+            return;
+        }
         
         try {
             // Get input values
@@ -1717,6 +1782,11 @@ class VibesAdminApp {
     async buyWithUsdc() {
         if (!this.connected || !this.contractClient) {
             this.showMessage('Please connect your wallet first', 'warning');
+            return;
+        }
+
+        if (this.isRelaunchLocked()) {
+            this.showMessage('Relaunch $VIBES Growth Deal starts on Nov 1, 2026 (UTC).', 'warning');
             return;
         }
         

@@ -998,25 +998,31 @@ class DirectContractClient {
             // Find current price based on current timestamp
             const now = Math.floor(Date.now() / 1000); // Current time in seconds
             let currentPrice = priceTiers[0].priceUsd; // Default to first tier
+            let currentTierIndex = 0;
             
             for (let i = priceTiers.length - 1; i >= 0; i--) {
                 if (now >= priceTiers[i].startTs) {
                     currentPrice = priceTiers[i].priceUsd;
+                    currentTierIndex = i;
                     console.log('✅ Current tier:', i, '- Price:', currentPrice);
                     break;
                 }
             }
             
-            // Calculate next price (always +10%)
-            const nextPrice = currentPrice * 1.10;
+            // Next price must come from the configured schedule (supports non-linear increments).
+            const nextTier = priceTiers[currentTierIndex + 1] || null;
+            const nextPrice = nextTier ? nextTier.priceUsd : currentPrice;
+            const priceIncrease = nextTier
+                ? ((nextPrice / currentPrice) - 1) * 100
+                : 0;
             
             console.log('💰 Current Price:', currentPrice);
-            console.log('📈 Next Price (+10%):', nextPrice);
+            console.log('📈 Next Price:', nextPrice);
             
             return {
                 currentPrice: currentPrice,
                 nextPrice: nextPrice,
-                priceIncrease: 10 // Always 10%
+                priceIncrease
             };
             
         } catch (error) {

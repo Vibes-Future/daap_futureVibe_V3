@@ -228,7 +228,7 @@ cd /Users/osmelprieto/Projects/vibes-defi-basic-dapp/vibe-future-smart-contract-
 node -e "
 const { Connection, PublicKey } = require('@solana/web3.js');
 (async () => {
-    const connection = new Connection('https://mainnet.helius-rpc.com/?api-key=e4246c12-6fa3-40ff-b319-c96c9e1e9c9c');
+    const connection = new Connection('https://mainnet.helius-rpc.com/?api-key=YOUR_HELIUS_MAINNET_API_KEY');
     const pda = new PublicKey('EoDCTycvkJV4UXm54KYiF1DuCMSHyXYPftGUVr3qJxPp');
     const data = (await connection.getAccountInfo(pda)).data;
     const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
